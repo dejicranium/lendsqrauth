@@ -1,8 +1,8 @@
-var models = require('../models');
-var login = require('../services/login');
-var decodeToken = require('../services/jwt.verify');
+//var models = require('../models');
+//var login = require('../services/login');
+//var decodeToken = require('../services/jwt.verify');
 
-
+/*
 models.question.findAll({
 	include:[{
 		model:models.answer,
@@ -17,4 +17,4 @@ models.question.findAll({
 	qs = qs.map((s) => {return s.toJSON();});
 	console.log(qs);
 
-})
+})*/

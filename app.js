@@ -27,7 +27,8 @@ var bodyParser = require('body-parser');
 var path = require('path');
 
 var app    = express();
-const api_routes = require('./routes/api');
+const apis_auth = require('./routes/auth');
+
 const EndpointRouter = require('express').Router();
 
 //var routes = require('./routes');
@@ -93,7 +94,7 @@ app.get("/", function (req, res, next){
 })
 
 const version = '/v1';
-app.use(version, api_routes(EndpointRouter));
+app.use(version, apis_auth(EndpointRouter));
 
 
 
@@ -102,6 +103,8 @@ app.use(version, api_routes(EndpointRouter));
 Handle 404
 */
 //app.use(mosh.initMoshErrorHandler);
+
+
 app.use(version, function(req, res, next) {
   res.json({m: `Undefined ${req.method} route access`})
 })

@@ -1,6 +1,7 @@
 {
 	"boot":"/boot/loader",
 	"middlewares":"/routes/middlewares",
+	"handlers":"/routes/api/handlers",
 	"routemeta":"/routes/middlewares/routemeta",
 	"appvalues":"/utils/appvalues",
 	"obval":"/utils/obval",
@@ -16,5 +17,8 @@
 	"mongolog":"/services/log/create",
 	"errorlogger":"/utils/logger",
 	"qb":"/utils/querybuilder",
-	"paginate":"/utils/paginate"
+	"paginate":"/utils/paginate",
+	"assertions":"/utils/assertions",
+	"validators":"/utils/validators",
+	"testutils":"/utils/testutils"
 }

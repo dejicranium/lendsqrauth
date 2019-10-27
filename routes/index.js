@@ -1,5 +1,5 @@
 var router = require('express').Router();
-var handlers = require('./apis');
+var handlers = require('/routes')
 var middlewares = require('./middlewares');
 var utils    = require('mt1l');
 
