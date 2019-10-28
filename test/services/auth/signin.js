@@ -4,7 +4,7 @@ const should = require('chai').should();
 
 const chai = require('chai');
 
-const forgotpassword = require('mlar').mreq('services', 'auth/forgotpassword');
+const signin = require('mlar').mreq('services', 'auth/signin');
 const generateRandom = require('mlar')('testutils').generateRandom;
 
 
@@ -12,13 +12,13 @@ const generateRandom = require('mlar')('testutils').generateRandom;
 describe('#Sign up user', () => {
     const params = {
         email: 'itisdeji@gmail.com',
-       
+        password: 'intelligent98'
     }
 
-    it.skip('should create an auth token', (done) => {
-        forgotpassword(params).then((result)=>{
+    it('should signin user', (done) => {
+        signin(params).then((result)=>{
             console.log(result);
-            result.should.be.a('string');
+            result.should.be.a('object');
             done();
         })
         .catch(err=> {

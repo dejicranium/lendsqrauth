@@ -32,7 +32,7 @@ function service(data){
             }
         })
 	}) 
-	.spread((auth_token) => { 
+	.then((auth_token) => { 
 		if (!auth_token) throw new Error(`Token cannot be found`);
 		
 		// check whether token is yet to expire;
