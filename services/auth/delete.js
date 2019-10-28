@@ -9,9 +9,8 @@ const assert = require('mlar')('assertions');
 const DEFAULT_EXCLUDES = require('mlar')('appvalues').DEFAULT_EXCLUDES;
 
 var spec = morx.spec({}) 
-			   .build('first_name', 'required:false, eg:Tina')   
-               .build('user_id', 'required:true')
-               .build('status', 'required:true')
+			   .build('user_id', 'required:false, eg:1')   
+               
 			   .end();
 
 function service(data){
@@ -32,29 +31,13 @@ function service(data){
 	}) 
 	.spread((user, params) => { 
         if (!user) throw new Error("User does not exist");
-        if (params.status == 'activate' && user.active) throw new Error("User is already active");
-        if (params.status == 'disable' && user.disable) throw new Error("User is already disabled");
-        
-        let updateParams = {};
-        if (params.status == 'disable') {
-            updateParams.disable = 1;
-            updateParams.active = 0;
-            updateParams.deleted = 0;
-            updateParams.deleted_at = null;
-        }
-        else if (params.status == 'activate') {
-            updateParams.active = 1;
-            updateParams.disable = 0;
-            updateParams.deleted = 0;
-            updateParams.deleted_at = null;
-        }
-        
-        return user.update(updateParams)
+        // soft delete
+        return user.update({deleted: 1, deleted_at: new Date(), active: 0, disabled: 0});
         
     }).then((user)=>{
         if (!user) throw new Error("An error occured while updating user's account");
         
-        d.resolve("Successfully updated user's status");
+        d.resolve("Successfully deleted user's status");
     })
 	.catch( (err) => {
 

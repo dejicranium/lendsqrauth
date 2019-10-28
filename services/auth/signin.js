@@ -44,14 +44,15 @@ function service(data){
                 user_id: user.id,
             },
             config.JWTsecret,
-            {expiresIn: config.JWTexpiresIn}
-        )
+            {expiresIn: config.JWTexpiresIn})
         ]
     
         
     })
 
     .spread((user, token) => {
+        if (user.disabled) throw new Error("User is disabled")
+        if (user.deleted) throw new Error("User account has been deleted")
         let response = {}
         response.email = user.email;
         response.token = token;

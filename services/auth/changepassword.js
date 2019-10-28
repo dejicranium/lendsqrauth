@@ -21,21 +21,23 @@ function service(data){
 	
 	q.fcall( async () => {
 		const validParameters = morx.validate(data, spec, {throw_error : true});
-		const params = validParameters.params;
+		data = validParameters.params;
         
-        if (!validators.areMutuallyExclusive([data.confirm_password, data.new_password]))
+        if (data.confirm_password != data.new_password)
             throw new Error("Passwords do not match")
-        if (!validators.areMutuallyExclusive([data.current_password, data.new_password]))   
+        if (data.current_password == data.new_password)
             throw new Error("Current password cannot be the same as new password")
 
         if (data.new_password.length < 8) throw new Error("Password cannot be less than 8 characters");
 
         // get and hash password 
-        return [models.user.findOne({where: {id: data.user_id}}), bcrypt.hash(data.new_password, 10);
+        return [data, models.user.findOne({where: {id: data.user_id}}), bcrypt.hash(data.new_password, 10)];
 	}) 
-	.spread((user, generated_password) => { 
+	.spread(async (data, user, generated_password) => { 
         if (!user) throw new Error("Could not fetch user details")
-        if (!generated_password) throw new Error("Could not generate new password")
+        const oldPasswordIsAccurate = await bcrypt.compare(data.current_password, user.password);
+        if (!oldPasswordIsAccurate) throw new Error("Entered password does not match current password");
+        if (!generated_password) throw new Error("Could not generate new password");
         
         user.password = generated_password;
         
@@ -43,7 +45,7 @@ function service(data){
         
     }).then((user)=>{
         if (!user) throw new Error("An error occured while updating user's account");
-        
+
         d.resolve("Successfully changed user's password");
     })
 	.catch( (err) => {
