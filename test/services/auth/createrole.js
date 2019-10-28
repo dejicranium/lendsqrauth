@@ -4,20 +4,21 @@ const should = require('chai').should();
 
 const chai = require('chai');
 
-const listout = require('mlar').mreq('services', 'auth/listusers');
+const createrole = require('mlar').mreq('services', 'auth/createrole');
+const generateRandom = require('mlar')('testutils').generateRandom;
 
 
 
-describe('#Get users service', () => {
+describe('#Create role', () => {
     const params = {
-        
+       type: 'lender'
+       
     }
 
-    it('should lists registered users', (done) => {
-        listout(params).then((result)=>{
+    it("should create a new role", (done) => {
+        createrole(params).then((result)=>{
             console.log(result);
             result.should.be.a('object');
-            result.should.have.property('users');
             done();
         })
         .catch(err=> {

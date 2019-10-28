@@ -15,7 +15,6 @@ module.exports = function (sequelize, DataTypes) {
     freezeTableName: true,
     classMethods: {
       associate: function(models) {
-        model.belongsTo(models.roletype, {allowNull: true});
         model.belongsTo(models.profile, {allowNull: true});
         model.belongsTo(models.user, {allowNull: true});
       }

@@ -18,7 +18,6 @@ var spec = morx.spec({})
 function service(data){
 
 	var d = q.defer();
-	
 	q.fcall( async () => {
 		var validParameters = morx.validate(data, spec, {throw_error:true});
 		let params = validParameters.params;
@@ -38,14 +37,7 @@ function service(data){
     }).then((user)=>{
         if (!user) throw new Error("Password is incorrect");
        
-        return [user, jwt.sign(
-            {
-                email: user.email,
-                user_id: user.id,
-            },
-            config.JWTsecret,
-            {expiresIn: config.JWTexpiresIn})
-        ]
+        return [user, jwt.sign({email: user.email, user_id: user.id,}, config.JWTsecret, {expiresIn: config.JWTexpiresIn})]
     
         
     })

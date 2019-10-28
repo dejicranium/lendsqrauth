@@ -4,20 +4,18 @@ const should = require('chai').should();
 
 const chai = require('chai');
 
-const listout = require('mlar').mreq('services', 'auth/listusers');
+const listout = require('mlar').mreq('services', 'auth/getrole');
 
 
 
-describe('#Get users service', () => {
-    const params = {
-        
+describe('#Get user service', () => {
+    let params = {
+        role_id: 1
     }
 
-    it('should lists registered users', (done) => {
+    it('should get a registered user', (done) => {
         listout(params).then((result)=>{
-            console.log(result);
             result.should.be.a('object');
-            result.should.have.property('users');
             done();
         })
         .catch(err=> {
