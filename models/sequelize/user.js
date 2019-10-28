@@ -9,9 +9,14 @@ module.exports = (sequelize, DataTypes) => {
       unique: true
     },
     business_name: DataTypes.STRING,
+    active: DataTypes.BOOLEAN,
+    disabled: DataTypes.BOOLEAN,
+    deleted: DataTypes.BOOLEAN,
+    password: DataTypes.STRING,
     password: DataTypes.STRING,
     type: DataTypes.STRING,
     subtype: DataTypes.STRING,
+    deleted_at: DataTypes.DATE,
   }, {
   });
   user.associate = function(models) {

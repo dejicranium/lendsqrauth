@@ -55,7 +55,7 @@ function service(data){
 	}) 
 	.spread((user, params) => { 
         if (user) throw new Error("User with this email already exists");
-        
+        params.active = 1;
         return models.user.create({...params})
         
     }).then((user)=>{
