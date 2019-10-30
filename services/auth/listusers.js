@@ -27,7 +27,8 @@ function service(data){
     
     data.limit = limit;
     data.offset = offset;
-
+    data.attributes = {};
+    data.attributes.exclude = ['password']
     q.fcall( async () => {
         return models.user.findAndCountAll(data)
 	}) 

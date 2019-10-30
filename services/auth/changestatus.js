@@ -33,11 +33,10 @@ function service(data){
 	.spread((user, params) => { 
         if (!user) throw new Error("User does not exist");
         if (params.status == 'activate' && user.active) throw new Error("User is already active");
-        if (params.status == 'disable' && user.disable) throw new Error("User is already disabled");
+        if (params.status == 'deactivate' && !user.active) throw new Error("User is already deactivated");
         
         let updateParams = {};
-        if (params.status == 'disable') {
-            updateParams.disable = 1;
+        if (params.status == 'deactivate') {
             updateParams.active = 0;
             updateParams.deleted = 0;
             updateParams.deleted_at = null;

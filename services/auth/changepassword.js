@@ -18,7 +18,7 @@ var spec = morx.spec({})
 function service(data){
 
 	var d = q.defer();
-	
+	let globalUserId = data.USERID;
 	q.fcall( async () => {
 		const validParameters = morx.validate(data, spec, {throw_error : true});
 		data = validParameters.params;
@@ -35,6 +35,7 @@ function service(data){
 	}) 
 	.spread(async (data, user, generated_password) => { 
         if (!user) throw new Error("Could not fetch user details")
+        if (user.id != globalUserId) throw new Error("User cannot change password of external party");
         const oldPasswordIsAccurate = await bcrypt.compare(data.current_password, user.password);
         if (!oldPasswordIsAccurate) throw new Error("Entered password does not match current password");
         if (!generated_password) throw new Error("Could not generate new password");

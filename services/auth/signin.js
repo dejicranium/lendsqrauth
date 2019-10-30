@@ -32,26 +32,48 @@ function service(data){
         
         // deciper password 
 
-        return bcrypt.compare(params.password, user.password)
+        return [user ,bcrypt.compare(params.password, user.password)]
         
-    }).then((user)=>{
-        if (!user) throw new Error("Password is incorrect");
-       
-        return [user, jwt.sign({email: user.email, user_id: user.id,}, config.JWTsecret, {expiresIn: config.JWTexpiresIn})]
+    }).spread((user, password)=>{
+        if (!password) throw new Error("Password is incorrect");
+        jwt.sign({email: user.email, user_id: user.id, subtype: user.subtype}, config.JWTsecret, {expiresIn: config.JWTexpiresIn})
+        return [user,  models.auth_token.findOne({ where: {  type: 'session', user_id: user.id}})]
     
         
     })
-
-    .spread((user, token) => {
+    .spread(async (user, token) => {
         if (user.disabled) throw new Error("User is disabled")
-        if (user.deleted) throw new Error("User account has been deleted")
-        let response = {}
-        response.email = user.email;
-        response.token = token;
+        else if (user.deleted) throw new Error("User's account has been deleted")            
+        else if (!user.active && !user.disabled && !user.deleted) throw new Error("User is inactive");
+        let newToken = await jwt.sign({email: user.email, user_id: user.id, subtype: user.subtype}, config.JWTsecret, {expiresIn: config.JWTexpiresIn})
+
+        if (!token) {
+            // create and store token
+            return[ user, models.auth_token.create({
+                type: 'session',
+                token: newToken,
+                user_id: user.id,
+            }) ]
+
+        }
+        else {
+            return  [user,  token.update({
+                token: newToken,
+            })]
+        }
+
+    }).spread( (user, token)=> {
+        if (!token) throw new Error("Could not create new token");
+        let fields = "id,first_name,last_name,phone,email,business_name,active,deleted,disabled,type,subtype".split(',')
+        
+        let response = {};
+        user = obval.select(fields).from(user);
+        response.user = user;
+        response.token = token.token;
+
         d.resolve(response)
     })
 	.catch( (err) => {
-
 		d.reject(err);
 
 	});

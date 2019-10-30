@@ -3,6 +3,7 @@
 	"middlewares":"/routes/middlewares",
 	"handlers":"/routes/api/handlers",
 	"routemeta":"/routes/middlewares/routemeta",
+	"authmiddleware":"/routes/middlewares/auth",
 	"appvalues":"/utils/appvalues",
 	"obval":"/utils/obval",
 	"errorer":"/utils/errorer",

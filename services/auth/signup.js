@@ -1,5 +1,4 @@
 const models = require('mlar')('models');
-const ErrorLogger = require('mlar')('errorlogger'); 
 const morx = require('morx'); 
 const q = require('q'); 
 const bcrypt = require('bcrypt'); 
@@ -7,6 +6,8 @@ const validators = require('mlar')('validators');
 const obval = require('mlar')('obval'); 
 const assert = require('mlar')('assertions'); 
 const DEFAULT_EXCLUDES = require('mlar')('appvalues').DEFAULT_EXCLUDES;
+const axios = require('axios');
+const config = require('../../config');
 
 var spec = morx.spec({}) 
 			   .build('first_name', 'required:false, eg:Tina')   
@@ -55,13 +56,46 @@ function service(data){
 	}) 
 	.spread((user, params) => { 
         if (user) throw new Error("User with this email already exists");
+        
+        // make user active from the get-go
         params.active = 1;
+        
+        if (!params.subtype) params.subtype = 'lender';
+        
         return models.user.create({...params})
         
-    }).then((user)=>{
+    }).then(async (user)=>{
         if (!user) throw new Error("An error occured while creating user's account");
-        let normalizedUser = obval.exclude(DEFAULT_EXCLUDES).from(user);
-        d.resolve(normalizedUser);
+
+        // send email 
+        const payload= {
+            context_id: 69,
+            sender: config.sender,
+            recipient: 'itisdeji@gmail.com',
+            sender_id: 1,
+            data:{
+                email: user.email,
+                name: user.first_name+ ' ' + user.last_name
+	        }
+        }
+        const requestHeaders = {
+            'Content-Type' : 'application/json',
+        }
+        const url = config.sender_email + "/email/send";
+        
+        await axios({
+            method: 'POST',
+            url: url,
+            data: payload,
+            headers: requestHeaders
+        }).then(response => {
+            response = response.data.data
+            d.resolve(response)
+        }).catch(err=> {
+            console.log(err)
+        })
+        
+        d.resolve(user);
     })
 	.catch( (err) => {
 

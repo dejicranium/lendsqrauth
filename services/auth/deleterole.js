@@ -9,9 +9,8 @@ const assert = require('mlar')('assertions');
 const DEFAULT_EXCLUDES = require('mlar')('appvalues').DEFAULT_EXCLUDES;
 
 var spec = morx.spec({}) 
-			   .build('user_id', 'required:true, eg:1')   
-               
-			   .end();
+                .build('role_id', 'required:true, eg:1')   
+                .end();
 
 function service(data){
 
@@ -23,18 +22,21 @@ function service(data){
         
         
 
-        return [models.user.findOne({where: {id: params.user_id}
-        }), params ]
+        return models.role.findOne({
+            where: {
+                id: params.role_id
+            }
+        })
 	}) 
-	.spread((user, params) => { 
-        if (!user) throw new Error("User does not exist");
+	.then(role => { 
+        if (!role) throw new Error("Role does not exist");
         // soft delete
-        return user.update({deleted: 1, deleted_at: new Date(), active: 0, disabled: 0});
+        return role.destroy({force: true});
         
     }).then((user)=>{
-        if (!user) throw new Error("An error occured while updating user's account");
+        if (!user) throw new Error("An error occured while deleting role");
         
-        d.resolve("Successfully deleted user's status");
+        d.resolve("Successfully deleted role");
     })
 	.catch( (err) => {
 

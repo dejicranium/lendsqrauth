@@ -16,7 +16,7 @@ var spec = morx.spec({})
 			   .end();
 
 function service(data){
-
+    const globalUserId = data.USERID
 	var d = q.defer();
 	
 	q.fcall( async () => {
@@ -34,7 +34,7 @@ function service(data){
 	}) 
 	.spread((user, params) => { 
         if (!user) throw new Error(`User with email ${params.email} was not found`);
-        
+        if (globalUserId !== user.id) throw new Error("You don't have access to this account");
         return crypto.randomBytes(32).toString('hex');
         
     }).then((randomBytes)=>{
@@ -47,9 +47,9 @@ function service(data){
 
     }).spread((usertoken, token) => {
         // store as auth token and set expiry to 10 minutes from now
-        let expiry = moment(new Date()).add(15, 'minutes');
+        let expiry = moment(new Date()).add(10, 'minutes');
         
-        if (!usertoken) return models.auth_token.create({type: 'password_reset', user_id: 1, token: token, expiry: expiry})
+        if (!usertoken) return models.auth_token.create({type: 'password_reset', user_id: globalUserId, token: token, expiry: expiry})
         return usertoken.update({
             token: token, 
             expiry: expiry

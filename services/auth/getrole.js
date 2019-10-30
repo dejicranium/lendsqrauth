@@ -22,16 +22,14 @@ function service(data){
 		var validParameters = morx.validate(data, spec, {throw_error:true});
 		let params = validParameters.params;
          
-        return [ models.role.findOne({ where: { id: role_id }})]
+        return models.role.findOne({ where: { id: params.role_id }})
 	}) 
 	.then((role) => { 
         if (!role) throw new Error(`Could not find role`);
         d.resolve(role);
     })
 	.catch( (err) => {
-
 		d.reject(err);
-
 	});
 
 	return d.promise;

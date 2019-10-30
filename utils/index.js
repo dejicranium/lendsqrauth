@@ -50,8 +50,9 @@ EXPRESS_UTILS.jsonS = function (res, data, message, meta) {
 
 
 EXPRESS_UTILS.jsonF = function (res, data, message) {
-	json_send(res, data, message, 'error', 400, null, 1);
+	json_send(res, data, message, 'error', 400);
 }
+
 
 EXPRESS_UTILS.json401 = function (res, data, message) {
 	json_send(res, data, message, 'error', 401);

@@ -52,7 +52,7 @@ function service(data){
 		
 	}).then(done=> {
 		if (!done) throw new Error("Could not set user's role")
-		d.resolve("Successfully set the user role")
+		d.resolve("Successfully set the user's role")
 	})
 	.catch( (err) => {
 

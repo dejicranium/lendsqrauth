@@ -23,6 +23,9 @@ function service(data){
     const selection = {
         where: {
             id: data.user_id
+        },
+        attributes: {
+            exclude: ['password']
         }
     }
 

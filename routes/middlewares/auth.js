@@ -1,30 +1,34 @@
 const models = require('mlar')('models');
 const jwt = require('jsonwebtoken');
 const config = require('../../config');
+var utils = require('mlar')('mt1l');
+const q = require('q');
 
-module.exports = function (req, res, next) {
+module.exports = async function (req, res, next) {
     let auth_token = req.headers.lendi_auth_token;
-    
-    jwt.verify(auth_token, config.JWTsecret)
-        .then((decoded) => {
-            if (!decoded) throw new Error("Unauthorized access attempted");
+    const d = q.defer();
 
-            models.auth_token.findOne({
-                where: {
-                    type: 'session',
-                    token:  auth_token,
-                },
-                include: [{model: models.user}]
-            }).then(found=> {
-                if(!found) throw new error("Invalid access token")
-                if(found.exipry <  new Date()) throw new error("Access token has expired")
-                req.user = found.user
-            }).catch(err=> {
-                throw new Error(err)
-            })
+    jwt.verify(auth_token, config.JWTsecret, function(err, decoded){
 
-        }).catch(err=> {
-            throw new Error(err)
+        if (err) utils.jsonF(res, null, "Unauthorized access attempted"); 
+        if (decoded && decoded.expiry < new Date())  utils.jsonF(res, null, "Expired access token");
+        models.auth_token.findOne({
+            where: {
+                type: 'session',
+                token: auth_token,
+            },
+            include: [{model: models.user}]
+           
+        }).then(resp=> {
+            if (!resp) utils.jsonF(res, null, "Invalid access token");
+            req.user = resp.user
+            req.decoded = decoded
+            next()
         })
-    next();
+        .catch(err=> {
+             utils.jsonF(res, null, err);
+        })
+
+    })
+    return d.promise
 }
