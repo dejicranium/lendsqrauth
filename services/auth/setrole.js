@@ -37,18 +37,15 @@ function service(data){
 		}), params ]
 
 	}).spread((user_role, params)=> {
-
+		const insertData = {
+			role_id: params.role_id,
+			user_id: params.user_id,
+		}
 		if (!user_role) {
-			return models.user_role.create({
-				role_id: params.role_id,
-				user_id: params.user_id
-			});
+			return models.user_role.create(insertData);
 		}
 		
-		return user_role.update({
-			role_id: params.role_id,
-			user_id: params.user_id
-		})
+		return user_role.update(insertData)
 		
 	}).then(done=> {
 		if (!done) throw new Error("Could not set user's role")
