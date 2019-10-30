@@ -66,28 +66,29 @@ function service(data){
         
     }).then(async (user)=>{
         if (!user) throw new Error("An error occured while creating user's account");
-
+        let fullname = user.type == 'business' ? user.business_name : user.first_name + ' ' + user.last_name;
         // send email 
         const payload= {
             context_id: 69,
-            sender: config.sender,
-            recipient: 'itisdeji@gmail.com',
+            sender: config.sender_email,
+            recipient: user.email,
             sender_id: 1,
             data:{
                 email: user.email,
-                name: user.first_name+ ' ' + user.last_name
+                name: fullname
 	        }
         }
         const requestHeaders = {
             'Content-Type' : 'application/json',
         }
-        const url = config.sender_email + "/email/send";
+
+        const url = config.notif_base_url + "email/send";
         
         await axios({
             method: 'POST',
             url: url,
             data: payload,
-            headers: requestHeaders
+            headers: requestHeaders,
         }).then(response => {
             response = response.data.data
             d.resolve(response)
