@@ -16,8 +16,16 @@ module.exports = (sequelize, DataTypes) => {
     password: DataTypes.STRING,
     type: DataTypes.STRING,
     subtype: DataTypes.STRING,
-    deleted_at: DataTypes.DATE,
+    created_on: DataTypes.DATE,
+    created_by: DataTypes.INTEGER,
+    modified_on: DataTypes.DATE,
+    modified_by: DataTypes.DATE,
+    deleted_on: DataTypes.DATE,
+    deleted_by: DataTypes.INTEGER,
+    
   }, {
+    timestamps: false
+
   });
   user.associate = function(models) {
     // associations can be defined here

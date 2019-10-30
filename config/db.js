@@ -1,10 +1,10 @@
 "use strict";
 module.exports = {
     "development": {
-      "username": process.env.DEVUN,
-      "password": process.env.DEVPW,
-      "database": process.env.DEVDB,
-      "host": process.env.DEVHOST,
+      "username": process.env.DEVUN || 'root',
+      "password": process.env.DEVPW || 'password',
+      "database": process.env.DEVDB || 'lendi',
+      "host": process.env.DEVHOST || 'localhost',
       "dialect": "mysql"
     },
     "production": {

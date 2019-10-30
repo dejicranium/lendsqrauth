@@ -33,13 +33,36 @@ module.exports = {
       subtype: {
         type: Sequelize.STRING
       },
-      createdAt: {
-        allowNull: false,
-        type: Sequelize.DATE
+      active: {
+        type: Sequelize.BOOLEAN
       },
-      updatedAt: {
+      disabled: {
+        type: Sequelize.BOOLEAN
+      },
+      deleted: {
+        type: Sequelize.BOOLEAN
+      },
+      deleted_on:{
+        type: Sequelize.DATE,
+      } ,
+      deleted_by:{
+        type: Sequelize.INTEGER,
+      } ,
+      created_on:{
+        type: Sequelize.DATE,
         allowNull: false,
-        type: Sequelize.DATE
+      } ,
+      created_by:{
+        type: Sequelize.INTEGER,
+      } ,
+      modified_on:{
+        type: Sequelize.DATE,
+        allowNull: false,
+        defaultValue: new Date()
+
+      },
+      modified_by: {
+        type: Sequelize.INTEGER,
       }
     }
     );

@@ -59,7 +59,7 @@ function service(data){
         
         // make user active from the get-go
         params.active = 1;
-        
+        params.create_on = new Date();
         if (!params.subtype) params.subtype = 'lender';
         
         return models.user.create({...params})
