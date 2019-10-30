@@ -36,7 +36,6 @@ function service(data){
         
     }).spread((user, password)=>{
         if (!password) throw new Error("Password is incorrect");
-        jwt.sign({email: user.email, user_id: user.id, subtype: user.subtype}, config.JWTsecret, {expiresIn: config.JWTexpiresIn})
         return [user,  models.auth_token.findOne({ where: {  type: 'session', user_id: user.id}})]
     
         
@@ -56,11 +55,10 @@ function service(data){
             }) ]
 
         }
-        else {
-            return  [user,  token.update({
-                token: newToken,
-            })]
-        }
+        return  [user,  token.update({
+            token: newToken,
+        })]
+        
 
     }).spread( (user, token)=> {
         if (!token) throw new Error("Could not create new token");
