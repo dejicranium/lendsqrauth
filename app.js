@@ -28,6 +28,7 @@ var path = require('path');
 
 var app    = express();
 const apis_auth = require('./routes/auth');
+const apis_profile = require('./routes/profile');
 
 const EndpointRouter = require('express').Router();
 
@@ -95,6 +96,7 @@ app.get("/", function (req, res, next){
 
 const version = '/v1';
 app.use(version, apis_auth(EndpointRouter));
+app.use(version, apis_profile(EndpointRouter));
 
 
 

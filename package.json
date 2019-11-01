@@ -6,6 +6,7 @@
   "scripts": {
     "test": "mocha reporter --spec",
     "dev-test": "mocha test/services/auth --recursive",
+    "prof-test": "mocha test/services/profile --recursive",
     "start": "node_modules/.bin/sequelize db:migrate && node app.js"
   },
   "keywords": [],
