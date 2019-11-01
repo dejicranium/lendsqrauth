@@ -16,7 +16,7 @@ function vinfo(req, res, next){
 }
 
 vinfo.routeConfig = {};
-vinfo.routeConfig.path = "/:profile_id/list"; 
+vinfo.routeConfig.path = "/:user_id/list"; 
 vinfo.routeConfig.method = "get"; 
 vinfo.routeConfig.middlewares = [auth_middleware, routemeta('get_profiles', 'none')];
 module.exports = vinfo;
