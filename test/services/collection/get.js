@@ -4,19 +4,19 @@ const should = require('chai').should();
 
 const chai = require('chai');
 
-const create = require('mlar').mreq('services', 'profile/filter');
+const create = require('mlar').mreq('services', 'collection/get');
 const generateRandom = require('mlar')('testutils').generateRandom;
 
 
 
 describe('#Profile service', () => {
-    const query = {
-        type: 'lender',
+    const params = {
+        collection_id: 1,
        
     }
 
-    it("should get user's profiles", (done) => {
-        create(query).then((result)=>{
+    it("should get collection", (done) => {
+        create(params).then((result)=>{
             result.should.be.a('object');
             done();
         })

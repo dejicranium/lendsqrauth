@@ -29,6 +29,9 @@ module.exports = (sequelize, DataTypes) => {
     // associations can be defined here
     profile.belongsTo(models.user, {foreignKey: 'user_id'});
     profile.hasOne(models.profile_contact, {foreignKey: 'profile_id'});
+    profile.hasMany(models.collection, {foreignKey: 'lender_id'});
+    profile.hasMany(models.collection, {foreignKey: 'borrower_id'});
+    profile.hasMany(models.collection_payment_requests, {foreignKey: 'borrower_id'});
   };
   return profile;
 };
