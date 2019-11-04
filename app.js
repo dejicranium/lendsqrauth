@@ -90,7 +90,7 @@ app.use(function(req, res, next) {
   next();
 });
 
-const base = 'api/v1/';
+const base = '/api/v1';
 
 app.get(base, function (req, res, next){
 
@@ -99,10 +99,10 @@ app.get(base, function (req, res, next){
 })
 
 // const version = '/v1';
-app.use(`${base}auth`, apis_auth(EndpointRouter));
-app.use(`${base}profile`, apis_profile(EndpointRouter));
-app.use(`${base}product`, apis_product(EndpointRouter));
-app.use(`${base}collection`, apis_collection(EndpointRouter));
+app.use(`${base}/auth`, apis_auth(EndpointRouter));
+app.use(`${base}/profile`, apis_profile(EndpointRouter));
+app.use(`${base}/product`, apis_product(EndpointRouter));
+app.use(`${base}/collection`, apis_collection(EndpointRouter));
 
 
 
