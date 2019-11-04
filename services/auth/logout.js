@@ -9,7 +9,7 @@ const assert = require('mlar')('assertions');
 const DEFAULT_EXCLUDES = require('mlar')('appvalues').DEFAULT_EXCLUDES;
 
 var spec = morx.spec({}) 
-			   .build('lendi_auth_token', 'required:true, eg:xxxxxererw')   
+			   .build('access_token', 'required:true, eg:xxxxxererw')   
 			   .end();
 
 function service(data){
@@ -24,7 +24,7 @@ function service(data){
             where: {
                 user_id: globalUserId,
                 type: 'session',
-                token: params.lendi_auth_token,
+                token: params.access_token,
             }
         }, {force: true})
 	}) 

@@ -5,7 +5,7 @@ var utils = require('mlar')('mt1l');
 const q = require('q');
 
 module.exports = async function (req, res, next) {
-    let auth_token = req.headers.lendi_auth_token;
+    let auth_token = req.headers.lendi_auth_token || req.headers.access_token;
     const d = q.defer();
 
     jwt.verify(auth_token, config.JWTsecret, function(err, decoded){
