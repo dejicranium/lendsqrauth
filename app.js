@@ -90,17 +90,19 @@ app.use(function(req, res, next) {
   next();
 });
 
-app.get("/", function (req, res, next){
+const base = 'api/v1/';
+
+app.get(base, function (req, res, next){
 
   res.json({version:1.0})
 
 })
 
-const version = '/v1';
-app.use(version, apis_auth(EndpointRouter));
-app.use(version, apis_profile(EndpointRouter));
-app.use(version, apis_product(EndpointRouter));
-app.use(version, apis_collection(EndpointRouter));
+// const version = '/v1';
+app.use(`${base}auth`, apis_auth(EndpointRouter));
+app.use(`${base}profile`, apis_profile(EndpointRouter));
+app.use(`${base}product`, apis_product(EndpointRouter));
+app.use(`${base}collection`, apis_collection(EndpointRouter));
 
 
 
@@ -111,7 +113,7 @@ Handle 404
 //app.use(mosh.initMoshErrorHandler);
 
 
-app.use(version, function(req, res, next) {
+app.use(base, function(req, res, next) {
   res.json({m: `Undefined ${req.method} route access`})
 })
 
