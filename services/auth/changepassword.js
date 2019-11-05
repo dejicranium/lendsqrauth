@@ -41,12 +41,13 @@ function service(data){
         if (!generated_password) throw new Error("Could not generate new password");
         
         user.password = generated_password;
-        
+
+        // save user and invalidate already existing token.
+        await models.auth_token.destroy({ where: {type: 'session', user_id: user.id}}, { force: true})
         return user.save();
         
     }).then((user)=>{
         if (!user) throw new Error("An error occured while updating user's account");
-
         d.resolve("Successfully changed user's password");
     })
 	.catch( (err) => {
