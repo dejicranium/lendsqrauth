@@ -17,7 +17,6 @@ describe('#Sign up user', () => {
 
     it('should signin user', (done) => {
         signin(params).then((result)=>{
-            console.log(result);
             result.should.be.a('object');
             done();
         })

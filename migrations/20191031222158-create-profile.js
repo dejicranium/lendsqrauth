@@ -8,13 +8,13 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      type: {
-        type: Sequelize.STRING
+      role_id: {
+        type: Sequelize.INTEGER
       },
       user_id: {
         type: Sequelize.INTEGER
       },
-      parent_lender_id: {
+      parent_profile_id: {
         type: Sequelize.INTEGER
       },
       deleted_flag: {

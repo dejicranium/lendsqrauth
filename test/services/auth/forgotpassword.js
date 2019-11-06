@@ -17,7 +17,6 @@ describe('#Sign up user', () => {
 
     it.skip('should create an auth token', (done) => {
         forgotpassword(params).then((result)=>{
-            console.log(result);
             result.should.be.a('string');
             done();
         })

@@ -16,7 +16,7 @@ describe('#Profile service', () => {
        
     }
 
-    it("should create user's profile", (done) => {
+    it.skip("should create user's profile", (done) => {
         create(params).then((result)=>{
             result.should.be.a('string');
             done();

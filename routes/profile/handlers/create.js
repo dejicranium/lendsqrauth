@@ -4,8 +4,8 @@ const auth_middleware = require('mlar')('authmiddleware');
 const service = require('mlar').mreq('services', 'profile/create');
 
 function vinfo(req, res, next){ 
-        const data = {...req.body, ...req.query, ...req.headers, ...req.params};
-        
+        let data = {...req.body, ...req.query, ...req.headers, ...req.params};
+        data.user_id = req.user.id;
         service(data)
         .then(response => {
             utils.jsonS(res, response, "Profile created"); 

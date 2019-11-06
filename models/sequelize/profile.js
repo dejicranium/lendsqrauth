@@ -1,7 +1,7 @@
 'use strict';
 module.exports = (sequelize, DataTypes) => {
   const profile = sequelize.define('profile', {
-    type: DataTypes.STRING,
+    role_id: DataTypes.INTEGER,
     user_id: DataTypes.INTEGER,
     url: DataTypes.STRING,
     business_logo: DataTypes.STRING,
@@ -15,7 +15,7 @@ module.exports = (sequelize, DataTypes) => {
     created_on: {
       type: DataTypes.DATE,
     },
-    parent_lender_id: DataTypes.INTEGER,
+    parent_profile_id: DataTypes.INTEGER,
     deleted_flag: DataTypes.BOOLEAN,
     created_by: DataTypes.INTEGER,
     modified_on: DataTypes.DATE,
@@ -27,6 +27,8 @@ module.exports = (sequelize, DataTypes) => {
   });
   profile.associate = function(models) {
     // associations can be defined here
+    profile.belongsTo(models.profile, {foreignKey: 'parent_profile_id', as: 'sub_profiles'});
+    profile.belongsTo(models.role, {foreignKey: 'role_id'});
     profile.belongsTo(models.user, {foreignKey: 'user_id'});
     profile.hasOne(models.profile_contact, {foreignKey: 'profile_id'});
     profile.hasMany(models.collection, {foreignKey: 'lender_id'});

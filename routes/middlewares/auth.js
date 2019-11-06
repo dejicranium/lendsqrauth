@@ -17,7 +17,7 @@ module.exports = async function (req, res, next) {
                 type: 'session',
                 token: auth_token,
             },
-            include: [{model: models.user}]
+            include: [{model: models.user, include:[{model: models.profile}]}]
            
         }).then(resp=> {
             if (!resp) utils.jsonF(res, null, "Invalid access token");

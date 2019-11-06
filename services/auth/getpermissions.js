@@ -11,7 +11,8 @@ const DEFAULT_EXCLUDES = require('mlar')('appvalues').DEFAULT_EXCLUDES;
 const moment = require('moment')
 
 var spec = morx.spec({}) 
-			   .build('name', 'required:true, eg:lender')   
+			   .build('permission_id', 'required:false, eg:1')   
+			   .build('fetch_one', 'required:false, eg:1')   
 			   .end();
 
 function service(data){
@@ -21,16 +22,18 @@ function service(data){
 	q.fcall( async () => {
 		var validParameters = morx.validate(data, spec, {throw_error:true});
 		let params = validParameters.params;
-         
-        return [ models.role.findOne({ where: { name: params.name }}), params]
+		
+		if (params.fetch_one) {
+			return models.permission.findOne({ where: { id: params.permission_id }})
+		}
+		else {
+			return models.permission.findAll({ where: { id: params.permission_id }})
+		}
 	}) 
-	.spread((role, params) => { 
-        if (role) throw new Error(`Role already exists`);
-        return models.role.create({name: params.name})        
-        
-    }).then((role)=>{
-        if (!role) throw new Error("An error occured while carrying out this operation");
-        d.resolve(role)
+	.then((permission) => { 
+        if (!permission) throw new Error(`Permission does not exist`);
+        d.resolve(permission)        
+    
     })
 	.catch( (err) => {
 

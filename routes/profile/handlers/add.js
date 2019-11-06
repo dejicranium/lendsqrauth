@@ -1,3 +1,4 @@
+/*
 var utils = require('mlar')('mt1l');
 const routemeta = require('mlar')('routemeta');
 const auth_middleware = require('mlar')('authmiddleware');
@@ -20,4 +21,4 @@ vinfo.routeConfig.path = "/";
 vinfo.routeConfig.method = "post"; 
 vinfo.routeConfig.middlewares = [auth_middleware, routemeta('profile_add', 'none')];
 module.exports = vinfo;
-
+*/

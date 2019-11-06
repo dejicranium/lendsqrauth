@@ -27,12 +27,6 @@ module.exports = {
       password: {
         type: Sequelize.STRING
       },
-      type: {
-        type: Sequelize.STRING
-      },
-      subtype: {
-        type: Sequelize.STRING
-      },
       active: {
         type: Sequelize.BOOLEAN
       },

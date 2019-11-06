@@ -15,7 +15,6 @@ describe('#Get users service', () => {
 
     it('should lists registered users', (done) => {
         listout(params).then((result)=>{
-            console.log(result);
             result.should.be.a('object');
             result.should.have.property('roles');
             done();

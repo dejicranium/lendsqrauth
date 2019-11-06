@@ -1,21 +1,27 @@
 'use strict';
 module.exports = {
   up: (queryInterface, Sequelize) => {
-    return queryInterface.createTable('roles', {
+    return queryInterface.createTable('entity_permissions', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      name: {
+      entity: {
         type: Sequelize.STRING
+      },
+      entity_id: {
+        type: Sequelize.INTEGER
+      },
+      permission_id: {
+        type: Sequelize.INTEGER
+      },
+      deleted_flag: {
+        type: Sequelize.BOOLEAN
       },
       deleted_on:{
         type: Sequelize.DATE,
-      } ,
-      deleted_flag:{
-        type: Sequelize.BOOLEAN,
       } ,
       deleted_by:{
         type: Sequelize.INTEGER,
@@ -23,6 +29,7 @@ module.exports = {
       created_on:{
         type: Sequelize.DATE,
         allowNull: false,
+        defaultValue: new Date();
       } ,
       created_by:{
         type: Sequelize.INTEGER,
@@ -39,6 +46,6 @@ module.exports = {
     });
   },
   down: (queryInterface, Sequelize) => {
-    return queryInterface.dropTable('roles');
+    return queryInterface.dropTable('entity_permissions');
   }
 };

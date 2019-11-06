@@ -1,7 +1,9 @@
 'use strict';
 module.exports = (sequelize, DataTypes) => {
-  const role = sequelize.define('role', {
+  const permission = sequelize.define('permission', {
     name: DataTypes.STRING,
+    description: DataTypes.STRING,
+    created_on: DataTypes.DATE,
     deleted_flag: DataTypes.BOOLEAN,
     created_by: DataTypes.INTEGER,
     modified_on: DataTypes.DATE,
@@ -9,10 +11,10 @@ module.exports = (sequelize, DataTypes) => {
     deleted_on: DataTypes.DATE,
     deleted_by: DataTypes.INTEGER,
   }, {
-    timestamps: false
+    timestamps: false,
   });
-  role.associate = function(models) {
-    role.hasMany(models.profile, {foreignKey: 'role_id'})
+  permission.associate = function(models) {
+    // associations can be defined here
   };
-  return role;
+  return permission;
 };

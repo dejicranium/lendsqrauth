@@ -18,7 +18,6 @@ describe('#Sign up user', () => {
 
     it("should update role", (done) => {
         updaterole(params).then((result)=>{
-            console.log(result);
             result.should.be.a('string');
             done();
         })

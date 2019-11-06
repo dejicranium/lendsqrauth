@@ -18,7 +18,6 @@ describe('#Change password service', () => {
 
     it("should successfully create user's password", (done) => {
         changepassword(params).then((result)=>{
-            console.log(result);
             result.should.be.equal("Successfully changed user's password");
             done();
         })

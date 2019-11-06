@@ -18,7 +18,6 @@ describe('#Sign up user', () => {
 
     it("should update user's status", (done) => {
         changestatus(params).then((result)=>{
-            console.log(result);
             result.should.be.a('string');
             done();
         })
