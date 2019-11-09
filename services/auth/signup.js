@@ -17,8 +17,7 @@ var spec = morx.spec({})
                .build('business_name', 'required:false, eg:Tina Comms')
                .build('email', 'required:true, eg:tinaton@gmail.com') 
                .build('phone', 'required:true, eg:0810045800') 
-               .build('type', 'required:true, eg:business')
-               .build('subtype', 'required:false, eg:lender')
+               .build('type', 'required:true, eg:1')
 			   .end();
 
 function service(data){
@@ -30,21 +29,23 @@ function service(data){
 		let params = validParameters.params;
         
         
-        assert.emailFormatOnly(params.email);  // validate email, throw error if it's some weird stuff
+        let role = await models.role.findAll({where: {id: params.type }});
+        if (!role) throw new Error("No such role exists")
         
+        assert.emailFormatOnly(params.email);  // validate email, throw error if it's some weird stuff
         if (validators.areMutuallyExclusive([params.password, params.password_confirmation]))
              throw new Error("Passwords do not match");
 
         if (params.password.length < 8) 
             throw new Error("Password cannot be less than 8 characters");
         
-        if (params.type.toLowerCase() == "individual" && !(params.first_name && params.last_name)) 
+        if (role.name == "individual_lender" && !(params.first_name && params.last_name)) 
             throw new Error("Individual accounts must have a first and last name");
 
-        if (params.type.toLowerCase() == "business" && params.business_name == undefined) 
+        if (role.name == "business_lender" && params.business_name == undefined) 
             throw new Error("Business accounts must have a business name");
         
-
+        
         // hash password
         params.password = await bcrypt.hash(params.password, 10);
         
@@ -52,20 +53,30 @@ function service(data){
             where: {
                 email: params.email
             }
-        }), params]
+        }), params, role]
 	}) 
-	.spread((user, params) => { 
+	.spread((user, params, role) => { 
         if (user) throw new Error("User with this email already exists");
         
         // make user active from the get-go
         params.active = 1;
-        params.create_on = new Date();
-        if (!params.subtype) params.subtype = 'lender';
+        params.created_on = new Date();
+
+        // role_id is the type passed from frontend 
+        params.role_id = params.type;  delete params.type;
+
+        return models.sequelize.transaction((t1) => {
+            return q.all([
+                models.user.create(params, {transaction: t1}), 
+                models.profile.create({role_id: params.role_id}, {transaction: t1})
+            ]);
+        })
         
-        return models.user.create({...params})
-        
-    }).then(async (user)=>{
+    }).spread(async (user, profile)=>{
         if (!user) throw new Error("An error occured while creating user's account");
+        if (!profile) throw new Error("Could not create a profile user")
+        await profile.update({user_id: user.id})
+        
         let fullname = user.type == 'business' ? user.business_name : user.first_name + ' ' + user.last_name;
         // send email 
         const payload= {

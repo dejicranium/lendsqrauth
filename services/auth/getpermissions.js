@@ -6,31 +6,34 @@ const bcrypt = require('bcrypt');
 const validators = require('mlar')('validators'); 
 const obval = require('mlar')('obval'); 
 const assert = require('mlar')('assertions'); 
+const crypto = require('crypto');
 const DEFAULT_EXCLUDES = require('mlar')('appvalues').DEFAULT_EXCLUDES;
+const moment = require('moment')
 
 var spec = morx.spec({}) 
-			   .build('access_token', 'required:true, eg:xxxxxererw')   
+			   .build('permission_id', 'required:false, eg:1')   
+			   .build('fetch_one', 'required:false, eg:1')   
 			   .end();
 
 function service(data){
 
 	var d = q.defer();
-	const globalUserId = data.USERID;
+	
 	q.fcall( async () => {
-		const validParameters = morx.validate(data, spec, {throw_error : true});
-		const params = validParameters.params;
-        
-        return models.auth_token.destroy({
-            where: {
-                user_id: globalUserId,
-                type: 'session',
-                token: params.access_token,
-            }
-        }, {force: true})
+		var validParameters = morx.validate(data, spec, {throw_error:true});
+		let params = validParameters.params;
+		
+		if (params.fetch_one) {
+			return models.permission.findOne({ where: { id: params.permission_id }})
+		}
+		else {
+			return models.permission.findAll()
+		}
 	}) 
-	.then((deleted) => { 
-        if (!deleted) throw new Error("User not logged in");
-        d.resolve("Log out successful")
+	.then((permission) => { 
+        if (!permission) throw new Error(`Permission does not exist`);
+        d.resolve(permission)        
+    
     })
 	.catch( (err) => {
 

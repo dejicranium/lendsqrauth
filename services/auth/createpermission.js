@@ -12,6 +12,7 @@ const moment = require('moment')
 
 var spec = morx.spec({}) 
 			   .build('name', 'required:true, eg:lender')   
+			   .build('description', 'required:true, eg:lender')   
 			   .end();
 
 function service(data){
@@ -22,15 +23,16 @@ function service(data){
 		var validParameters = morx.validate(data, spec, {throw_error:true});
 		let params = validParameters.params;
          
-        return [ models.role.findOne({ where: { name: params.name }}), params]
+        return [ models.permission.findOne({ where: { name: params.name, description:params.description }}), params]
 	}) 
-	.spread((role, params) => { 
-        if (role) throw new Error(`Role already exists`);
-        return models.role.create({name: params.name})        
+	.spread((permission, params) => { 
+        if (permission) throw new Error(`Permission already exists`);
+		permission.created_on = new Date();
+		return models.permission.create(params)        
         
-    }).then((role)=>{
-        if (!role) throw new Error("An error occured while carrying out this operation");
-        d.resolve(role)
+    }).then((permission)=>{
+        if (!permission) throw new Error("An error occured while carrying out this operation");
+        d.resolve(permission)
     })
 	.catch( (err) => {
 

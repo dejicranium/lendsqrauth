@@ -4,20 +4,21 @@ const should = require('chai').should();
 
 const chai = require('chai');
 
-const create = require('mlar').mreq('services', 'profile/delete');
+const creator = require('mlar').mreq('services', 'auth/createpermission');
 const generateRandom = require('mlar')('testutils').generateRandom;
 
 
 
-describe('#Profile service', () => {
+describe('#Create permission', () => {
     const params = {
-        profile_id: 1,
+       name: 'approve_loans',
+       description: 'Allows permitted user to approve loans'
        
     }
 
-    it.skip("should delete user's profile", (done) => {
-        create(params).then((result)=>{
-            result.should.be.a('string');
+    it("should create a new permission", (done) => {
+        creator(params).then((result)=>{
+            result.should.be.a('object');
             done();
         })
         .catch(err=> {

@@ -11,15 +11,16 @@ const generateRandom = require('mlar')('testutils').generateRandom;
 
 describe('#Profile service', () => {
     const params = {
-        user_id: 1,
-        type: 'lender',
+        user_id: 17,
+        role_id: 3,
        
     }
 
     it("should create user's profile", (done) => {
-        create(params).then((result)=>{
+        create(params).then(result => {
             result.should.be.a('string');
             done();
+            
         })
         .catch(err=> {
             done(err);

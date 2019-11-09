@@ -17,7 +17,6 @@ describe('#Create role', () => {
 
     it("should create a new role", (done) => {
         createrole(params).then((result)=>{
-            console.log(result);
             result.should.be.a('object');
             done();
         })

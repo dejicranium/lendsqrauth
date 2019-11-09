@@ -8,7 +8,6 @@ const paginate = require('mlar')('paginate');
 
 var spec = morx.spec({}) 
 			   .build('user_id', 'required:true, eg:1')   
-			    
 			              
 			   .end();
 
@@ -26,7 +25,8 @@ function service(data){
 		const validParameters = morx.validate(data, spec, {throw_error : true});
 		const params = validParameters.params;
         data.where = {
-            user_id: params.user_id
+			user_id: params.user_id,
+			include: [{model: models.profile}]
         }
         return models.profile.findAndCountAll(data);
 

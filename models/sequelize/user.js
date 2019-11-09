@@ -14,8 +14,6 @@ module.exports = (sequelize, DataTypes) => {
     deleted: DataTypes.BOOLEAN,
     password: DataTypes.STRING,
     password: DataTypes.STRING,
-    type: DataTypes.STRING,
-    subtype: DataTypes.STRING,
     created_on: DataTypes.DATE,
     created_by: DataTypes.INTEGER,
     modified_on: DataTypes.DATE,

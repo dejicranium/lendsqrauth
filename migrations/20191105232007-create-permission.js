@@ -1,7 +1,7 @@
 'use strict';
 module.exports = {
   up: (queryInterface, Sequelize) => {
-    return queryInterface.createTable('roles', {
+    return queryInterface.createTable('permissions', {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -11,11 +11,14 @@ module.exports = {
       name: {
         type: Sequelize.STRING
       },
+      description: {
+        type: Sequelize.STRING
+      },
+      deleted_flag: {
+        type: Sequelize.BOOLEAN
+      },
       deleted_on:{
         type: Sequelize.DATE,
-      } ,
-      deleted_flag:{
-        type: Sequelize.BOOLEAN,
       } ,
       deleted_by:{
         type: Sequelize.INTEGER,
@@ -39,6 +42,6 @@ module.exports = {
     });
   },
   down: (queryInterface, Sequelize) => {
-    return queryInterface.dropTable('roles');
+    return queryInterface.dropTable('permissions');
   }
 };

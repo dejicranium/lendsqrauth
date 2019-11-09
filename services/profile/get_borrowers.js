@@ -25,8 +25,11 @@ function service(data){
 	q.fcall( async () => {
 		const validParameters = morx.validate(data, spec, {throw_error : true});
 		const params = validParameters.params;
+		let borrowerRole = await models.role.findOne({where: {name: 'borrower'}});
+		let borrowerRoleId = borrowerRole.id;
         data.where = {
-            parent_lender_id: params.profile_id
+			parent_profile_id: params.profile_id,
+			include: [{model: models.profile, where: {role_id: borrowerRole}}]
         }
         return models.profile.findAndCountAll(data);
 

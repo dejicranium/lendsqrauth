@@ -18,7 +18,7 @@ describe('#Sign up user', () => {
         password_confirmation: password,
         email: generateRandom('email'),
         phone: generateRandom('string', 10),
-        type: "individual",
+        type: 1,
     }
 
     it ('should successfully sign up a user', (done) => {

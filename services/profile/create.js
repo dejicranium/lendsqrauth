@@ -6,9 +6,9 @@ const validators = require('mlar')('validators');
 const assert = require('mlar')('assertions'); 
 
 var spec = morx.spec({}) 
-			   .build('type', 'required:true, eg:lender')   
-			   .build('user_id', 'required:true, eg:lender')   
-			   .build('parent_lender_id', 'required:false, eg:1')   
+			   .build('role_id', 'required:true, eg:1')   
+			   .build('user_id', 'required:true, eg:1')   
+			   .build('parent_profile_id', 'required:false, eg:1')   
 			   .build('url', 'required:false, eg:lender')   
 			   .build('business_logo', 'required:false, eg:lender')   
 			   .build('business_name', 'required:false, eg:lender')   
@@ -18,7 +18,11 @@ var spec = morx.spec({})
 			   .build('tin_number', 'required:false, eg:lender')   
 			   .build('state', 'required:false, eg:lender')   
 			   .build('country', 'required:false, eg:lender')   
-			              
+			   .build('contact_first_name', 'required:false, eg:lender')   
+			   .build('contact_last_name', 'required:false, eg:lender')   
+			   .build('contact_phone', 'required:false, eg:lender')   
+			   .build('contact_email', 'required:false, eg:lender')   
+			   .build('contact_role', 'required:false, eg:lender')   
 			   .end();
 
 function service(data){
@@ -29,33 +33,44 @@ function service(data){
 		const validParameters = morx.validate(data, spec, {throw_error : true});
 		const params = validParameters.params;
 
-		if (params.type !== 'borrower' && params.type !== 'lender') throw new Error("Unsupported profile type: " + params.type);
-        if (params.type === 'borrower' && params.parent_lender_id === undefined) throw new Error("A borrower must have a lender. Pass `parent_lender_id` as a parameter");
-        return [models.profile.findOne({
-            where: {
-                type: params.type, 
-                user_id: params.user_id,
-            }
-        }), params];
+		let roleSelectionParams = {
+			where: {
+				id: params.role_id
+			}
+		}
 
-        
-	}) 
-	.spread((profile, params) => { 
-        if (!profile)  {
-            params.created_on = new Date();
-            return models.profile.create({...params});
-        }
-        else throw new Error("User already has the specified profile type")
-    }).then((profile)=>{
-        if (!profile) throw new Error("An error occured while creating user's profile");        
+		return [models.role.findOne(roleSelectionParams), params];
+	})
+	.spread( async (role, params) => {
+		if (role && role.name == 'borrower') {
+			// see if user already had a borrower profile
+			let userBorrowerProfile = await models.profile.findOne({
+				where: {
+					user_id : params.user_id,
+					role_id: role.id
+				}
+			})
+
+			if (userBorrowerProfile) throw new Error("Can't have more than one profile with role `borrower`");
+		}
+
+
+		params.created_on = new Date();
+	
+        return [models.profile.create({...params}), params];
+	})
+	.spread(async (profile, params)=> {
+		if (!profile) throw new Error("An error occured while creating user's profile");    
+		
+		if (params.contact_first_name || params.contact_last_name || params.contact_phone || params.contact_email ){
+			params.profile_id = profile.id
+			await models.profile_contact.create(params)
+		} 
         d.resolve("Successfully created user's profile");
-    })
-	.catch( (err) => {
-
-		d.reject(err);
-
-	});
-
+	})
+	.catch(error=> {
+		d.reject(error)
+	})
 	return d.promise;
 
 }

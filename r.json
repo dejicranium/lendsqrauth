@@ -4,6 +4,7 @@
 	"handlers":"/routes/api/handlers",
 	"routemeta":"/routes/middlewares/routemeta",
 	"authmiddleware":"/routes/middlewares/auth",
+	"hasPermMiddleware":"/middlewares/has_permission",
 	"appvalues":"/utils/appvalues",
 	"obval":"/utils/obval",
 	"errorer":"/utils/errorer",
