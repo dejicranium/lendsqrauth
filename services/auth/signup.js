@@ -8,6 +8,7 @@ const assert = require('mlar')('assertions');
 const DEFAULT_EXCLUDES = require('mlar')('appvalues').DEFAULT_EXCLUDES;
 const axios = require('axios');
 const config = require('../../config');
+const makeRequest = require('mlar')('makerequest');
 
 var spec = morx.spec({}) 
 			   .build('first_name', 'required:false, eg:Tina')   
@@ -23,7 +24,9 @@ var spec = morx.spec({})
 function service(data){
 
 	var d = q.defer();
-	
+    const requestHeaders = {
+        'Content-Type' : 'application/json',
+    }
 	q.fcall( async () => {
 		var validParameters = morx.validate(data, spec, {throw_error:true});
 		let params = validParameters.params;
@@ -33,6 +36,25 @@ function service(data){
         if (!role) throw new Error("No such role exists")
         
         assert.emailFormatOnly(params.email);  // validate email, throw error if it's some weird stuff
+        
+        assert.mustBeValidPassword(params.password);
+
+        // make request to verify phone number
+        const verifiedPhone = await makeRequest(
+            config.utility_base_url + 'verify/phone/',
+            'POST',
+            { phone: params.phone },
+            requestHeaders,
+            'Phone validation'
+        )
+        
+        if (verifiedPhone) {
+            if (verifiedPhone.phone == undefined && verifiedPhone.countryCode == undefined) throw new Error("Phone number not valid");
+        }
+        if (verifiedPhone.status == 'error'){
+            throw new Error("Could not validate phone number");
+        }
+        
         if (validators.areMutuallyExclusive([params.password, params.password_confirmation]))
              throw new Error("Passwords do not match");
 
@@ -89,23 +111,12 @@ function service(data){
                 name: fullname
 	        }
         }
-        const requestHeaders = {
-            'Content-Type' : 'application/json',
-        }
+
 
         const url = config.notif_base_url + "email/send";
         
-        await axios({
-            method: 'POST',
-            url: url,
-            data: payload,
-            headers: requestHeaders,
-        }).then(response => {
-            response = response.data.data
-            d.resolve(response)
-        }).catch(err=> {
-            console.log(err)
-        })
+        // send the welcome email 
+        await makeRequest(url, 'POST', payload, requestHeaders);
         
         d.resolve(user);
     })

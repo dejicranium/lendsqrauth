@@ -2,7 +2,7 @@
 module.exports = (sequelize, DataTypes) => {
   const auth_token = sequelize.define('auth_token', {
     type: DataTypes.STRING,
-    user_id: DataTypes.INTEGER,
+    user_id: DataTypes.STRING,
     token: DataTypes.STRING,
     expiry: DataTypes.DATE
   }, {});

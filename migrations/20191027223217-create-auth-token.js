@@ -12,7 +12,7 @@ module.exports = {
         type: Sequelize.STRING
       },
       user_id: {
-        type: Sequelize.INTEGER
+        type: Sequelize.STRING // COULD BE A STRING
       },
       expiry: {
         type: Sequelize.DATE

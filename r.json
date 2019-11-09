@@ -22,5 +22,6 @@
 	"paginate":"/utils/paginate",
 	"assertions":"/utils/assertions",
 	"validators":"/utils/validators",
-	"testutils":"/utils/testutils"
+	"testutils":"/utils/testutils",
+	"makerequest":"/utils/request"
 }
