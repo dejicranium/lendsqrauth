@@ -8,7 +8,6 @@ const paginate = require('mlar')('paginate');
 
 var spec = morx.spec({}) 
 			   .build('user_id', 'required:true, eg:1')   
-			    
 			              
 			   .end();
 

@@ -27,7 +27,7 @@ function service(data){
 			return models.permission.findOne({ where: { id: params.permission_id }})
 		}
 		else {
-			return models.permission.findAll({ where: { id: params.permission_id }})
+			return models.permission.findAll()
 		}
 	}) 
 	.then((permission) => { 

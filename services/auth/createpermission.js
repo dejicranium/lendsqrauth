@@ -27,7 +27,8 @@ function service(data){
 	}) 
 	.spread((permission, params) => { 
         if (permission) throw new Error(`Permission already exists`);
-        return models.permission.create(params)        
+		permission.created_on = new Date();
+		return models.permission.create(params)        
         
     }).then((permission)=>{
         if (!permission) throw new Error("An error occured while carrying out this operation");
