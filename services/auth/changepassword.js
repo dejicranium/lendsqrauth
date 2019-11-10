@@ -1,12 +1,10 @@
 const models = require('mlar')('models');
-const ErrorLogger = require('mlar')('errorlogger'); 
 const morx = require('morx'); 
 const q = require('q'); 
 const bcrypt = require('bcrypt'); 
-const validators = require('mlar')('validators'); 
-const obval = require('mlar')('obval'); 
 const assert = require('mlar')('assertions'); 
-const DEFAULT_EXCLUDES = require('mlar')('appvalues').DEFAULT_EXCLUDES;
+const config = require('../../config');
+const makeRequest = require('mlar')('makerequest');
 
 var spec = morx.spec({}) 
 			   .build('current_password', 'required:true, eg:somethingsweet')   
@@ -23,6 +21,8 @@ function service(data){
 		const validParameters = morx.validate(data, spec, {throw_error : true});
 		data = validParameters.params;
         
+        assert.mustBeValidPassword(data.new_password);
+
         if (data.confirm_password != data.new_password)
             throw new Error("Passwords do not match")
         if (data.current_password == data.new_password)
@@ -45,8 +45,26 @@ function service(data){
         await models.auth_token.destroy({ where: {type: 'session', user_id: user.id}}, { force: true})
         return user.save();
         
-    }).then((user)=>{
+    }).then(async (user)=>{
         if (!user) throw new Error("An error occured while updating user's account");
+        
+        // prepare email;
+        const requestHeaders = {
+            'Content-Type' : 'application/json',
+        }
+        
+        // prepare email 
+        const payload = {
+            context_id: 79,
+            sender: config.sender_email,
+            recipient: user.email,
+            sender_id: 1,
+        }
+        const url = config.notif_base_url + "email/send";
+        
+        // send the change password email 
+        await makeRequest(url, 'POST', payload, requestHeaders);
+
         d.resolve("Successfully changed user's password");
     })
 	.catch( (err) => {

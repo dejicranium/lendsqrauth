@@ -2,6 +2,7 @@ var utils = require('mlar')('mt1l');
 const service = require('mlar').mreq('services', 'auth/delete');
 const routemeta = require('mlar')('routemeta');
 const auth_middleware = require('mlar')('authmiddleware');
+const has_role = require('mlar')('hasRoleMiddleware');
 
 function vinfo(req, res, next){ 
         const data = {...req.body, ...req.query, ...req.headers, ...req.params};
@@ -16,8 +17,11 @@ function vinfo(req, res, next){
 }
 
 vinfo.routeConfig = {};
-vinfo.routeConfig.path = "/user/:user_id"; 
+vinfo.routeConfig.path = "/admin/user/:user_id"; 
 vinfo.routeConfig.method = "delete"; 
-vinfo.routeConfig.middlewares = [auth_middleware, routemeta('auth_delete_user', 'none')];
+vinfo.routeConfig.middlewares = [
+    auth_middleware,
+    has_role('admin'),
+    routemeta('auth_delete_user', 'none')];
 module.exports = vinfo;
 

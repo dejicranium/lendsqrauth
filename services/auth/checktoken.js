@@ -13,7 +13,6 @@ const moment = require('moment');
 var spec = morx.spec({}) 
 			   .build('token', 'required:true')   
 			   .build('type', 'required:true')   
-               
 			   .end();
 
 function service(data){
@@ -32,12 +31,15 @@ function service(data){
             }
         })
 	}) 
-	.then((auth_token) => { 
+	.then(async (auth_token) => { 
 		if (!auth_token) throw new Error(`Token was not found`);
 		
-		// check whether token is yet to expire;
-        if (moment(new Date()).isAfter(auth_token.expiry)) throw new Error(`Token has expired`);
-		
+		if (auth_token.expiry) {
+			// check whether token is yet to expire;
+			if (moment(new Date()).isAfter(auth_token.expiry)) throw new Error(`Token has expired`);
+		}
+		// set auth_token to status 'used';
+		await auth_token.update({is_used: true});
 		d.resolve(auth_token);
         
    

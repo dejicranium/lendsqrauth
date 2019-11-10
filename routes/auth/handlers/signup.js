@@ -7,7 +7,7 @@ function vinfo(req, res, next){
         
         signupService(data)
         .then(response => {
-            utils.jsonS(res, response.data, "User account created successfully"); 
+            utils.jsonS(res, null, "User account created successfully"); 
         })
         .catch(error => {
             utils.jsonF(res, null, error.message); 
