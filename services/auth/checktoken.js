@@ -45,6 +45,7 @@ function service(data){
 		if (auth_token.type == 'user_activation') {
 			let user = await  models.user.findOne({where: {id: auth_token.user_id}});
 			user.active = 1;
+			await user.save();
 		}
 		d.resolve(auth_token);
         
