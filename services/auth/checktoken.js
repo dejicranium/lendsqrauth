@@ -40,6 +40,13 @@ function service(data){
 		}
 		// set auth_token to status 'used';
 		await auth_token.update({is_used: true});
+
+		// if it's an account activation token, activate user's account
+		if (auth_token.type == 'user_activation') {
+			let user = await  models.user.findOne({where: {id: auth_token.user_id}});
+			user.active = 1;
+			await user.save();
+		}
 		d.resolve(auth_token);
         
    
