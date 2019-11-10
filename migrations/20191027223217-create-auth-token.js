@@ -12,13 +12,16 @@ module.exports = {
         type: Sequelize.STRING
       },
       user_id: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER 
       },
       expiry: {
         type: Sequelize.DATE
       },
       token: {
         type: Sequelize.STRING
+      },
+      is_used: {
+        type: Sequelize.BOOLEAN
       },
       createdAt: {
         allowNull: false,

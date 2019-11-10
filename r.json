@@ -5,6 +5,7 @@
 	"routemeta":"/routes/middlewares/routemeta",
 	"authmiddleware":"/routes/middlewares/auth",
 	"hasPermMiddleware":"/middlewares/has_permission",
+	"hasRoleMiddleware":"/middlewares/has_role",
 	"appvalues":"/utils/appvalues",
 	"obval":"/utils/obval",
 	"errorer":"/utils/errorer",
@@ -22,5 +23,6 @@
 	"paginate":"/utils/paginate",
 	"assertions":"/utils/assertions",
 	"validators":"/utils/validators",
-	"testutils":"/utils/testutils"
+	"testutils":"/utils/testutils",
+	"makerequest":"/utils/request"
 }

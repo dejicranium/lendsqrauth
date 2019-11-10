@@ -9,8 +9,7 @@ const assert = require('mlar')('assertions');
 const DEFAULT_EXCLUDES = require('mlar')('appvalues').DEFAULT_EXCLUDES;
 
 var spec = morx.spec({}) 
-			   .build('first_name', 'required:false, eg:Tina')   
-               .build('user_id', 'required:true')
+               .build('user_id', 'required:true') // to be used by admin
                .build('status', 'required:true')
 			   .end();
 

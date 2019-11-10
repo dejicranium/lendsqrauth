@@ -9,38 +9,36 @@ const assert = require('mlar')('assertions');
 const DEFAULT_EXCLUDES = require('mlar')('appvalues').DEFAULT_EXCLUDES;
 
 var spec = morx.spec({}) 
-			   .build('user_id', 'required:true, eg:1')                  
+               .build('user_id', 'required:true')
+               .build('new_password', 'required:true')
+               .build('confirm_password', 'required:true')
 			   .end();
 
 function service(data){
 
 	var d = q.defer();
-	
-	q.fcall( async () => {
+    
+    q.fcall( async () => {
 		const validParameters = morx.validate(data, spec, {throw_error : true});
-		const params = validParameters.params;
-		
-		// ADMIN OR THE SPECIFIED USER INNSTIGATED THIS ACTION
-		params.user_id  = params.user_id || data.USER_ID;
-        
-
-        return [models.user.findOne({where: {id: params.user_id}
-        }), params ]
-	}) 
-	.spread((user, params) => { 
-        if (!user) throw new Error("User does not exist");
-        // soft delete
-        return user.update({deleted: 1, deleted_at: new Date(), active: 0, disabled: 0});
+        params = validParameters.params;
+        assert.mustBeValidPassword(data.new_password)
+        if (data.new_password != data.confirm_password) throw new Error("Passwords must match");
+        return [ models.user.findOne({where: {id: params.user_id}}), params];
+    })
+    .spread((user, params) => { 
+        return [user, bcrypt.hash(params.new_password, 10)]
+    }) 
+	.spread(async( user, generated_password) => { 
+       
+        user.password = generated_password;
+        return user.save();
         
     }).then((user)=>{
         if (!user) throw new Error("An error occured while updating user's account");
-        
-        d.resolve("Successfully deleted user's status");
+        d.resolve("Successfully reset user's password");
     })
 	.catch( (err) => {
-
 		d.reject(err);
-
 	});
 
 	return d.promise;

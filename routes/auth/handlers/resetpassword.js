@@ -1,15 +1,14 @@
 var utils = require('mlar')('mt1l');
-const forgotpassword = require('mlar').mreq('services', 'auth/forgotpassword');
 const routemeta = require('mlar')('routemeta');
 const auth_middleware = require('mlar')('authmiddleware');
-
-
+const service = require('mlar').mreq('services', 'auth/resetpassword');
 
 function vinfo(req, res, next){ 
         const data = {...req.body, ...req.query, ...req.headers, ...req.params};
-        forgotpassword(data)
+        
+        service(data)
         .then(response => {
-            utils.jsonS(res, response.data, "Password reset token has been sent to user's email"); 
+            utils.jsonS(res, response, "Password reset"); 
         })
         .catch(error => {
             utils.jsonF(res, null, error.message); 
@@ -17,8 +16,9 @@ function vinfo(req, res, next){
 }
 
 vinfo.routeConfig = {};
-vinfo.routeConfig.path = "/password/forgot"; 
-vinfo.routeConfig.method = "post"; 
-vinfo.routeConfig.middlewares = [routemeta('auth_forgot_password', 'none')];
+vinfo.routeConfig.path = "/reset/password"; 
+vinfo.routeConfig.method = "put"; 
+vinfo.routeConfig.middlewares = [
+    routemeta('auth_reset_password', 'none')];
 module.exports = vinfo;
 

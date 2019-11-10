@@ -7,7 +7,8 @@ const auth_middleware = require('mlar')('authmiddleware');
 
 function vinfo(req, res, next){ 
         const data = {...req.body, ...req.query, ...req.headers, ...req.params};
-        data.USERID = req.user.id
+        
+        data.USER_ID = req.user.id;
         
         forgotpassword(data)
         .then(response => {

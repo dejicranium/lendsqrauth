@@ -47,6 +47,38 @@ module.exports ={
             const errorFields = params.length ? params.map(param => param).join(', ') : entities.map(entity => entity).join(', ');
             throw new Error(`${errorFields} cannot be the same value`);
         }
+    },
+
+    mustBeValidPassword(password) {
+        // lazily check;
+
+        let oneUpperCaseCharacter = false;
+        let oneLowerCaseCharacter = false;
+        let oneSpecialCharacter = false;
+
+        for (let i = 0; i < password.toString().length; i++) {
+            let character = password.charAt(i);
+
+            if (/[A-Z]/.test(character)) {
+                oneUpperCaseCharacter = true;
+            }
+            else if (/[a-z]/.test(character)) {
+                oneLowerCaseCharacter = true;
+            }
+            else if (/[0123456789!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(character)) {
+                oneSpecialCharacter = true;
+            }
+
+            if (oneUpperCaseCharacter && oneLowerCaseCharacter && oneSpecialCharacter) {
+                // can end loop
+                return;
+            }
+        }
+
+        if (!oneUpperCaseCharacter) throw new Error("Password must have at least one uppercase character");
+        if (!oneLowerCaseCharacter) throw new Error("Password must have at least one lowercase character");
+        if (!oneSpecialCharacter) throw new Error("Password must have at least one special character or digit");
+
     }
     
 }

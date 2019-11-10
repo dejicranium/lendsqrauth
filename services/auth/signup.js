@@ -3,11 +3,10 @@ const morx = require('morx');
 const q = require('q'); 
 const bcrypt = require('bcrypt'); 
 const validators = require('mlar')('validators'); 
-const obval = require('mlar')('obval'); 
 const assert = require('mlar')('assertions'); 
-const DEFAULT_EXCLUDES = require('mlar')('appvalues').DEFAULT_EXCLUDES;
-const axios = require('axios');
 const config = require('../../config');
+const makeRequest = require('mlar')('makerequest');
+const crypto = require('crypto');
 
 var spec = morx.spec({}) 
 			   .build('first_name', 'required:false, eg:Tina')   
@@ -23,16 +22,36 @@ var spec = morx.spec({})
 function service(data){
 
 	var d = q.defer();
-	
+    const requestHeaders = {
+        'Content-Type' : 'application/json',
+    }
 	q.fcall( async () => {
 		var validParameters = morx.validate(data, spec, {throw_error:true});
 		let params = validParameters.params;
         
-        
-        let role = await models.role.findAll({where: {id: params.type }});
-        if (!role) throw new Error("No such role exists")
-        
         assert.emailFormatOnly(params.email);  // validate email, throw error if it's some weird stuff
+        
+        assert.mustBeValidPassword(params.password);
+
+        let role = await models.role.findAll({where: {id: params.type }});
+        if (!role) throw new Error("No such role exists. Change `type`");
+
+        // make request to verify phone number
+        const verifiedPhone = await makeRequest(
+            config.utility_base_url + 'verify/phone/',
+            'POST',
+            { phone: params.phone },
+            requestHeaders,
+            'Phone validation'
+        )
+        
+        if (verifiedPhone) {
+            if (verifiedPhone.phone == undefined && verifiedPhone.countryCode == undefined) throw new Error("Phone number not valid");
+        }
+        if (verifiedPhone.status == 'error'){
+            throw new Error("Could not validate phone number");
+        }
+        
         if (validators.areMutuallyExclusive([params.password, params.password_confirmation]))
              throw new Error("Passwords do not match");
 
@@ -42,7 +61,7 @@ function service(data){
         if (role.name == "individual_lender" && !(params.first_name && params.last_name)) 
             throw new Error("Individual accounts must have a first and last name");
 
-        if (role.name == "business_lender" && params.business_name == undefined) 
+        else if (role.name == "business_lender" && params.business_name == undefined) 
             throw new Error("Business accounts must have a business name");
         
         
@@ -55,17 +74,19 @@ function service(data){
             }
         }), params, role]
 	}) 
-	.spread((user, params, role) => { 
+	.spread(async (user, params, role) => { 
         if (user) throw new Error("User with this email already exists");
         
         // make user active from the get-go
-        params.active = 1;
         params.created_on = new Date();
 
         // role_id is the type passed from frontend 
         params.role_id = params.type;  delete params.type;
 
         return models.sequelize.transaction((t1) => {
+            // create user, his profile and then activation token
+            // all in one transaction
+            
             return q.all([
                 models.user.create(params, {transaction: t1}), 
                 models.profile.create({role_id: params.role_id}, {transaction: t1})
@@ -75,11 +96,36 @@ function service(data){
     }).spread(async (user, profile)=>{
         if (!user) throw new Error("An error occured while creating user's account");
         if (!profile) throw new Error("Could not create a profile user")
-        await profile.update({user_id: user.id})
         
-        let fullname = user.type == 'business' ? user.business_name : user.first_name + ' ' + user.last_name;
+        // update created profile
+        await profile.update({user_id: user.id})
+
+        // create activation token
+        const userToken = await crypto.randomBytes(32).toString('hex')
+
+        const token = await models.auth_token.findOrCreate({
+            where: {
+                user_id: user.id,
+                type: 'user_activation'
+            },
+            defaults: {
+                user_id: user.id,
+                type: 'user_activation',
+                token: userToken,
+            }
+        });
+
+        // if token type already existed for user
+        if (!token[1]) {
+            // update token record  - no two tokens of the same type for a user
+            await token.update({
+                token: userToken
+            });
+        }
+        
+        let fullname =  user.business_name ||  user.first_name + ' ' + user.last_name;
         // send email 
-        const payload= {
+        let payload= {
             context_id: 69,
             sender: config.sender_email,
             recipient: user.email,
@@ -89,24 +135,18 @@ function service(data){
                 name: fullname
 	        }
         }
-        const requestHeaders = {
-            'Content-Type' : 'application/json',
-        }
 
         const url = config.notif_base_url + "email/send";
         
-        await axios({
-            method: 'POST',
-            url: url,
-            data: payload,
-            headers: requestHeaders,
-        }).then(response => {
-            response = response.data.data
-            d.resolve(response)
-        }).catch(err=> {
-            console.log(err)
-        })
+        // send the welcome email 
+        await makeRequest(url, 'POST', payload, requestHeaders);
         
+        // prepare to send email verification email
+        payload.context_id = 81;
+        payload.data.token = userToken;
+
+        await makeRequest(url, 'POST', payload, requestHeaders);
+        // add activation email to response
         d.resolve(user);
     })
 	.catch( (err) => {

@@ -9,6 +9,8 @@ const assert = require('mlar')('assertions');
 const crypto = require('crypto');
 const DEFAULT_EXCLUDES = require('mlar')('appvalues').DEFAULT_EXCLUDES;
 const moment = require('moment')
+const config = require('../../config');
+const makeRequest = require('mlar')('makerequest');
 
 var spec = morx.spec({}) 
 			   .build('email', 'required:true, eg:itisdeji@gmail.com')   
@@ -16,7 +18,6 @@ var spec = morx.spec({})
 			   .end();
 
 function service(data){
-    const globalUserId = data.USERID
 	var d = q.defer();
 	
 	q.fcall( async () => {
@@ -29,33 +30,64 @@ function service(data){
         return [ models.user.findOne({
             where: {
                 email: params.email
-            }
+            },
+            
         }), params]
 	}) 
 	.spread((user, params) => { 
         if (!user) throw new Error(`User with email ${params.email} was not found`);
-        if (globalUserId !== user.id) throw new Error("You don't have access to this account");
-        return crypto.randomBytes(32).toString('hex');
+
+        //if (globalUserId !== user.id) throw new Error("You don't have access to this account");
         
-    }).then((randomBytes)=>{
+        return [crypto.randomBytes(32).toString('hex'), user];
+        
+    }).spread((randomBytes, user)=>{
         if (!randomBytes) throw new Error("An error occured while carrying out this operation");
         
-        return [models.auth_token.findOne({where: {
-            id: 1,
-            type: 'password_reset',
-        }}), randomBytes];
+        // for password reset, user_id will be the user email;
+        return [
+            models.auth_token.findOne({where: { type: 'password_reset', user_id: user.id }}),
+            randomBytes, 
+            user
+        ];
 
-    }).spread((usertoken, token) => {
-        // store as auth token and set expiry to 10 minutes from now
-        let expiry = moment(new Date()).add(10, 'minutes');
+    }).spread((usertoken, token, user) => {
         
-        if (!usertoken) return models.auth_token.create({type: 'password_reset', user_id: globalUserId, token: token, expiry: expiry})
-        return usertoken.update({
-            token: token, 
-            expiry: expiry
-        })
-    }).then(tokencreated=> {
+        // store as auth token and set expiry to 20 minutes from now
+        let expiry = moment(new Date()).add(20, 'minutes');
+
+        if (!usertoken) 
+            return [
+                models.auth_token.create({type: 'password_reset', user_id: user.id, token: token, expiry: expiry}), 
+                user
+            ];
+
+        return [
+            usertoken.update({ token: token, expiry: expiry}), 
+            user
+        ];
+    
+    }).spread(async (tokencreated, user)=> {
         if (!tokencreated) throw new Error("An error occured please try again");
+        
+        let fullname =  user.business_name  || user.first_name + ' ' + user.last_name;
+
+        const payload= {
+            context_id: 80,
+            sender: config.sender_email,
+            recipient: user.email,
+            sender_id: 1,
+            data:{
+                email: user.email,
+                name: fullname,
+                url: `https://lendsqr.com/reset/password?token=${tokencreated.token}&u_id=${user.id}`,
+                token: tokencreated.token
+            }
+        }
+        const url = config.notif_base_url + "email/send";
+        const requestHeaders = {'Content-Type' : 'application/json'}
+        await makeRequest(url, 'POST', payload, requestHeaders);
+
         d.resolve(tokencreated.token);
     })
 	.catch( (err) => {
