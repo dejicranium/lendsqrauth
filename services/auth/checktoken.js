@@ -33,7 +33,7 @@ function service(data){
 	}) 
 	.then(async (auth_token) => { 
 		if (!auth_token) throw new Error(`Token was not found`);
-		
+		if (auth_token.is_used) throw new Error("Token has been previously used");
 		if (auth_token.expiry) {
 			// check whether token is yet to expire;
 			if (moment(new Date()).isAfter(auth_token.expiry)) throw new Error(`Token has expired`);
