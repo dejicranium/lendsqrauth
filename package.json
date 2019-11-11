@@ -9,6 +9,7 @@
     "prof-test": "mocha test/services/profile --recursive",
     "product-test": "mocha test/services/product --recursive",
     "coll-test": "mocha test/services/collection --recursive",
+    "pref-test": "mocha test/services/preference --recursive",
     "start": "node_modules/.bin/sequelize db:migrate && node app.js"
   },
   "keywords": [],

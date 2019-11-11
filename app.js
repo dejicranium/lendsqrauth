@@ -31,6 +31,7 @@ const apis_auth = require('./routes/auth');
 const apis_profile = require('./routes/profile');
 const apis_product = require('./routes/product');
 const apis_collection = require('./routes/collection');
+const apis_preferences = require('./routes/preference');
 
 const EndpointRouter = require('express').Router();
 
@@ -101,6 +102,7 @@ app.use(version, apis_auth(EndpointRouter));
 app.use(version, apis_profile(EndpointRouter));
 app.use(version, apis_product(EndpointRouter));
 app.use(version, apis_collection(EndpointRouter));
+app.use(version, apis_preferences(EndpointRouter));
 
 
 
