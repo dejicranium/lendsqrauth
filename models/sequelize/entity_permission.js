@@ -16,6 +16,7 @@ module.exports = (sequelize, DataTypes) => {
   });
   entity_permission.associate = function(models) {
     // associations can be defined here
+    entity_permission.hasMany(models.permission, {foreignKey: 'permission_id'});
   };
   return entity_permission;
 };

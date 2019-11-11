@@ -49,7 +49,7 @@ function service(data){
 		
 	}).spread((permission, params)=> {
         if(permission) throw new Error("Permission already exists");
-
+        params.created_on = new Date();
         return models.entity_permission.create(params);
 	
 	}).then(created=>  {

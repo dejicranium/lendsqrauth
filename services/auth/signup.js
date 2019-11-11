@@ -9,8 +9,8 @@ const makeRequest = require('mlar')('makerequest');
 const crypto = require('crypto');
 
 var spec = morx.spec({}) 
-			   .build('first_name', 'required:false, eg:Tina')   
-               .build('last_name', 'required:false, eg:Braxton') 
+			   .build('first_name', 'required:true, eg:Tina')   
+               .build('last_name', 'required:true, eg:Braxton') 
                .build('password', 'required:true, eg:tinatona98') 
                .build('password_confirmation', 'required:true, eg:tinatona98') 
                .build('business_name', 'required:false, eg:Tina Comms')
@@ -57,10 +57,7 @@ function service(data){
 
         if (params.password.length < 8) 
             throw new Error("Password cannot be less than 8 characters");
-        
-        if (role.name == "individual_lender" && !(params.first_name && params.last_name)) 
-            throw new Error("Individual accounts must have a first and last name");
-
+    
         else if (role.name == "business_lender" && params.business_name == undefined) 
             throw new Error("Business accounts must have a business name");
         
