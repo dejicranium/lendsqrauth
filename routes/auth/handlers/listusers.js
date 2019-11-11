@@ -5,7 +5,7 @@ const auth_middleware = require('mlar')('authmiddleware');
 const has_perm_middleware = require('mlar')('hasPermMiddleware');
 
 function vinfo(req, res, next){ 
-        const data = {...req.body, ...req.query, ...req.headers, ...req.params};
+        const data = {...req.query};
         
         service(data)
         .then(response => {
@@ -19,6 +19,6 @@ function vinfo(req, res, next){
 vinfo.routeConfig = {};
 vinfo.routeConfig.path = "/users"; 
 vinfo.routeConfig.method = "get"; 
-vinfo.routeConfig.middlewares = [auth_middleware, has_perm_middleware('get_users'), routemeta('get_users', 'none')];
+vinfo.routeConfig.middlewares = [auth_middleware, routemeta('get_users', 'none')];
 module.exports = vinfo;
 
