@@ -57,6 +57,7 @@ function service(data){
         }
         return  [user,  token.update({
             token: newToken,
+            is_used: 0
         })]
         
 

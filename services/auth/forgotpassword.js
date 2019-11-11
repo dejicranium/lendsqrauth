@@ -63,7 +63,7 @@ function service(data){
             ];
 
         return [
-            usertoken.update({ token: token, expiry: expiry}), 
+            usertoken.update({ token: token, expiry: expiry, is_used: 0}), 
             user
         ];
     

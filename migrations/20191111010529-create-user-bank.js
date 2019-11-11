@@ -1,33 +1,36 @@
 'use strict';
 module.exports = {
   up: (queryInterface, Sequelize) => {
-    return queryInterface.createTable('profile_contacts', {
+    return queryInterface.createTable('user_banks', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      contact_first_name: {
+      bvn: {
         type: Sequelize.STRING
       },
-      profile_id: {
-        type: Sequelize.INTEGER,
+      user_id: {
+        type: Sequelize.INTEGER
       },
-      contact_last_name: {
+      account_number: {
         type: Sequelize.STRING
       },
-      contact_phone: {
+      bank_code: {
         type: Sequelize.STRING
       },
-      contact_email: {
+      bank_name: {
         type: Sequelize.STRING
       },
-      support_email: {
-        type: Sequelize.STRING
+      is_default: {
+        type: Sequelize.BOOLEAN
       },
-      contact_role: {
-        type: Sequelize.STRING
+      is_active: {
+        type: Sequelize.BOOLEAN
+      },
+      deleted_flag: {
+        type: Sequelize.BOOLEAN
       },
       deleted_on:{
         type: Sequelize.DATE,
@@ -54,6 +57,6 @@ module.exports = {
     });
   },
   down: (queryInterface, Sequelize) => {
-    return queryInterface.dropTable('profile_contacts');
+    return queryInterface.dropTable('user_banks');
   }
 };

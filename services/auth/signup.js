@@ -109,6 +109,7 @@ function service(data){
                 user_id: user.id,
                 type: 'user_activation',
                 token: userToken,
+                is_used: 0,
             }
         });
 
@@ -116,7 +117,8 @@ function service(data){
         if (!token[1]) {
             // update token record  - no two tokens of the same type for a user
             await token.update({
-                token: userToken
+                token: userToken,
+                is_used: 0
             });
         }
         

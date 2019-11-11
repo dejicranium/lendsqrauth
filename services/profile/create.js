@@ -23,6 +23,7 @@ var spec = morx.spec({})
 			   .build('contact_phone', 'required:false, eg:lender')   
 			   .build('contact_email', 'required:false, eg:lender')   
 			   .build('contact_role', 'required:false, eg:lender')   
+			   .build('support_email', 'required:false, eg:lender')   
 			   .end();
 
 function service(data){

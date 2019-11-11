@@ -22,6 +22,7 @@ module.exports = async function (req, res, next) {
         }).then(resp=> {
             if (!resp) utils.jsonF(res, null, "Invalid access token");
             req.user = resp.user
+    
             req.decoded = decoded
             next()
         })
