@@ -17,7 +17,7 @@ module.exports = (url, method, payload, headers, caller=null) => {
         d.resolve(response)
     }).catch(err=> {
         if (caller) {
-            d.reject(new Error(`${caller} returned ${err}`))
+            d.reject(new Error(`Could not ${caller}`))
         }
         d.reject(err)
     })

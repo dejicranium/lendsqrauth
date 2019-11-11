@@ -17,7 +17,11 @@ var spec = morx.spec({})
 			   .build('tin_number', 'required:false, eg:lender')   
 			   .build('state', 'required:false, eg:lender')   
 			   .build('country', 'required:false, eg:lender')   
-			   .build('deleted_flag', 'required:false, eg:lender')   
+			   .build('contact_first_name', 'required:false, eg:lender')   
+			   .build('contact_last_name', 'required:false, eg:lender')   
+			   .build('contact_phone', 'required:false, eg:lender')   
+			   .build('contact_email', 'required:false, eg:lender')   
+			   .build('support_email', 'required:false, eg:lender')   
 			              
 			   .end();
 
@@ -39,9 +43,12 @@ function service(data){
 	}) 
 	.spread((profile, params) => { 
         if (!profile) throw new Error("Profile does not exist");
-        return profile.update({...params});
-    }).then((profile)=>{
-        if (!profile) throw new Error("An error occured while updating user's profile");        
+        return [profile.update({...params}), params];
+    }).then(async (profile, params)=>{
+		if (!profile) throw new Error("An error occured while updating user's profile"); 
+		// update contact too
+		let profile =  await models.profile_contact.findOne({where: {profile_id: params.profile_id}})
+		await profile.update({...params});
         d.resolve("Successfully updated user's profile");
     })
 	.catch( (err) => {
