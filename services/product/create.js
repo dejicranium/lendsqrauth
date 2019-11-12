@@ -32,6 +32,20 @@ function service(data){
 		const params = validParameters.params;
 
 		if (params.product_name.length > 255) throw new Error("Product name cannot be more than 255 characters");
+		
+
+		// make sure that the lender is a valid profile;
+		let lenderProfile = models.profile.findOne({
+			where: {
+				id: params.lender_id
+			},
+			
+		});
+		
+		if (!lenderProfile) {
+			throw new Error("Lender indicated by lender_id doesn't exist");
+		}
+		
 
         let getProductName = models.product.findOne({
             where: {
@@ -49,6 +63,7 @@ function service(data){
         // set creation details
         params.created_on = new Date();
         params.created_by = globalUserId;
+		params.status = 'active';
 
         return models.product.create({...params})
     }).then((product)=>{

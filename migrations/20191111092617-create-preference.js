@@ -1,7 +1,7 @@
 'use strict';
 module.exports = {
   up: (queryInterface, Sequelize) => {
-    return queryInterface.createTable('permissions', {
+    return queryInterface.createTable('preferences', {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -11,22 +11,25 @@ module.exports = {
       name: {
         type: Sequelize.STRING
       },
-      description: {
-        type: Sequelize.STRING
-      },
-      deleted_flag: {
-        type: Sequelize.BOOLEAN
-      },
-      deleted_on:{
+      created_on:{
         type: Sequelize.DATE,
+        allowNull: false,
       } ,
-      deleted_by:{
+      created_by:{
         type: Sequelize.INTEGER,
       } ,
-    
+      modified_on:{
+        type: Sequelize.DATE,
+        allowNull: false,
+        defaultValue: new Date()
+
+      },
+      modified_by: {
+        type: Sequelize.INTEGER,
+      }
     });
   },
   down: (queryInterface, Sequelize) => {
-    return queryInterface.dropTable('permissions');
+    return queryInterface.dropTable('preferences');
   }
 };
