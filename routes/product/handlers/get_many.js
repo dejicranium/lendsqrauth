@@ -5,7 +5,7 @@ const service = require('mlar').mreq('services', 'product/get');
 
 function vinfo(req, res, next){ 
         const data = {...req.body, ...req.query, ...req.headers, ...req.params};
-        
+        data.fetch_all = true;
         service(data)
         .then(response => {
             utils.jsonS(res, response, "Products"); 

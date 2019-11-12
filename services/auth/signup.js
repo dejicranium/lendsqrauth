@@ -42,7 +42,7 @@ function service(data){
             'POST',
             { phone: params.phone },
             requestHeaders,
-            'Phone validation'
+            'validate phone'
         )
         
         if (verifiedPhone) {
@@ -72,7 +72,7 @@ function service(data){
         }), params, role]
 	}) 
 	.spread(async (user, params, role) => { 
-        if (user) throw new Error("User with this email already exists");
+        if (user) throw new Error("User with these credentials exists");
         
         // make user active from the get-go
         params.created_on = new Date();

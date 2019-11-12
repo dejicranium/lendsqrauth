@@ -21,7 +21,18 @@ function service(data){
                 }
             })
         }
-        return models.preference.findAll({})
+
+        let selection  = {
+            where: {
+
+            }
+        }
+
+        if (!data.raw) {
+            selection.where.display = 1;
+        }
+        
+        return models.preference.findAll(selection);
 	})
 	.then( async (preferences) => {
 		if (!preferences) throw new Error("No preferences");

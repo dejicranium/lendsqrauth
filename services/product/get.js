@@ -26,21 +26,64 @@ function service(data){
         
 
         // get by lender_id
-        if (params.lender_id){
+        if (data.fetch_all){
             const page = data.page ? Number(data.page) : 1;
             const limit = data.limit ? data.limit : 20;
             const offset = page ? (page - 1) * limit : false;	
             
             data.limit = limit;
             data.offset = offset;
+
+            if (data.status) {
+                data.where.status = data.status;
+                delete data.status;
+            }
+            if (data.product_name) {
+                data.where.product_name = {$like: '%' + data.product_name + '%'};
+                delete data.product_name;
+            }
+            if (data.product_description) {
+                data.where.product_description = {$like: '%' + data.product_description + '%'};
+                delete data.product_description;
+            }
+            if (data.repayment_model) {
+                data.where.repayment_model = {$like: '%' + data.repayment_model + '%'};
+                delete data.repayment_model;
+            }
+            if (data.repayment_method) {
+                data.where.repayment_method = data.repayment_method;
+                delete data.repayment_method;
+            }
+            if (data.interest) {
+                data.where.interest = data.interest;
+                delete data.interest;
+            }
+            if (data.deleted) {
+                data.where.deleted_flag = 1;
+                delete data.deleted;
+            }
+
+            // default sort order
+            
+            data.order = [['id', 'DESC']];
+
+            // if sort order is passed in the query string
+            if (data.sort) {
+                data.order = [[data.sort.toString(), 'DESC']]
+            }
             
             // selection for lender id
-            data.where = {
-                lender_id: params.lender_id
-            }
+            if (params.lender_id) data.where.lender_id =  params.lender_id;
+            
             return [ models.product.findAndCountAll(data), data];
         }
 
+        else if (params.lender_id && !data.fetch_all) {
+            data.where.lender_id =  params.lender_id
+            return [ models.product.findAll(data), data];
+        }
+
+        
         // filter by product - id : returns an object
         else if (params.product_id) {
             data.fetch_one = true;

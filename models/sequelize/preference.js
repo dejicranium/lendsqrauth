@@ -7,8 +7,12 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue: new Date(),
     },
     created_by: DataTypes.INTEGER,
-    modified_on: DataTypes.DATE,
-    modified_by: DataTypes.DATE,
+    modified_on: {
+      type: DataTypes.DATE,
+      defaultValue: new Date()
+    },
+    modified_by: DataTypes.INTEGER,
+    display: DataTypes.BOOLEAN,
   
   }, {
     timestamps: false

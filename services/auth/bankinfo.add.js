@@ -55,7 +55,7 @@ function service(data){
                 bvn: params.bvn
             }
             let phoneNumberFromBVN = null;
-            let verifiedBVN = await makeRequest(url, 'POST', payload, requestHeaders, 'Verify BVN');
+            let verifiedBVN = await makeRequest(url, 'POST', payload, requestHeaders, 'verify B  VN');
     
             if (verifiedBVN && verifiedBVN.mobile) {
                 phoneNumberFromBVN = verifiedBVN.mobile;

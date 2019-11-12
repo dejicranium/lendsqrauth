@@ -9,7 +9,7 @@ function vinfo(req, res, next){
         const data = {...req.body, ...req.query, ...req.headers, ...req.params};
         forgotpassword(data)
         .then(response => {
-            utils.jsonS(res, response.data, "Password reset token has been sent to user's email"); 
+            utils.jsonS(res, response.data, "Please check your email for a link to reset your password"); 
         })
         .catch(error => {
             utils.jsonF(res, null, error.message); 
