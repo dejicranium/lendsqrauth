@@ -11,11 +11,30 @@ module.exports = {
       name: {
         type: Sequelize.STRING
       },
-      email: {
+      borrower_name: {
+        type: Sequelize.STRING,
+      },
+      
+      borrower_email: {
+        type: Sequelize.STRING,
+      },
+      borrower_bvn: {
+        type: Sequelize.STRING,
+      },
+      borrower_phone: {
+        type: Sequelize.STRING,
+      },
+      disbursement_mode: {
         type: Sequelize.STRING
       },
-      mobile: {
-        type: Sequelize.STRING
+      disbursement_date: {
+        type: Sequelize.DATE
+      },
+      num_of_collections: {
+        type: Sequelize.INTEGER
+      },
+      collection_frequency: {
+        type: Sequelize.INTEGER
       },
       product_id: {
         type: Sequelize.INTEGER
@@ -29,14 +48,14 @@ module.exports = {
       lender_id: {
         type: Sequelize.INTEGER
       },
+      lender_name: {
+        type: Sequelize.STRING
+      },
       product_id: {
         type: Sequelize.INTEGER
       },
       tenor: {
         type: Sequelize.STRING
-      },
-      loan_amount: {
-        type: Sequelize.DOUBLE
       },
       loan_status: {
         type: Sequelize.STRING

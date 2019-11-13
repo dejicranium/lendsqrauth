@@ -79,6 +79,26 @@ module.exports ={
         if (!oneLowerCaseCharacter) throw new Error("Password must have at least one lowercase character");
         if (!oneSpecialCharacter) throw new Error("Password must have at least one special character or digit");
 
+    },
+
+    mustBeAllOrNone(array, arraylabels) {
+        // no element of the array can be null if at least one is not null;
+
+        // loop 
+        // if an element is not null in the array, gracefully exist;
+        
+        let element = array.find(element=> element !== null && element !== undefined);
+
+        if (element) {
+            array.forEach(i=> {
+                if (i == undefined || i == null) {
+                    let labels = arraylabels.join(', ');
+
+                    throw new Error(`${labels} must be defined together`);
+                }
+            })
+        }
+        
     }
     
 }
