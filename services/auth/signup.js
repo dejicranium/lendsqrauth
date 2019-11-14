@@ -30,7 +30,12 @@ function service(data){
 		let params = validParameters.params;
         
         assert.emailFormatOnly(params.email);  // validate email, throw error if it's some weird stuff
-        
+        if (params.first_name.length < 3) {
+            throw new Error("Name cannot be less than 3 characters")
+        }
+        if (params.last_name.length < 3) {
+            throw new Error("Name cannot be less than 3 characters")
+        }
         assert.mustBeValidPassword(params.password);
 
         let role = await models.role.findAll({where: {id: params.type }});
@@ -118,7 +123,7 @@ function service(data){
             // update token record  - no two tokens of the same type for a user
             await token.update({
                 token: userToken,
-                is_used: 0
+                is_used: 0  
             });
         }
         

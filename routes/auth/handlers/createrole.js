@@ -18,6 +18,8 @@ function vinfo(req, res, next){
 vinfo.routeConfig = {};
 vinfo.routeConfig.path = "/role"; 
 vinfo.routeConfig.method = "post"; 
-vinfo.routeConfig.middlewares = [auth_middleware, routemeta('auth_create_role', 'none')];
+vinfo.routeConfig.middlewares = [
+    auth_middleware, 
+    routemeta('auth_create_role', 'none')];
 module.exports = vinfo;
 
