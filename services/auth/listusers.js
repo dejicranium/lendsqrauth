@@ -8,14 +8,13 @@ function service(data){
     const d = q.defer();
     
     const page = data.page ? Number(data.page) : 1;
-    const limit = data.limit ? data.limit : 20;
+    const limit = data.limit ? Number(data.limit) : 20;
     const offset = page ? (page - 1) * limit : false;	
-    delete data.page;
 
     
     let params = {};
 
-    params.limit = limit;
+    params.page = page;
     params.offset = offset;
     params.attributes = {};
     params.attributes.exclude = ['password'];
