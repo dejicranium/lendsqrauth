@@ -22,7 +22,7 @@ function service(data){
 		const validParameters = morx.validate(data, spec, {throw_error : true});
 		const params = validParameters.params;
         const page = data.page ? Number(data.page) : 1;
-        const limit = data.limit ? data.limit : 20;
+        const limit = data.limit ? Number(data.limit) : 20;
         const offset = page ? (page - 1) * limit : false;	
         
         data.limit = limit;
@@ -52,7 +52,7 @@ function service(data){
 	.spread((schedules, data) => { 
         if (!schedules) throw new Error("No schedules available");
         
-        d.resolve(paginate(schedules.rows, 'schedules', schedules.count, data.limit, data.page));
+        d.resolve(paginate(schedules.rows, 'schedules', schedules.count, Number(data.limit), data.page));
     })
 	.catch( (err) => {
 
