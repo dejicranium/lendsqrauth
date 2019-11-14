@@ -2,6 +2,7 @@ var utils = require('mlar')('mt1l');
 const routemeta = require('mlar')('routemeta');
 const auth_middleware = require('mlar')('authmiddleware');
 const service = require('mlar').mreq('services', 'auth/createrole');
+const has_role = require('mlar')('hasRoleMiddleware');
 
 function vinfo(req, res, next){ 
         const data = {...req.body, ...req.query, ...req.headers, ...req.params};
@@ -20,6 +21,7 @@ vinfo.routeConfig.path = "/role";
 vinfo.routeConfig.method = "post"; 
 vinfo.routeConfig.middlewares = [
     auth_middleware, 
+    has_role('admin'), 
     routemeta('auth_create_role', 'none')];
 module.exports = vinfo;
 
