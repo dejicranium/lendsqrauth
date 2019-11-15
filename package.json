@@ -27,6 +27,7 @@
     "express": "^4.17.0",
     "json2csv": "^4.5.2",
     "jsonwebtoken": "^7.2.1",
+    "jwt-decode": "^2.2.0",
     "mlar": "0.0.1",
     "mlite": "0.0.3",
     "moment": "^2.24.0",

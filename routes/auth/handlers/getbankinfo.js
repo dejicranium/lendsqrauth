@@ -5,7 +5,7 @@ const auth_middleware = require('mlar')('authmiddleware');
 
 function vinfo(req, res, next){ 
         const data = {...req.body, ...req.query, ...req.headers, ...req.params};
-        data.USER_ID = req.user.id;
+        data.user_id = req.user.id;
 
         service(data)
         .then(response => {
@@ -18,7 +18,7 @@ function vinfo(req, res, next){
 }
 
 vinfo.routeConfig = {};
-vinfo.routeConfig.path = "/users/:user_id/bank"; 
+vinfo.routeConfig.path = "/users/bank"; 
 vinfo.routeConfig.method = "get"; 
 vinfo.routeConfig.middlewares = [
     auth_middleware,

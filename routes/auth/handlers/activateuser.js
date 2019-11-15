@@ -1,16 +1,12 @@
 var utils = require('mlar')('mt1l');
+const service = require('mlar').mreq('services', 'auth/checktoken');
 const routemeta = require('mlar')('routemeta');
-const auth_middleware = require('mlar')('authmiddleware');
-const service = require('mlar').mreq('services', 'auth/createrole');
-const has_role = require('mlar')('hasRoleMiddleware');
-const profile_verify = require('mlar')('profileVerifyMiddleware');
 
 function vinfo(req, res, next){ 
         const data = {...req.body, ...req.query, ...req.headers, ...req.params};
-        
         service(data)
         .then(response => {
-            utils.jsonS(res, response, "Role created"); 
+            utils.jsonS(res, response, "Update was successful"); 
         })
         .catch(error => {
             utils.jsonF(res, null, error.message); 
@@ -18,12 +14,10 @@ function vinfo(req, res, next){
 }
 
 vinfo.routeConfig = {};
-vinfo.routeConfig.path = "/roles"; 
+vinfo.routeConfig.path = "/users/activate"; 
 vinfo.routeConfig.method = "post"; 
 vinfo.routeConfig.middlewares = [
-    auth_middleware, 
-    profile_verify,
-    has_role('admin'), 
-    routemeta('auth_create_role', 'none')];
+    routemeta('auth_activate_user', 'none')
+];
 module.exports = vinfo;
 

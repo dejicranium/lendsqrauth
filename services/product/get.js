@@ -28,7 +28,7 @@ function service(data){
         // get by lender_id
         if (data.fetch_all){
             const page = data.page ? Number(data.page) : 1;
-            const limit = data.limit ? data.limit : 20;
+            const limit = data.limit ? Number(data.limit) : 20;
             const offset = page ? (page - 1) * limit : false;	
             
             data.limit = limit;

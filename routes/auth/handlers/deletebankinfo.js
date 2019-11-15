@@ -24,10 +24,9 @@ function vinfo(req, res, next){
 }
 
 vinfo.routeConfig = {};
-vinfo.routeConfig.path = "/users/:user_id/bank"; 
+vinfo.routeConfig.path = "/users/bank"; 
 vinfo.routeConfig.method = "delete"; 
 vinfo.routeConfig.middlewares = [
-    auth_middleware,
     auth_middleware,
     routemeta('update_user_bank_info', 'none')
 ];

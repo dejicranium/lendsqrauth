@@ -6,7 +6,7 @@ const has_role = require('mlar')('hasRoleMiddleware');
 
 function vinfo(req, res, next){ 
         const data = {...req.body, ...req.query, ...req.headers, ...req.params};
-        data.USER_ID = req.user.id;
+        data.user_id = req.user.id;
 
         service(data)
         .then(response => {

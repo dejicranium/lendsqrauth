@@ -8,24 +8,24 @@ function service(data){
     const d = q.defer();
     
     const page = data.page ? Number(data.page) : 1;
-    const limit = data.limit ? data.limit : 20;
+    const limit = data.limit ? Number(data.limit) : 20;
     const offset = page ? (page - 1) * limit : false;	
-    
+
     
     let params = {};
-    params.limit = limit;
+
+    params.page = page;
     params.offset = offset;
     params.attributes = {};
     params.attributes.exclude = ['password'];
 
-    // include role 
-    params.include = [{model: models.profile}];
-
     // for filter conditions 
-    params.where = {
+    params.where = {};
 
-    }
-    
+    // include role 
+   //params.include = [{model: models.profile, required: false}];
+
+
     if (data.first_name) {
         params.where.first_name = {
             $like: '%' + data.first_name + '%'
@@ -52,11 +52,11 @@ function service(data){
             $like: '%' + data.business_name + '%'
         }
     }
-
+/*
     if (data.role) {
         params.include[0].where = data.role;
-    }
-    /*
+    }*/
+    
     if (data.active) {
         params.where.active = 1;
     }
@@ -75,7 +75,7 @@ function service(data){
             $gte: start.toISOString(), $lte: stop.toISOString()   
         }   
     }
-*/
+
     q.fcall( async () => {
         return models.user.findAndCountAll(params)
 	}) 

@@ -19,10 +19,7 @@ function service(data){
 	q.fcall( async () => {
 		const validParameters = morx.validate(data, spec, {throw_error : true});
 		const params = validParameters.params;
-		
-		// ADMIN OR THE SPECIFIED USER INNSTIGATED THIS ACTION
-		params.user_id  = params.user_id || data.USER_ID;
-        
+		        
 
         return [models.user.findOne({where: {id: params.user_id}
         }), params ]

@@ -6,7 +6,7 @@ const validators = require('mlar')('validators');
 const assert = require('mlar')('assertions'); 
 
 var spec = morx.spec({}) 
-			   .build('role_id', 'required:true, eg:1')   
+			   .build('user_id', 'required:true, eg:1')   
 			   .build('user_id', 'required:true, eg:1')   
 			   .build('parent_profile_id', 'required:false, eg:1')   
 			   .build('url', 'required:false, eg:lender')   

@@ -3,6 +3,7 @@ const routemeta = require('mlar')('routemeta');
 const auth_middleware = require('mlar')('authmiddleware');
 const service = require('mlar').mreq('services', 'preference/delete');
 const has_role = require('mlar')('hasRoleMiddleware');
+const profile_middleware = require('mlar')('profileVerifyMiddleware');
 
 function vinfo(req, res, next){ 
         const data = {...req.body, ...req.query, ...req.headers, ...req.params};
@@ -21,6 +22,8 @@ vinfo.routeConfig.path = "/:preference_id";
 vinfo.routeConfig.method = "delete"; 
 vinfo.routeConfig.middlewares = [
     auth_middleware,
+    profile_middleware,
+
     has_role('admin'),
     routemeta('create_collection', 'none')];
 module.exports = vinfo;

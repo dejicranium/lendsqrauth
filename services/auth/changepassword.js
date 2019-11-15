@@ -43,6 +43,7 @@ function service(data){
 
         // save user and invalidate already existing token.
         await models.auth_token.destroy({ where: {type: 'session', user_id: user.id}}, { force: true})
+        
         return user.save();
         
     }).then(async (user)=>{
