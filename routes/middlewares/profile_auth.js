@@ -14,23 +14,28 @@ module.exports = async function (req, res, next) {
     }
     catch(err) {
         utils.jsonF(res, null, "Profile token not supplied");
+        return;
     }
     
     jwt.verify(prof_token, config.JWTsecret, function(err, decoded){
         if (decoded && decoded.expiry < new Date())  utils.jsonF(res, null, "Expired access token");
 
-        if (err) utils.jsonF(res, null, "Profile token expired or invalid"); 
+        if (err) {
+            utils.jsonF(res, null, "Profile token expired or invalid"); 
+            return
+        }
         try {
             let decoded_dict = jwt_decode(prof_token);
             if (decoded_dict) {
                 req.profile = decoded_dict
                 next()
+                return;
     
             }
         }
         catch(err) {
             utils.jsonF(res, null, err);  
-            
+            return;
         }
         
         /*models.auth_token.findOne({

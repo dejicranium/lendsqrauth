@@ -4,6 +4,6 @@ var middlewares = require('mlar')('middlewares');
 var utils    = require('mlar')('mt1l');
 utils.buildRoutes(handlers, middlewares, router);
 module.exports = function (EndpointRouter) {
-    EndpointRouter.use('/profile', router);
+    EndpointRouter.use('/profiles', router);
     return EndpointRouter;
 }
