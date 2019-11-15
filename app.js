@@ -32,6 +32,8 @@ const apis_profile = require('./routes/profile');
 const apis_product = require('./routes/product');
 const apis_collection = require('./routes/collection');
 const apis_preferences = require('./routes/preference');
+var utils = require('mlar')('mt1l');
+
 
 const EndpointRouter = require('express').Router();
 
@@ -114,8 +116,10 @@ Handle 404
 //app.use(mosh.initMoshErrorHandler);
 
 
-app.use(base, function(req, res, next) {
-  res.json({m: `Undefined ${req.method} route access`})
+app.use(version, function(req, res, next) {
+  utils.jsonF(res, null, `Undefined ${req.method} route access`)
+
+ // res.json({m: `Undefined ${req.method} route access`})
 })
 
 
