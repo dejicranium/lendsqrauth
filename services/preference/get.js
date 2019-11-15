@@ -11,7 +11,7 @@ var spec = morx.spec({})
 function service(data){
 
     var d = q.defer();
-    const globalUserId = data.USER_ID;
+    const globalUserId = data.user_id;
 	q.fcall( async () => {
 
 		if (globalUserId) {

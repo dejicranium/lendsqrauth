@@ -16,14 +16,11 @@ var spec = morx.spec({})
 
 function service(data){
 	var d = q.defer();
-    let globalUserId = data.USER_ID;
 
     
     // decide whether to default user_id to the user making the request or not
     // as we don't want people except admin viewing other people's bank details 
     
-    data.user_id = data.ignore_default_user_id ? data.user_id : globalUserId;
-
 	q.fcall( async () => {
         const validation = morx.validate(data, spec, {throw_error: true});
         params = validation.params;

@@ -6,7 +6,7 @@ const has_role = require('mlar')('hasRoleMiddleware');
 
 function vinfo(req, res, next){ 
         const data = {...req.body, ...req.query, ...req.headers, ...req.params};
-        data.USER_ID = req.user.id;
+        data.user_id = req.user.id;
         service(data)
         .then(response => {
             const message = response == 'OTP verified' ? 'OTP correct and account details stored' : "BVN verified and OTP sent to user's phone";
@@ -18,7 +18,7 @@ function vinfo(req, res, next){
 }
 
 vinfo.routeConfig = {};
-vinfo.routeConfig.path = "/users/:user_id/bank"; 
+vinfo.routeConfig.path = "/users/bank"; 
 vinfo.routeConfig.method = "post"; 
 vinfo.routeConfig.middlewares = [
     auth_middleware,

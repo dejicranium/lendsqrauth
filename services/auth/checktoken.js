@@ -47,7 +47,7 @@ function service(data){
 			user.active = 1;
 			await user.save();
 		}
-		d.resolve(auth_token);
+		d.resolve("Activation successful");
         
    
     })

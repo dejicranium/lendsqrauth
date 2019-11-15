@@ -3,6 +3,7 @@ const routemeta = require('mlar')('routemeta');
 const auth_middleware = require('mlar')('authmiddleware');
 const service = require('mlar').mreq('services', 'auth/createpermission');
 const has_role = require('mlar')('hasRoleMiddleware');
+const profile_middleware = require('mlar')('profileVerifyMiddleware');
 
 function vinfo(req, res, next){ 
         const data = {...req.body, ...req.query, ...req.headers, ...req.params};
@@ -17,10 +18,12 @@ function vinfo(req, res, next){
 }
 
 vinfo.routeConfig = {};
-vinfo.routeConfig.path = "/admin/permissions"; 
+vinfo.routeConfig.path = "/permissions"; 
 vinfo.routeConfig.method = "post"; 
 vinfo.routeConfig.middlewares = [
     auth_middleware,
+    profile_middleware,
+
     has_role('admin'), 
     routemeta('auth_create_permission', 'none')];
 module.exports = vinfo;

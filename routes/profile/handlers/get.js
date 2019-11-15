@@ -1,11 +1,11 @@
 var utils = require('mlar')('mt1l');
 const routemeta = require('mlar')('routemeta');
 const auth_middleware = require('mlar')('authmiddleware');
+const profile_middleware = require('mlar')('profileVerifyMiddleware');
 const service = require('mlar').mreq('services', 'profile/get');
 
 function vinfo(req, res, next){ 
         const data = {...req.body, ...req.query, ...req.headers, ...req.params};
-        
         service(data)
         .then(response => {
             utils.jsonS(res, response, "Profile"); 
@@ -18,6 +18,6 @@ function vinfo(req, res, next){
 vinfo.routeConfig = {};
 vinfo.routeConfig.path = "/:profile_id"; 
 vinfo.routeConfig.method = "get"; 
-vinfo.routeConfig.middlewares = [auth_middleware, routemeta('get_profile', 'none')];
+vinfo.routeConfig.middlewares = [auth_middleware, profile_middleware, routemeta('get_profile', 'none')];
 module.exports = vinfo;
 

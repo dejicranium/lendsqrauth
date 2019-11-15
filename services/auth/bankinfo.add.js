@@ -23,7 +23,7 @@ function service(data){
         If there is, we verify OTP
     */
 	var d = q.defer();
-	const globalUserId = data.USER_ID;
+	const globalUserId = data.user_id;
     const requestHeaders = {
         'Content-Type' : 'application/json',
     }

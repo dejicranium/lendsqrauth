@@ -4,6 +4,7 @@
 	"handlers":"/routes/api/handlers",
 	"routemeta":"/routes/middlewares/routemeta",
 	"authmiddleware":"/routes/middlewares/auth",
+	"profileVerifyMiddleware":"/routes/middlewares/profile_auth",
 	"hasPermMiddleware":"/middlewares/has_permission",
 	"hasRoleMiddleware":"/middlewares/has_role",
 	"appvalues":"/utils/appvalues",

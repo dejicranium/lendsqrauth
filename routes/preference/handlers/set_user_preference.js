@@ -2,7 +2,7 @@ var utils = require('mlar')('mt1l');
 const routemeta = require('mlar')('routemeta');
 const auth_middleware = require('mlar')('authmiddleware');
 const service = require('mlar').mreq('services', 'preference/create');
-const has_role = require('mlar')('hasRoleMiddleware');
+const profile_middleware = require('mlar')('profileVerifyMiddleware');
 
 function vinfo(req, res, next){ 
         const data = {...req.body, ...req.query, ...req.headers, ...req.params};
@@ -23,6 +23,7 @@ vinfo.routeConfig.path = "/users/:user_id";
 vinfo.routeConfig.method = "put"; 
 vinfo.routeConfig.middlewares = [
     auth_middleware,
-    routemeta('create_collection', 'none')];
+    profile_middleware,
+    routemeta('set_user_preference', 'none')];
 module.exports = vinfo;
 

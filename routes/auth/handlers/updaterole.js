@@ -17,7 +17,7 @@ function vinfo(req, res, next){
 }
 
 vinfo.routeConfig = {};
-vinfo.routeConfig.path = "/role/:role_id/update"; 
+vinfo.routeConfig.path = "/roles/:role_id/update"; 
 vinfo.routeConfig.method = "put"; 
 vinfo.routeConfig.middlewares = [auth_middleware, routemeta('auth_update_role', 'none')];
 module.exports = vinfo;
