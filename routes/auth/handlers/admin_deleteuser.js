@@ -17,7 +17,7 @@ function vinfo(req, res, next){
 }
 
 vinfo.routeConfig = {};
-vinfo.routeConfig.path = "/admin/user/:user_id"; 
+vinfo.routeConfig.path = "/admin/users/:user_id"; 
 vinfo.routeConfig.method = "delete"; 
 vinfo.routeConfig.middlewares = [
     auth_middleware,
