@@ -28,14 +28,14 @@ function service(data){
         return [ models.user.findOne({ where: {  email: params.email}}), params]
 	}) 
 	.spread((user, params) => { 
-        if (!user) throw new Error("No such email exists");
+        if (!user) throw new Error("Invalid credentials");
         
         // deciper password 
 
         return [user ,bcrypt.compare(params.password, user.password)]
         
     }).spread((user, password)=>{
-        if (!password) throw new Error("Password is incorrect");
+        if (!password) throw new Error("Invalid credentials");
         return [user,  models.auth_token.findOne({ where: {  type: 'session', user_id: user.id}})]
     
         
