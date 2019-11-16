@@ -6,7 +6,7 @@ const has_role = require('mlar')('hasRoleMiddleware');
 const profile_middleware = require('mlar')('profileVerifyMiddleware');
 
 function vinfo(req, res, next){ 
-        const data = {...req.body, ...req.query, ...req.headers, ...req.params};
+        const data = {...req.query};
         
         service(data)
         .then(response => {

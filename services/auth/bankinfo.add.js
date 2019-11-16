@@ -32,20 +32,24 @@ function service(data){
         let params = validParameters.params;
         assert.bvnFormatOnly(params.bvn);
         assert.nubanFormatOnly(params.account_number);
+        
+        
         return [ 
-            models.user_bank.findOne(
-            {
-                where: {
-                    account_number: params.account_number
-                }
-            }
-        ),  params ]
+            models.user_bank.findOne({where: { account_number: params.account_number }}),  
+            models.user_bank.findOne({where: {bvn: params.bvn}}),
+            params ]
 
         
    
     })
-    .spread(  async (record , params) => {
+    .spread(  async (record , bvnRecord, params) => {
         if (record) throw new Error("Account number already exits");
+
+        // if bvn exists for a user other than the one making the request;
+
+        if (bvnRecord.user_id != globalUserId) {
+            throw new Error("A different account is alredy associated with this BVN");
+        }
 
         // verify bvn and send otp 
         if (!params.otp){

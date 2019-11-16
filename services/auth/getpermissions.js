@@ -8,7 +8,11 @@ const obval = require('mlar')('obval');
 const assert = require('mlar')('assertions'); 
 const crypto = require('crypto');
 const DEFAULT_EXCLUDES = require('mlar')('appvalues').DEFAULT_EXCLUDES;
-const moment = require('moment')
+const moment = require('moment');
+const paginate = require('mlar')('paginate');
+
+
+
 
 var spec = morx.spec({}) 
 			   .build('permission_id', 'required:false, eg:1')   
@@ -19,7 +23,10 @@ var spec = morx.spec({})
 function service(data){
 
 	var d = q.defer();
-	
+	const page = data.page ? Number(data.page) : 1;
+	const limit = data.limit ? parseInt(data.limit) : 20;
+	const offset = page ? (page - 1) * limit : false;	
+
 	q.fcall( async () => {
 		var validParameters = morx.validate(data, spec, {throw_error:true});
 		let params = validParameters.params;
@@ -31,31 +38,41 @@ function service(data){
 
 		if (params.fetch_one) {
 			selection.where.id = params.permission_id;
-			return models.permission.findOne(selection)
+			return [models.permission.findOne(selection), 'one']
 
 		}
 		
 		// to get the permissions of a profile
 		if (params.profile) {
-			return models.entity_permission.findAll(
-				{ 
-					where:{ 
-						entity: 'profile', entity_id: params.profile
-					},
-					attributes: ['id', 'created_on', 'modified_on'], 
-					include: [
-						{ 
-							model: models.permission,
-							attributes: ['id', 'name', 'description'] 
-						}]
-				})
+			return [
+				models.entity_permission.findAll(
+					{ 
+						where:{ 
+							entity: 'profile', entity_id: params.profile
+						},
+						attributes: ['id', 'created_on', 'modified_on'], 
+						include: [
+							{ 
+								model: models.permission,
+								attributes: ['id', 'name', 'description'] 
+							}]
+					}),
+
+					'many'
+				]
 		}
 		
-		return models.permission.findAll(selection)
+		return [
+			models.permission.findAndCountAll(selection),
+			'many']
 	}) 
-	.then((permission) => { 
+	.spread((permission, number) => { 
         if (!permission) throw new Error(`Permission does not exist`);
-        d.resolve(permission)        
+		if (number == 'many') {
+			d.resolve(paginate(permission.rows, 'permissions', permission.count, limit, page));        
+		}
+
+		d.resolve(permission);
     
     })
 	.catch( (err) => {

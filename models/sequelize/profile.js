@@ -27,9 +27,9 @@ module.exports = (sequelize, DataTypes) => {
   });
   profile.associate = function(models) {
     // associations can be defined here
-    profile.belongsTo(models.profile, {foreignKey: 'parent_profile_id', as: 'sub_profiles'});
-    profile.belongsTo(models.role, {foreignKey: 'role_id'});
+    profile.belongsTo(models.profile, {foreignKey: 'parent_profile_id', as: 'sub_profiles'});    
     profile.belongsTo(models.user, {foreignKey: 'user_id'});
+    profile.belongsTo(models.role, {foreignKey: 'role_id'})
     profile.hasOne(models.profile_contact, {foreignKey: 'profile_id'});
     profile.hasMany(models.collection, {foreignKey: 'lender_id'});
     profile.hasMany(models.collection, {foreignKey: 'borrower_id'});

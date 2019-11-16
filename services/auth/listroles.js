@@ -28,7 +28,17 @@ function service(data){
     data.limit = limit;
     data.offset = offset;
 
+    data.where = {
+        
+    }
+
     q.fcall( async () => {
+
+    if (data.name) {
+        data.where.name = { $like : '%' + data.name  +  '%' };
+        delete data.name;
+    }
+
         return models.role.findAndCountAll(data)
 	}) 
 	.then((roles) => { 
