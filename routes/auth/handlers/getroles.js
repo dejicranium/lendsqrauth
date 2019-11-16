@@ -21,9 +21,9 @@ vinfo.routeConfig = {};
 vinfo.routeConfig.path = "/roles"; 
 vinfo.routeConfig.method = "get"; 
 vinfo.routeConfig.middlewares = [
-    auth_middleware ,
-    profile_middleware,
-    has_role('admin'), 
+    //auth_middleware ,
+    //profile_middleware,
+    //has_role('admin'), 
     routemeta('auth_get_roles', 'none')];
 module.exports = vinfo;
 
