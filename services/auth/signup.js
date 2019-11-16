@@ -38,7 +38,7 @@ function service(data){
         }
         assert.mustBeValidPassword(params.password);
 
-        let role = await models.role.findAll({where: {id: params.type }});
+        let role = await models.role.findAll({where: {name: params.type }});
         if (!role) throw new Error("No such role exists. Change `type`");
 
         // make request to verify phone number
@@ -83,7 +83,7 @@ function service(data){
         params.created_on = new Date();
 
         // role_id is the type passed from frontend 
-        params.role_id = params.type;  delete params.type;
+        params.role_id = role.id;  delete params.type;
 
         return models.sequelize.transaction((t1) => {
             // create user, his profile and then activation token
