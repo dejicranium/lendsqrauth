@@ -34,10 +34,14 @@ function service(data){
 
     q.fcall( async () => {
 
-    if (data.name) {
-        data.where.name = { $like : '%' + data.name  +  '%' };
-        delete data.name;
-    }
+        if (data.name) {
+            data.where.name = { $like : '%' + data.name  +  '%' };
+            delete data.name;
+        }
+
+        data.attributes = {
+            include: ['name', 'id']
+        }
 
         return models.role.findAndCountAll(data)
 	}) 
