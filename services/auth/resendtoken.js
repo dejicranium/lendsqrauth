@@ -9,6 +9,8 @@ const assert = require('mlar')('assertions');
 const crypto = require('crypto');
 const DEFAULT_EXCLUDES = require('mlar')('appvalues').DEFAULT_EXCLUDES;
 const moment = require('moment');
+const config = require('../../config');
+const makeRequest = require('mlar')('makerequest');
 const generateRandom = require('mlar')('testutils').generateRandom;
 
 var spec = morx.spec({}) 
@@ -23,34 +25,39 @@ var spec = morx.spec({})
 function service(data){
 
 	var d = q.defer();
-    let globalUserId = data.USER_ID;
+    let globalUserId = '';
     
 	q.fcall( async () => {
 		var validParameters = morx.validate(data, spec, {throw_error:true});
 		let params = validParameters.params;
     
-		if (!params.type.includes('otp') || !params.type.includes('token')) {
+		if (params.type !== 'otp' && params.type !== 'token') {
             throw new Error("Type can be `otp` or `token` only");
         }
 
-		if (!params.subtype.includes('user_activation') || !params.subtype.includes('password_reset') || !params.subtype.includes('verify_bank_otp')) {
+		if (params.subtype !=='user_activation' && params.subtype !== 'password_reset' && params.subtype !== 'verify_bank_otp') {
             throw new Error("Subtype should be `user_activation` or `password_reset` or `verify_bank_otp` ");
         }
 
-        if (!params.subtype == 'user_activation' && !params.user_id) throw new Error("You must provide user_id");
-        if (!params.subtype == 'password_reset' && !params.email) throw new Error("You must provide an email");
+        if (params.subtype == 'user_activation' && !params.email) throw new Error("You must provide an email");
+        if (params.subtype == 'password_reset' && !params.email) throw new Error("You must provide an email");
+        if (params.type == 'otp' && params.subtype == 'verify_bank_otp' && !params.phone) throw new Error("You must provide a `phone`")
+        if (params.type == 'otp' && params.subtype == 'verify_bank_otp' && !params.user_id) throw new Error("You must provide a `user_id`")
+        const requestHeaders = {
+            'Content-Type' : 'application/json',
+        }
 
-        if (type == 'otp') {
+        if (params.type == 'otp') {
             let OTP = generateRandom('digits', 6);
             let token_create = await models.auth_token.findOrCreate({
                 where:{ 
                     type: 'verify_bank_otp',
-                    user_id: globalUserId,
+                    user_id: params.user_id,
                 },
                 defaults: {
                     token: OTP,
                     type: 'verify_bank_otp',
-                    user_id: globalUserId,
+                    user_id: params.user_id,
                     is_used: false,
                     expiry: moment(new Date()).add(10, 'minutes')     
                 }
@@ -70,7 +77,7 @@ function service(data){
                 message: `Your OTP is ${OTP}`,
                 sender_id:1
             }
-            return makeRequest(url, 'POST', payload, requestHeaders, 'Verify BVN');
+            return makeRequest(url, 'POST', payload, requestHeaders);
 
         }
         else {
@@ -83,18 +90,18 @@ function service(data){
                 
             }
 
-            if (type == 'user_activation') {
-                let user = await models.user.findOne({ where: {id: params.user_id}});
+            if (params.type == 'token' && params.subtype == 'user_activation') {
+                let user = await models.user.findOne({ where: {email: params.email}});
                 if (!user.email) throw new Error("No such user found");
 
                 let fullname =  user.business_name ||  user.first_name + ' ' + user.last_name;
                 payload.recipient = user.email;
                 payload.data = {
                     email: user.email,
-                    name: fullname
+                    name: fullname,
                 }
 
-                payload.context_id = 69;
+                payload.context_id = 81;
 
                 // create activation token
                 const userToken = await crypto.randomBytes(32).toString('hex');
@@ -115,16 +122,18 @@ function service(data){
                 // if token type already existed for user
                 if (!token[1]) {
                     // update token record  - no two tokens of the same type for a user
-                    await token.update({
+                    await token[0].update({
                         token: userToken,
                         is_used: 0
                     });
                 }
+
+                payload.data.token = userToken;
             }
 
-            else if (type == 'password_reset') {
+            else if (params.type == 'token' && params.subtype == 'password_reset') {
                 let user = await models.user.findOne({where: {email: params.email}});
-                if (user.email) throw new Error("No such user exists");
+                if (!user.email) throw new Error("No such user exists");
                 let fullname =  user.business_name  || user.first_name + ' ' + user.last_name;
                 
                 let randomBytes = await crypto.randomBytes(32).toString('hex');
@@ -139,7 +148,7 @@ function service(data){
                             is_used: false
                         }
                     }
-                ),
+                )
 
                 if (!password_token[1]) {
                     await password_token[0].update({
@@ -148,8 +157,6 @@ function service(data){
                         is_used: false
                     })
                 }
-
-
 
                 payload.context_id = 80;
                 payload.recipient = user.email,
@@ -161,12 +168,8 @@ function service(data){
                 }
             }
 
-
-
-
             const url = config.notif_base_url + "email/send";
             
-            // send the welcome email 
             return makeRequest(url, 'POST', payload, requestHeaders);
             
         }

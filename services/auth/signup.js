@@ -121,7 +121,7 @@ function service(data){
         // if token type already existed for user
         if (!token[1]) {
             // update token record  - no two tokens of the same type for a user
-            await token.update({
+            await token[0].update({
                 token: userToken,
                 is_used: 0  
             });
