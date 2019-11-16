@@ -12,7 +12,7 @@ module.exports = (sequelize, DataTypes) => {
     timestamps: false
   });
   role.associate = function(models) {
-    role.hasMany(models.profile, {foreignKey: 'role_id'})
+    role.hasMany(models.profile, {foreignKey: 'role_id'});
   };
   return role;
 };
