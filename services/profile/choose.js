@@ -51,7 +51,8 @@ function service(data){
         }
        
         let newToken = await jwt.sign(
-            {
+            {   
+                id: profile.id,
                 email: globalUser.email, 
                 user_id: globalUser.id, 
                 role: role ? role.name : null,
