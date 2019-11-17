@@ -7,7 +7,7 @@ const assert = require('mlar')('assertions');
 const paginate = require('mlar')('paginate');
 
 var spec = morx.spec({}) 
-		.build('user_id', 'required:true, eg:1')   
+		//.build('user_id', 'required:true, eg:1')   
 		.end();
 
 function service(data){
@@ -26,17 +26,8 @@ function service(data){
 		const validParameters = morx.validate(data, spec, {throw_error : true});
 		const params = validParameters.params;
 		
-		// if the request user id the same as the user whose profile wants to be seen?
-		if (data.user.id != params.user_id) {
-			// check whether user is an admin
-			// if she is not, quickly disable her from seeing profile;
-			if (data.profile.role_id !== 1) {
-				throw new Error("Unauthorized access");
-			}
-
-		} 
 		data.where = {
-			user_id: params.user_id,
+			user_id: data.user.id,
 		}
 
 		
