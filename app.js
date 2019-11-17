@@ -6,7 +6,7 @@ try{
   const appEnvProfile = process.env.ENV_PROFILE || "";
   let envPath = "";
   if(appEnvProfile) {
-    envPath = `.${appEnvProfile}`
+    envPath = `.${appEnvProfile}`;
   }
   const fullEnvPath = './config/env'+ envPath +'.json';
   console.log(fullEnvPath);
@@ -97,7 +97,7 @@ const base = '/api/v1';
 
 app.get(base, function (req, res, next){
 
-  res.json({version:1.0})
+	res.json({ base: 1.0 });
 
 })
 
@@ -116,7 +116,7 @@ Handle 404
 //app.use(mosh.initMoshErrorHandler);
 
 
-app.use(version, function(req, res, next) {
+app.use(base, function(req, res, next) {
   utils.jsonF(res, null, `Undefined ${req.method} route access`)
 
  // res.json({m: `Undefined ${req.method} route access`})
