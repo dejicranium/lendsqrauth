@@ -17,8 +17,7 @@ const paginate = require('mlar')('paginate');
 var spec = morx.spec({}) 
 			   .build('permission_id', 'required:false, eg:1')   
 			   .build('profile', 'required:false, eg:1')   
-			   .build('fetch_one', 'required:false, eg:1')   
-			   .end();
+			   .build('name', 'required:false, eg:1')   
 
 function service(data){
 
@@ -38,16 +37,20 @@ function service(data){
 
 		if (params.fetch_one) {
 			selection.where.id = params.permission_id;
-			return [models.permission.findOne(selection), 'one']
+			return [
+				models.permission.findOne(selection), 'one'
+			]
 
 		}
 		
 		// to get the permissions of a profile
 		if (params.profile) {
+
 			return [
 				models.entity_permission.findAll(
 					{ 
-						where:{ 
+						where:
+						{ 
 							entity: 'profile', entity_id: params.profile
 						},
 						attributes: ['id', 'created_on', 'modified_on'], 
@@ -58,13 +61,17 @@ function service(data){
 							}]
 					}),
 
-					'many'
-				]
+				'many'
+			]
 		}
-		
+
+		if (params.name) {
+			selection.where.name = data.name;
+		}
 		return [
 			models.permission.findAndCountAll(selection),
-			'many']
+			'many'
+		]
 	}) 
 	.spread((permission, number) => { 
         if (!permission) throw new Error(`Permission does not exist`);

@@ -2,10 +2,11 @@ var utils = require('mlar')('mt1l');
 const routemeta = require('mlar')('routemeta');
 const auth_middleware = require('mlar')('authmiddleware');
 const service = require('mlar').mreq('services', 'profile/update');
+const profile_middleware = require('mlar')('profileVerifyMiddleware');
 
 function vinfo(req, res, next){ 
         const data = {...req.body, ...req.query, ...req.headers, ...req.params};
-        
+        data.user = req.user;
         service(data)
         .then(response => {
             utils.jsonS(res, response, "Profile updated"); 
@@ -17,7 +18,9 @@ function vinfo(req, res, next){
 
 vinfo.routeConfig = {};
 vinfo.routeConfig.path = "/:profile_id"; 
-vinfo.routeConfig.method = "post"; 
-vinfo.routeConfig.middlewares = [auth_middleware, routemeta('profile_create', 'none')];
+vinfo.routeConfig.method = "put"; 
+vinfo.routeConfig.middlewares = [
+    auth_middleware,
+    routemeta('profile_update', 'none')];
 module.exports = vinfo;
 
