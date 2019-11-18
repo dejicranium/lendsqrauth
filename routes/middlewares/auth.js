@@ -5,9 +5,18 @@ var utils = require('mlar')('mt1l');
 const q = require('q');
 
 module.exports = async function (req, res, next) {
-    let auth_token = req.headers.lendi_auth_token || req.headers.access_token;
-    const d = q.defer();
+    let auth_token = null;
+    let authorization_header = req.headers.authorization;
 
+    if (authorization_header) {
+        auth_token = authorization_header.split(' ')[1];
+    }
+    
+    const d = q.defer();
+    if (!auth_token) {
+        utils.jsonF(res, null, "Access token required"); 
+        return;
+    }
     jwt.verify(auth_token, config.JWTsecret, function(err, decoded){
 
         if (err) utils.jsonF(res, null, "Unauthorized access attempted"); 
