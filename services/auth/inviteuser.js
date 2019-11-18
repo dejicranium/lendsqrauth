@@ -25,11 +25,15 @@ function service(data){
     
     q.fcall( async () => {
 		var validParameters = morx.validate(data, spec, {throw_error:true});
-		let params = validParameters.params;
+        let params = validParameters.params;
+        
+        
         
         // through the email, find out  whether user already exist
-
-        return [models.user.findOne({where:{email: params.email }}), params]
+        return [
+            models.user.findOne({where:{email: params.email }}), 
+            params
+        ]
 		
 	}) 
 	.spread(async (user, params) => { 

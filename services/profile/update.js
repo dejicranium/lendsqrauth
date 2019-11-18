@@ -6,7 +6,6 @@ const validators = require('mlar')('validators');
 const assert = require('mlar')('assertions'); 
 
 var spec = morx.spec({}) 
-			   .build('role_id', 'required:false, eg:lender')   
 			   .build('profile_id', 'required:true, eg:lender')   
 			   .build('url', 'required:false, eg:lender')   
 			   .build('bvn', 'required:false, eg:lender')   
@@ -33,23 +32,41 @@ function service(data){
 	q.fcall( async () => {
 		const validParameters = morx.validate(data, spec, {throw_error : true});
 		const params = validParameters.params;
-        
-        return [models.profile.findOne({
-            where: {
-                id: params.profile_id
-            }
-        }), params];
+				
+        return [
+			models.profile.findOne({ where: {id: params.profile_id }}), 
+			params
+		];
 
         
 	}) 
 	.spread((profile, params) => { 
-        if (!profile) throw new Error("Profile does not exist");
-        return [profile.update({...params}), params];
-    }).then(async (profile, params)=>{
+		if (!profile) throw new Error("Profile does not exist");
+		if (profile.user_id != data.user.id) throw new Error("Cannot update someone else's profile");
+
+        return [
+			profile.update({...params}),
+			params
+		];
+   
+	}).spread(async (profile, params)=> { 
 		if (!profile) throw new Error("An error occured while updating user's profile"); 
+		
 		// update contact too
-		let profile =  await models.profile_contact.findOne({where: {profile_id: params.profile_id}})
-		await profile.update({...params});
+		let profile_contact =  
+			await models.profile_contact.findOne(
+				{
+					where: {
+						profile_id: profile.id
+					}
+				}
+			)
+		
+		if (profile_contact && profile_contact.id) {
+			await profile_contact.update({...params});
+
+		}
+		
         d.resolve("Successfully updated user's profile");
     })
 	.catch( (err) => {
