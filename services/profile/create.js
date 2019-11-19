@@ -82,8 +82,6 @@ function service(data){
 			if (business_lender_profile) throw new Error("Cannot have more than one business lender profile");
 			
 		}
-		
-
 
 		params.created_on = new Date();
 	
