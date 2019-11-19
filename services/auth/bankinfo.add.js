@@ -44,12 +44,12 @@ function service(data){
     })
     .spread(  async (record , bvnRecord, params) => {
         if (record) throw new Error("Account number already exits");
-
         // if bvn exists for a user other than the one making the request;
 
-        if (bvnRecord.user_id != globalUserId) {
-            throw new Error("A different account is alredy associated with this BVN");
+        if (bvnRecord && bvnRecord.user_id != globalUserId) {
+            throw new Error("A different account is already associated with this BVN");
         }
+
 
         // verify bvn and send otp 
         if (!params.otp){
@@ -67,6 +67,8 @@ function service(data){
             else {
                 throw new Error("Could not verify BVN");
             }
+
+            // create new user_bank details 
 
             // generate otp 
             let OTP = generateRandom('digits', 6);
