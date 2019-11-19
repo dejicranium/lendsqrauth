@@ -50,7 +50,7 @@ function service(data){
         if (!user) throw new Error("An error occured while updating user's account");
         
         // prepare email;
-        const requestHeaders = {
+        /*const requestHeaders = {
             'Content-Type' : 'application/json',
         }
         
@@ -62,7 +62,7 @@ function service(data){
             sender_id: 1,
         }
         const url = config.notif_base_url + "email/send";
-        
+        */
         // send the change password email 
         //await makeRequest(url, 'POST', payload, requestHeaders);
 
