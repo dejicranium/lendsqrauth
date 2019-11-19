@@ -97,7 +97,7 @@ function service(data){
 
         if (!token) {
             // create and store token
-            return[ user, models.auth_token.create({
+            return[ user, profile_token, models.auth_token.create({
                 type: 'session',
                 token: newToken,
                 user_id: user.id,
