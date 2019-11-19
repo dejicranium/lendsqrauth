@@ -7,9 +7,10 @@ const validators = require('mlar')('validators');
 const obval = require('mlar')('obval'); 
 const assert = require('mlar')('assertions'); 
 const DEFAULT_EXCLUDES = require('mlar')('appvalues').DEFAULT_EXCLUDES;
+const moment = require('moment');
 
 var spec = morx.spec({}) 
-               .build('user_id', 'required:true')
+               .build('token', 'required:true')
                .build('new_password', 'required:true')
                .build('confirm_password', 'required:true')
 			   .end();
@@ -26,18 +27,37 @@ function service(data){
 
         if (data.new_password != data.confirm_password) throw new Error("Passwords must match");
         
-        return [ models.user.findOne({where: {id: params.user_id}}), params];
-    })
-    .spread((user, params) => { 
-        return [user, bcrypt.hash(params.new_password, 10)]
-    }) 
-	.spread(async( user, generated_password) => { 
-       
-        user.password = generated_password;
-        return user.save();
+        let reset_token = await models.auth_token.findOne({
+            where: {
+                type: 'password_reset',
+                token: params.token
+            }
+        });
+
+        if (!reset_token) throw new Error("Token is invalid");
         
-    }).then((user)=>{
+        if (reset_token.token) {
+            if (reset_token.is_used) throw new Error("Token is used");
+			if (moment(new Date()).isAfter(reset_token.expiry)) throw new Error(`Token has expired`);
+        }
+
+        return [ models.user.findOne({where: {id: reset_token.user_id}}), params, reset_token];
+    })
+    .spread((user, params, reset_token) => { 
+        return [user, bcrypt.hash(params.new_password, 10), reset_token]
+    }) 
+	.spread(async( user, generated_password, reset_token) => { 
+        if (!user) throw new Error("User does not exist");
+        user.password = generated_password;
+        
+        return [user.save(), reset_token];
+        
+    }).spread(async (user, reset_token)=>{
         if (!user) throw new Error("An error occured while updating user's account");
+        
+        await reset_token.update({
+            is_used: 1
+        })
         d.resolve("Successfully reset user's password");
     })
 	.catch( (err) => {
