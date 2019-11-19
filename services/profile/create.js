@@ -44,18 +44,45 @@ function service(data){
 		return [models.role.findOne(roleSelectionParams), params];
 	})
 	.spread( async (role, params) => {
-		if (role && role.name == 'borrower') {
+		
+		if (!role) throw new Error("Could not find role");
+		if (role.name == 'borrower' || role.name == 'collaborator') {
 			// see if user already had a borrower profile
-			let userBorrowerProfile = await models.profile.findOne({
+			
+			/*let userBorrowerProfile = await models.profile.findOne({
+				where: {
+					user_id : params.user_id,
+					role_id: role.id
+				}
+			})
+			*/
+			if (userBorrowerProfile) throw new Error(`Can't register as ${role.name}`);
+		}
+
+		if (role.name == 'individual_lender') {
+			let individualLenderProfile = await models.profile.findOne({
 				where: {
 					user_id : params.user_id,
 					role_id: role.id
 				}
 			})
 
-			if (userBorrowerProfile) throw new Error("Can't have more than one profile with role `borrower`");
+			if (individualLenderProfile) throw new Error("Cannot have more than one individual lender profile");
+			
 		}
+		
 
+		if (role.name == 'business_lender') {
+			let business_lender_profile = await models.profile.findOne({
+				where: {
+					user_id : params.user_id,
+					role_id: role.id
+				}
+			})
+
+			if (business_lender_profile) throw new Error("Cannot have more than one business lender profile");
+			
+		}
 
 		params.created_on = new Date();
 	
