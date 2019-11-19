@@ -6,7 +6,7 @@ const validators = require('mlar')('validators');
 const assert = require('mlar')('assertions'); 
 
 var spec = morx.spec({}) 
-			   .build('user_id', 'required:true, eg:1')   
+			   .build('role_id', 'required:true, eg:1')   
 			   .build('user_id', 'required:true, eg:1')   
 			   .build('parent_profile_id', 'required:false, eg:1')   
 			   .build('bvn', 'required:false, eg:1')   
@@ -46,7 +46,7 @@ function service(data){
 	.spread( async (role, params) => {
 		
 		if (!role) throw new Error("Could not find role");
-		if (role.name == 'borrower' || role.name == 'collaborator') {
+		if (role.name == 'borrower' || role.name == 'collaborator' || role.name == 'admin') {
 			// see if user already had a borrower profile
 			
 			/*let userBorrowerProfile = await models.profile.findOne({
