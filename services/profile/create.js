@@ -35,16 +35,11 @@ function service(data){
 		const validParameters = morx.validate(data, spec, {throw_error : true});
 		const params = validParameters.params;
 
-		let roleSelectionParams = {
-			where: {
-				id: params.role_id
-			}
-		}
-
-		return [models.role.findOne(roleSelectionParams), params];
+		return [models.role.findOne({where: {id: params.role_id}}), params];
 	})
 	.spread( async (role, params) => {
 		if (!role) throw new Error("Could not find role");
+		
 		if (role.name == 'borrower' || role.name == 'collaborator' || role.name == 'admin') {
 			// see if user already had a borrower profile
 			
@@ -55,7 +50,7 @@ function service(data){
 				}
 			})
 			*/
-			if (userBorrowerProfile) throw new Error(`Can't register as ${role.name}`);
+			 throw new Error(`Can't register as ${role.name}`);
 		}
 
 		if (role.name == 'individual_lender') {
