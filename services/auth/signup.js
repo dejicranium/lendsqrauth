@@ -30,12 +30,14 @@ function service(data){
 		let params = validParameters.params;
         
         assert.emailFormatOnly(params.email);  // validate email, throw error if it's some weird stuff
+        
         if (params.first_name.length < 3) {
             throw new Error("Name cannot be less than 3 characters")
         }
         if (params.last_name.length < 3) {
             throw new Error("Name cannot be less than 3 characters")
         }
+
         assert.mustBeValidPassword(params.password);
 
         let role = await models.role.findAll({where: {name: params.type }});
@@ -47,7 +49,7 @@ function service(data){
             'POST',
             { phone: params.phone },
             requestHeaders,
-            'validate phone'
+            'validate phone number'
         )
         
         if (verifiedPhone) {
@@ -63,32 +65,26 @@ function service(data){
         if (params.password.length < 8) 
             throw new Error("Password cannot be less than 8 characters");
     
-        else if (role.name == "business_lender" && params.business_name == undefined) 
+        if (role.name == "business_lender" && params.business_name == undefined) 
             throw new Error("Business accounts must have a business name");
         
         
         // hash password
         params.password = await bcrypt.hash(params.password, 10);
         
-        return [ models.user.findOne({
-            where: {
-                email: params.email
-            }
-        }), params, role]
+        return [ models.user.findOne({where: { email: params.email}}), params, role]
 	}) 
 	.spread(async (user, params, role) => { 
         if (user) throw new Error("User with these credentials exists");
         
-        // make user active from the get-go
-        params.created_on = new Date();
 
-        // role_id is the type passed from frontend 
+        // set role
         params.role_id = role.id;  delete params.type;
 
+        params.created_on = new Date();
+
         return models.sequelize.transaction((t1) => {
-            // create user, his profile and then activation token
-            // all in one transaction
-            
+            // create a user and his profile            
             return q.all([
                 models.user.create(params, {transaction: t1}), 
                 models.profile.create({role_id: params.role_id}, {transaction: t1})
@@ -103,7 +99,7 @@ function service(data){
         await profile.update({user_id: user.id})
 
         // create activation token
-        const userToken = await crypto.randomBytes(32).toString('hex')
+        const userToken = await crypto.randomBytes(32).toString('hex');
 
         const token = await models.auth_token.findOrCreate({
             where: {
@@ -141,16 +137,14 @@ function service(data){
         }
 
         const url = config.notif_base_url + "email/send";
-        
         // send the welcome email 
         await makeRequest(url, 'POST', payload, requestHeaders);
         
         // prepare to send email verification email
         payload.context_id = 81;
         payload.data.token = userToken;
-
         await makeRequest(url, 'POST', payload, requestHeaders);
-        // add activation email to response
+
         d.resolve(user);
     })
 	.catch( (err) => {

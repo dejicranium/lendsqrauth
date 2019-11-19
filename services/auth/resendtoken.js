@@ -35,14 +35,16 @@ function service(data){
             throw new Error("Type can be `otp` or `token` only");
         }
 
-		if (params.subtype !=='user_activation' && params.subtype !== 'password_reset' && params.subtype !== 'verify_bank_otp') {
+		if (params.subtype !== 'user_activation' && params.subtype !== 'password_reset' && params.subtype !== 'verify_bank_otp') {
             throw new Error("Subtype should be `user_activation` or `password_reset` or `verify_bank_otp` ");
         }
 
         if (params.subtype == 'user_activation' && !params.email) throw new Error("You must provide an email");
         if (params.subtype == 'password_reset' && !params.email) throw new Error("You must provide an email");
+        
         if (params.type == 'otp' && params.subtype == 'verify_bank_otp' && !params.phone) throw new Error("You must provide a `phone`")
         if (params.type == 'otp' && params.subtype == 'verify_bank_otp' && !params.user_id) throw new Error("You must provide a `user_id`")
+        
         const requestHeaders = {
             'Content-Type' : 'application/json',
         }
@@ -72,11 +74,13 @@ function service(data){
 
             // send otp to phone;
             let url =  config.notif_base_url + "sms/send";
-            payload = {
+            
+            let payload = {
                 recipient: params.phone,
                 message: `Your OTP is ${OTP}`,
                 sender_id:1
             }
+
             return makeRequest(url, 'POST', payload, requestHeaders);
 
         }
@@ -95,12 +99,12 @@ function service(data){
                 if (!user.email) throw new Error("No such user found");
 
                 let fullname =  user.business_name ||  user.first_name + ' ' + user.last_name;
+                
                 payload.recipient = user.email;
                 payload.data = {
                     email: user.email,
                     name: fullname,
                 }
-
                 payload.context_id = 81;
 
                 // create activation token

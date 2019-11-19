@@ -21,8 +21,11 @@ function service(data){
     q.fcall( async () => {
 		const validParameters = morx.validate(data, spec, {throw_error : true});
         params = validParameters.params;
-        assert.mustBeValidPassword(data.new_password)
+
+        assert.mustBeValidPassword(data.new_password);
+
         if (data.new_password != data.confirm_password) throw new Error("Passwords must match");
+        
         return [ models.user.findOne({where: {id: params.user_id}}), params];
     })
     .spread((user, params) => { 

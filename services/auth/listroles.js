@@ -14,6 +14,7 @@ const spec = morx.spec({})
                 .build('page', 'required:false')               
                 .build('limit', 'required:false')               
                 .build('offset', 'required:false')               
+                .build('name', 'required:false')               
 			    .end();
 
 function service(data){

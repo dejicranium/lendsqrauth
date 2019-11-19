@@ -28,7 +28,9 @@ function service(data){
 
 	q.fcall( async () => {
 		var validParameters = morx.validate(data, spec, {throw_error:true});
+		
 		let params = validParameters.params;
+		
 		let selection = {
 			where: {
 

@@ -41,14 +41,12 @@ function service(data){
         }
 
         // check if this relation has already been set 
-        
-        return [ models.entity_permission.findOne({
-            where: {...params}
-        }), params ]
+        return [ models.entity_permission.findOne({where: {...params}}), params ]
 		 
 		
 	}).spread((permission, params)=> {
-        if(permission) throw new Error("Permission already exists");
+        if (permission) throw new Error("Permission already exists");
+        
         params.created_on = new Date();
         return models.entity_permission.create(params);
 	
