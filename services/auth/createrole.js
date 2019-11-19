@@ -21,7 +21,9 @@ function service(data){
 	q.fcall( async () => {
 		var validParameters = morx.validate(data, spec, {throw_error:true});
 		let params = validParameters.params;
-         
+         if (params.name.length < 3) {
+			 throw new Error("Name cannot be less than 3 characters");
+		 }
         return [ models.role.findOne({ where: { name: params.name }}), params]
 	}) 
 	.spread((role, params) => { 

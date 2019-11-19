@@ -22,7 +22,6 @@ function service(data){
 		var validParameters = morx.validate(data, spec, {throw_error:true});
 		let params = validParameters.params;
         
-        
         assert.emailFormatOnly(params.email);  // validate email, throw error if it's some weird stuff
         
         return [ models.user.findOne({ where: {  email: params.email}}), params]
@@ -31,7 +30,6 @@ function service(data){
         if (!user) throw new Error("Invalid credentials");
         
         // deciper password 
-
         return [user ,bcrypt.compare(params.password, user.password)]
         
     }).spread((user, password)=>{
@@ -44,6 +42,7 @@ function service(data){
         if (user.disabled) throw new Error("User is disabled")
         else if (user.deleted) throw new Error("User's account has been deleted")            
         else if (!user.active && !user.disabled && !user.deleted) throw new Error("User is inactive");
+        
         let newToken = await jwt.sign({email: user.email, user_id: user.id, subtype: user.subtype}, config.JWTsecret, {expiresIn: config.JWTexpiresIn})
 
         if (!token) {
