@@ -27,6 +27,12 @@ function service(data){
 		var validParameters = morx.validate(data, spec, {throw_error:true});
         let params = validParameters.params;
         
+
+        // check to make sure that only a lender can do this;
+        
+        if (data.profile.role !== 'individual_lender' && data.profile.role !== 'business_lender') {
+            throw new Error("Only lenders can add team members")
+        }
         
         
         // through the email, find out  whether user already exist
