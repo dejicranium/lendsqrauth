@@ -45,7 +45,7 @@ function service(data){
 	})
 	.spread( async (role, params) => {
 		if (!role) throw new Error("Could not find role");
-		if (role.name == 'borrower' || role.name == 'collaborator') {
+		if (role.name == 'borrower' || role.name == 'collaborator' || role.name == 'admin') {
 			// see if user already had a borrower profile
 			
 			/*let userBorrowerProfile = await models.profile.findOne({
