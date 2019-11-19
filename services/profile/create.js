@@ -50,7 +50,7 @@ function service(data){
 				}
 			})
 			*/
-			 throw new Error(`Can't register as ${role.name}`);
+			throw new Error(`Can't register as ${role.name}`);
 		}
 
 		if (role.name == 'individual_lender') {

@@ -64,7 +64,7 @@ function service(data){
         const url = config.notif_base_url + "email/send";
         */
         // send the change password email 
-        //await makeRequest(url, 'POST', payload, requestHeaders);
+        //await makeRequest(url, 'POST', payload, requestHeaders, 'send notification');
 
         d.resolve("Successfully changed user's password");
     })
