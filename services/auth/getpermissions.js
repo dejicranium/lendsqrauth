@@ -18,6 +18,7 @@ var spec = morx.spec({})
 			   .build('permission_id', 'required:false, eg:1')   
 			   .build('profile', 'required:false, eg:1')   
 			   .build('name', 'required:false, eg:1')   
+			   .end();
 
 function service(data){
 
@@ -68,7 +69,7 @@ function service(data){
 		}
 
 		if (params.name) {
-			selection.where.name = data.name;
+			selection.where.name = params.name;
 		}
 		return [
 			models.permission.findAndCountAll(selection),
