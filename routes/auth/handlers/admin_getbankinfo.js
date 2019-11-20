@@ -3,6 +3,7 @@ const service = require('mlar').mreq('services', 'auth/bankinfo.get');
 const routemeta = require('mlar')('routemeta');
 const auth_middleware = require('mlar')('authmiddleware');
 const has_role = require('mlar')('hasRoleMiddleware');
+const profile_middleware = require('mlar')('profileVerifyMiddleware');
 /**
  * Used by admin to get info about user's bank account
  * @param {*} req 
@@ -29,8 +30,8 @@ vinfo.routeConfig.path = "/admin/users/:user_id/bank";
 vinfo.routeConfig.method = "get"; 
 vinfo.routeConfig.middlewares = [
     auth_middleware,
+    profile_middleware,
     has_role('admin'),
-    auth_middleware,
     routemeta('get_user_bank_info', 'none')
 ];
 module.exports = vinfo;
