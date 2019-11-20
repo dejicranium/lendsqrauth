@@ -34,9 +34,11 @@ module.exports = async function (req, res, next) {
     
             req.decoded = decoded
             next()
+            return
         })
         .catch(err=> {
              utils.jsonF(res, null, err);
+             return;
         })
 
     })

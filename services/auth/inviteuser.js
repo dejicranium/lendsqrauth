@@ -6,9 +6,11 @@ const bcrypt = require('bcrypt');
 const validators = require('mlar')('validators'); 
 const obval = require('mlar')('obval'); 
 const assert = require('mlar')('assertions'); 
-const crypto = require('crypto');
 const DEFAULT_EXCLUDES = require('mlar')('appvalues').DEFAULT_EXCLUDES;
 const moment = require('moment')
+const config = require('../../config');
+const makeRequest = require('mlar')('makerequest');
+const crypto = require('crypto');
 
 var spec = morx.spec({}) 
 			   .build('first_name', 'required:true, eg:1')   
@@ -22,12 +24,18 @@ function service(data){
 	var d = q.defer();
 	const globalProfileId = data.profile.id;
     const globalUserId = data.user.id;
+            
+    const requestHeaders = {
+        'Content-Type' : 'application/json',
+    }
     
     q.fcall( async () => {
 		var validParameters = morx.validate(data, spec, {throw_error:true});
         let params = validParameters.params;
         
-
+        const requestHeaders = {
+            'Content-Type' : 'application/json',
+        }
         // check to make sure that only a lender can do this;
         
         if (data.profile.role !== 'individual_lender' && data.profile.role !== 'business_lender') {
@@ -94,19 +102,36 @@ function service(data){
         else {
 
             // create an incomplete user
-            return [ models.user.create({ created_by: globalUserId },) ,'user-created']
+            return [params, models.user.create({ created_by: globalUserId }),'user-created']
         }
 
-    }).spread(async (created1, created2) => {
+    }).spread(async (params, created1, created2) => {
         if (!created1) {
             throw new Error("An error occurred while creating a user");
         }
 
-        if ( created2 != 'user-created' ) {
+        if ( created2 == 'user-created' ) {
             // update profile_contact 
 
             await created2.update({profile_id: created1.id});
         }
+
+        // send email 
+        let payload= {
+            context_id: 69,
+            sender: config.sender_email,
+            recipient: params.email,
+            sender_id: 1,
+            data:{
+                email: params.email,
+                name: params.first_name + ' ' + params.last_name
+	        }
+        }
+
+        const url = config.notif_base_url + "email/send";
+        // send the welcome email 
+        await makeRequest(url, 'POST', payload, requestHeaders);
+        
         d.resolve("Invited team member")
 
     })

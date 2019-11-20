@@ -7,7 +7,10 @@ module.exports = (sequelize, DataTypes) => {
     business_logo: DataTypes.STRING,
     business_name: DataTypes.STRING,
     business_phone: DataTypes.STRING,
-    rc_number: DataTypes.STRING,
+    rc_number: {
+      type: DataTypes.STRING,
+      unique: true
+    },
     certificate_of_incorporation: DataTypes.STRING,
     tin_number: DataTypes.STRING,
     state: DataTypes.STRING,
