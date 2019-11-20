@@ -6,6 +6,7 @@ const validators = require('mlar')('validators');
 const assert = require('mlar')('assertions'); 
 
 var spec = morx.spec({}) 
+			   .build('role_id', 'required:false, eg:lender')   
 			   .build('profile_id', 'required:true, eg:lender')   
 			   .build('url', 'required:false, eg:lender')   
 			   .build('bvn', 'required:false, eg:lender')   
@@ -32,7 +33,8 @@ function service(data){
 	q.fcall( async () => {
 		const validParameters = morx.validate(data, spec, {throw_error : true});
 		const params = validParameters.params;
-				
+		
+		if (params.role_id) throw new Error("Cannot update role");
         return [
 			models.profile.findOne({ where: {id: params.profile_id }}), 
 			params
