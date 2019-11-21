@@ -1,16 +1,19 @@
 var utils = require('mlar')('mt1l');
 const routemeta = require('mlar')('routemeta');
 const auth_middleware = require('mlar')('authmiddleware');
-const service = require('mlar').mreq('services', 'profile/update');
+const service = require('mlar').mreq('services', 'profile/get_user_profiles');
 const profile_middleware = require('mlar')('profileVerifyMiddleware');
+const has_role = require('mlar')('hasRoleMiddleware');
 
 function vinfo(req, res, next){ 
         const data = {...req.body, ...req.query, ...req.headers, ...req.params};
-        data.user = req.user;
+        
+
+        // pass profile 
         data.profile = req.profile;
         service(data)
         .then(response => {
-            utils.jsonS(res, response, "Profile updated"); 
+            utils.jsonS(res, response, "Profile"); 
         })
         .catch(error => {
             utils.jsonF(res, null, error.message); 
@@ -18,11 +21,12 @@ function vinfo(req, res, next){
 }
 
 vinfo.routeConfig = {};
-vinfo.routeConfig.path = "/:profile_id"; 
-vinfo.routeConfig.method = "put"; 
+vinfo.routeConfig.path = "/users/:user_id"; 
+vinfo.routeConfig.method = "get"; 
 vinfo.routeConfig.middlewares = [
-    auth_middleware,
+    auth_middleware, 
     profile_middleware,
-    routemeta('profile_update', 'none')];
+    has_role('admin'),
+    routemeta('admin_get_user_profiles', 'none')];
 module.exports = vinfo;
 

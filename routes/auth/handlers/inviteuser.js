@@ -19,7 +19,7 @@ function vinfo(req, res, next){
 }
 
 vinfo.routeConfig = {};
-vinfo.routeConfig.path = "/team/member"; 
+vinfo.routeConfig.path = "/team/invite"; 
 vinfo.routeConfig.method = "post"; 
 vinfo.routeConfig.middlewares = [
     auth_middleware, 

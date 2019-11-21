@@ -94,7 +94,7 @@ function service(data){
     }).spread(async (user, profile)=>{
         if (!user) throw new Error("An error occured while creating user's account");
         if (!profile) throw new Error("Could not create a profile user")
-        
+    
         // update created profile
         await profile.update({user_id: user.id})
 

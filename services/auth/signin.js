@@ -23,12 +23,18 @@ function service(data){
 		let params = validParameters.params;
         
         assert.emailFormatOnly(params.email);  // validate email, throw error if it's some weird stuff
-        
         return [ models.user.findOne({ where: {  email: params.email}}), params]
 	}) 
-	.spread((user, params) => { 
+	.spread(async (user, params) => { 
         if (!user) throw new Error("Invalid credential(s)");
         
+        // make sure that user doesn't have just one profile and that profile is an admin
+        let user_profiles = await models.profile.findAll({where: {user_id: user.id}})
+        let admin_role = await models.role.findOne({where:{ name: 'admin' }})
+        if (user_profiles.length == 1 && user_profiles[0].role_id == admin_role.id) {
+            throw new Error("Cannot sign in user with only one profile which is an admin profile")
+        }
+
         // deciper password 
         return [user ,bcrypt.compare(params.password, user.password)]
         

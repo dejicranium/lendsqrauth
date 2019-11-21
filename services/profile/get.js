@@ -9,8 +9,6 @@ const paginate = require('mlar')('paginate');
 var spec = morx.spec({}) 
 			   .build('profile_id', 'required:false, eg:1')   
 			   .build('type', 'required:false, eg:lender')   
-			    
-			              
 			   .end();
 
 function service(data){
@@ -22,6 +20,45 @@ function service(data){
 		const validParameters = morx.validate(data, spec, {throw_error : true});
 		const params = validParameters.params;
 		
+		if (params.profile_id) {
+
+			// try to see whether the person making the request 
+			// is  a parent lender and  if the profile he is trying to see is the
+			// profile of one of his collaborators or borrowers
+			if (data.profile.role == 'business_lender' || data.profile.role == 'individual_lender') {
+				let sub_profiles = await models.profile.findAll({where: {parent_profile_id : data.profile.id}});
+				
+				if (sub_profiles && sub_profiles.length) {
+					let sub_profiles_ids = sub_profiles.map(sub=> sub.id);
+					if (!sub_profiles_ids.includes(params.profile_id)) {
+						throw new Error("Can't view profile of user who isn't a collaborator or borrower on your profile");
+					}
+				}
+			}
+	
+	
+	
+			let user_profiles = await models.profile.findAll({where: {user_id: data.user.id}});
+			let user_profiles_ids = user_profiles.map(prof => prof.id);
+	
+			// check if profile of the requester is not admin 
+			// and the profile being searched for is one of the profiles of the requester
+			if (data.profile.role !== 'admin' && !user_profiles_ids.includes(params.profile_id)) {
+				throw new Error("You need to be an admin or own this profile to see it");
+			}
+
+
+			return [models.profile.findOne({
+				where: {
+					id: params.profile_id, 
+				},
+				include: [{
+					model: models.profile_contact}]
+			}), data];
+		}
+
+		if (data.profile.role !== 'admin') throw new Error("Unauthorized");
+
 		if (filter) {
 			const page = data.page ? Number(data.page) : 1;
 			const limit = data.limit ? Number(data.limit) : 20;
@@ -36,13 +73,6 @@ function service(data){
 			return [models.profile.findAndCountAll(data), data];
 		}
 
-        return [models.profile.findOne({
-            where: {
-                id: params.profile_id, 
-            },
-            include: [{
-                model: models.profile_contact}]
-        }), data];
 
         
 	}) 
