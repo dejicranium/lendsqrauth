@@ -8,7 +8,7 @@ const paginate = require('mlar')('paginate');
 const DEFAULT_EXCLUDES = require('mlar')('appvalues').DEFAULT_EXCLUDES;
 
 var spec = morx.spec({}) 
-		.build('user_id', 'required:true, eg:1')   
+		.build('user_id', 'required:false, eg:1')   
 		.end();
 
 function service(data){
