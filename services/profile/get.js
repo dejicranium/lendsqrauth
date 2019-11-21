@@ -21,7 +21,7 @@ function service(data){
 		const params = validParameters.params;
 		
 		if (params.profile_id) {
-
+			let profile_is_a_subprofile = true;
 			// try to see whether the person making the request 
 			// is  a parent lender and  if the profile he is trying to see is the
 			// profile of one of his collaborators or borrowers
@@ -31,7 +31,7 @@ function service(data){
 				if (sub_profiles && sub_profiles.length) {
 					let sub_profiles_ids = sub_profiles.map(sub=> sub.id);
 					if (!sub_profiles_ids.includes(params.profile_id)) {
-						throw new Error("Can't view profile of user who isn't a collaborator or borrower on your profile");
+						profile_is_a_subprofile = false;
 					}
 				}
 			}
@@ -43,8 +43,8 @@ function service(data){
 	
 			// check if profile of the requester is not admin 
 			// and the profile being searched for is one of the profiles of the requester
-			if (data.profile.role !== 'admin' && !user_profiles_ids.includes(params.profile_id)) {
-				throw new Error("You need to be an admin or own this profile to see it");
+			if (data.profile.role !== 'admin' && !user_profiles_ids.includes(params.profile_id) && !profile_is_a_subprofile) {
+				throw new Error("You need to be an admin, own this profile or be it's parent to view it");
 			}
 
 
