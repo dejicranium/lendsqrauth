@@ -33,9 +33,9 @@ function service(data){
 	q.fcall( async () => {
 		const validParameters = morx.validate(data, spec, {throw_error : true});
 		const params = validParameters.params;
+		if (params.role_id) throw new Error("Cannot update role");		
 		
-		if (params.role_id) throw new Error("Cannot update role");
-        return [
+		return [
 			models.profile.findOne({ where: {id: params.profile_id }}), 
 			params
 		];
@@ -44,7 +44,8 @@ function service(data){
 	}) 
 	.spread((profile, params) => { 
 		if (!profile) throw new Error("Profile does not exist");
-		if (profile.user_id != data.user.id) throw new Error("Cannot update someone else's profile");
+		if ((profile.user_id != data.user.id) && data.profile.role != 'admin') 
+			throw new Error("Only admins can update someone else's profile");
 
         return [
 			profile.update({...params}),

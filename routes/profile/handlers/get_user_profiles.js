@@ -24,6 +24,7 @@ vinfo.routeConfig.path = "/";
 vinfo.routeConfig.method = "get"; 
 vinfo.routeConfig.middlewares = [
     auth_middleware, 
+    
     routemeta('get_profiles', 'none')];
 module.exports = vinfo;
 

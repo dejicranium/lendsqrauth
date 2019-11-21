@@ -8,7 +8,7 @@ const paginate = require('mlar')('paginate');
 const DEFAULT_EXCLUDES = require('mlar')('appvalues').DEFAULT_EXCLUDES;
 
 var spec = morx.spec({}) 
-		//.build('user_id', 'required:true, eg:1')   
+		.build('user_id', 'required:true, eg:1')   
 		.end();
 
 function service(data){
@@ -27,8 +27,17 @@ function service(data){
 		const validParameters = morx.validate(data, spec, {throw_error : true});
 		const params = validParameters.params;
 		
-		data.where = {
-			user_id: data.user.id,
+		// if admin is making the request (only the admin route can pass `user_id`
+		if (params.user_id) {
+			data.where = {
+				user_id: params.user_id
+			}
+		}
+
+		else {
+			data.where = {
+				user_id: data.user.id,
+			}
 		}
 
 		data.attributes = {

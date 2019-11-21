@@ -45,12 +45,16 @@ function service(data){
         
         // through the email, find out  whether user already exist
         return [
+            models.user_invites.findOne({where: {inviter: data.user.id, invitee: params.email}}),
             models.user.findOne({where:{email: params.email }}), 
             params
         ]
 		
 	}) 
-	.spread(async (user, params) => { 
+	.spread(async (invitation, user, params) => { 
+        if (invitation && invitation.status !== 'declined') {
+            throw new Error("Invitation has been sent already");
+        }
         if (user) {
             
             // prepare to copy the details of the user's profile into a new and change only the role_id  (should be collaborator) and parent_profile_id
@@ -71,17 +75,16 @@ function service(data){
             });
             
             let collaboratorRoleId = collaboratorRole.id;
-            
             // copy existing profile to new profile object
             let newProfile = {};
-
+            params.collaborator_role_id =  collaboratorRoleId;
+            
             let paramsToCopy = {...userProfile}
-            paramsToCopy.role_id = collaboratorRoleId;
+            paramsToCopy.role_id = params.collaborator_role_id ;
             paramsToCopy.user_id = user.id
             paramsToCopy.parent_profile_id = globalProfileId;
             paramsToCopy.create_on = new Date();
             newProfile = paramsToCopy;
-
 
 
             let newProfileContact = {
@@ -94,6 +97,7 @@ function service(data){
 
             return models.sequelize.transaction((t1) => {
                 return q.all([
+                    params,
                     models.profile.create(newProfile, {transaction: t1}), 
                     models.profile_contact.create(newProfileContact, {transaction: t1})
                 ]);
@@ -110,11 +114,29 @@ function service(data){
             throw new Error("An error occurred while creating a user");
         }
 
-        if ( created2 == 'user-created' ) {
-            // update profile_contact 
+        let new_profile_id = created1.id; // created1 is profile.id if no new user was created;
 
-            await created2.update({profile_id: created1.id});
+        if ( created2 == 'user-created' ) {
+            
+            // create profile 
+            let new_profile = await models.profile.create({
+                role_id: params.collaborator_role_id,
+                user_id: created1.id,
+                parent_profile_id: globalProfileId
+            })
+            new_profile_id = new_profile.id
+            
         }
+        // invitation token 
+        let invite_token = await crypto.randomBytes(32).toString('hex');
+        // create a user invite record
+        await models.user_invites.create({
+            invitee: params.email,
+            inviter: data.user.id,
+            token: invite_token,
+            profile_created_id: new_profile_id,
+            user_created_id: created2 == 'user-created' ? created1.id : null
+        })
 
         // send email 
         let payload= {
