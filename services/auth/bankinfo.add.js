@@ -124,8 +124,6 @@ function service(data){
             else if (moment(new Date()).isAfter(token.expiry)) throw new Error();
             else if (token.is_used) throw new Error("Token is already used");
 
-
-
             // create account number;
             params.user_id = globalUserId;
             
@@ -135,6 +133,8 @@ function service(data){
             
             // else if token has no issues, show success and flag as used
             token.is_used = true;
+
+
             await token.save();
             return "OTP verified";
         }
