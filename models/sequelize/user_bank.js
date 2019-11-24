@@ -7,7 +7,6 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       unique: true },
     bank_code: DataTypes.STRING,
-    bank_name: DataTypes.STRING,
     deleted_flag: DataTypes.BOOLEAN,
     created_by: DataTypes.INTEGER,
     modified_on: DataTypes.DATE,

@@ -20,9 +20,6 @@ module.exports = {
       bank_code: {
         type: Sequelize.STRING
       },
-      bank_name: {
-        type: Sequelize.STRING
-      },
       is_default: {
         type: Sequelize.BOOLEAN
       },
