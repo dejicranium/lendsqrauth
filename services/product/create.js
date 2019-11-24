@@ -6,7 +6,7 @@ const validators = require('mlar')('validators');
 const assert = require('mlar')('assertions'); 
 
 var spec = morx.spec({}) 
-			   .build('lender_id', 'required:true, eg:lender')   
+			   .build('profile_id', 'required:true, eg:lender')   
 			   .build('product_name', 'required:true, eg:lender')   
 			   .build('product_description', 'required:false, eg:1')   
 			   .build('repayment_model', 'required:false, eg:lender')   
@@ -34,7 +34,7 @@ function service(data){
 
         let getProductName = models.product.findOne({
             where: {
-                lender_id: params.lender_id,
+                profile_id: params.profile_id,
                 product_name: params.product_name
             }
         })
