@@ -36,7 +36,7 @@ function service(data){
 		// make sure that the lender is a valid profile;
 		let lenderProfile = models.profile.findOne({
 			where: {
-				id: params.lender_id
+				id: params.profile_id
 			},
 			
 		});
