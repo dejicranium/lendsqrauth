@@ -2,6 +2,7 @@ var utils = require('mlar')('mt1l');
 const service = require('mlar').mreq('services', 'auth/update_user');
 const routemeta = require('mlar')('routemeta');
 const profile_verify = require('mlar')('profileVerifyMiddleware');
+const auth_middleware = require('mlar')('authmiddleware');
 
 function vinfo(req, res, next){ 
         const data = {...req.body, ...req.query, ...req.headers, ...req.params};
