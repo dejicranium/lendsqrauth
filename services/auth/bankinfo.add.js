@@ -12,7 +12,6 @@ var spec = morx.spec({})
                .build('bvn', 'required:true')
                .build('account_number', 'required:true')
                .build('bank_code', 'required:true')
-               .build('bank_name', 'required:false')
                .build('otp', 'required:false')
 			   .end();
 
