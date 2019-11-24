@@ -62,10 +62,6 @@ function service(data){
 
 		if (!['card', 'direct debit', 'bank transfer', 'cheque', 'cash'].includes(params.repayment_method))
 			throw new Error("Repayment method can only be card, direct debit, bank transfer, cheque or cash")
-<<<<<<< HEAD
-		if (params.product_name.length > 255) throw new Error("Product name cannot be more than 255 characters");
-
-=======
 		
 		if (!['equal installments', 'reducing balance'].includes(params.repayment_model))
 			throw new Error('Repayment model can be either `equal installments` or `reducing balance`')
@@ -76,7 +72,6 @@ function service(data){
 		
 			if (params.product_name.length > 255) throw new Error("Product name cannot be more than 255 characters");
 		
->>>>>>> 7019bc4... verify loan product params
         let getProductName = models.product.findOne({
             where: {
                 profile_id: params.profile_id,
