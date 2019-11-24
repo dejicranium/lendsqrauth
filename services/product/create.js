@@ -6,7 +6,7 @@ const validators = require('mlar')('validators');
 const assert = require('mlar')('assertions'); 
 
 var spec = morx.spec({}) 
-			   .build('profile_id', 'required:true, eg:lender')   
+			   //.build('profile_id', 'required:true, eg:lender')   
 			   .build('product_name', 'required:true, eg:lender')   
 			   .build('product_description', 'required:false, eg:1')   
 			   .build('repayment_model', 'required:false, eg:lender')   
@@ -16,6 +16,7 @@ var spec = morx.spec({})
 			   .build('tenor_type', 'required:false, eg:lender')   
 			   .build('min_tenor', 'required:false, eg:lender')   
 			   .build('max_tenor', 'required:false, eg:lender')   
+			   .build('interest_period', 'required:false, eg:lender')   
 			   .build('interest', 'required:false, eg:lender')   
 			   .build('status', 'required:false, eg:lender')   
 			   .build('urL_slug', 'required:false, eg:lender')   
@@ -29,7 +30,10 @@ function service(data){
 	q.fcall( async () => {
 		const validParameters = morx.validate(data, spec, {throw_error : true});
 		const params = validParameters.params;
+		params.repayment_method = params.repayment_method.toLowerCase();
 
+		if (!params.repayment_method.includes('card', 'direct debit', 'bank transfer', 'cheque', 'cash'))
+			throw new Error("Repayment method can only be card, direct debit, bank transfer, cheque or cash")
 		if (params.product_name.length > 255) throw new Error("Product name cannot be more than 255 characters");
 
         let getProductName = models.product.findOne({
@@ -45,7 +49,8 @@ function service(data){
 	.spread((product, params) => { 
         if (product) throw new Error("Product name must be unique for lender");
 
-        // set creation details
+		// set creation details
+		params.profile_id = data.profile.id
         params.created_on = new Date();
         params.created_by = globalUserId;
 
