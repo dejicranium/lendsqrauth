@@ -12,87 +12,57 @@ const moment = require('moment');
 const paginate = require('mlar')('paginate');
 
 var spec = morx.spec({}) 
-			   .build('lender_id', 'required:false,eg:1')   
+			   .build('profile_id', 'required:false,eg:1')   
 			   .build('product_id', 'required:false,eg:1')   
 			   .end();
 
 function service(data){
 
 	var d = q.defer();
-	
+    const page = data.page ? Number(data.page) : 1;
+    const limit = data.limit ? Number(data.limit) : 20;
+    const offset = page ? (page - 1) * limit : false;	
+    
+    data.limit = limit;
+    data.offset = offset;
+
 	q.fcall( async () => {
 		var validParameters = morx.validate(data, spec, {throw_error:true});
         let params = validParameters.params;
-        
-
-        // get by lender_id
-        if (data.fetch_all){
-            const page = data.page ? Number(data.page) : 1;
-            const limit = data.limit ? Number(data.limit) : 20;
-            const offset = page ? (page - 1) * limit : false;	
-            
-            data.limit = limit;
-            data.offset = offset;
-
-            if (data.status) {
-                data.where.status = data.status;
-                delete data.status;
-            }
-            if (data.product_name) {
-                data.where.product_name = {$like: '%' + data.product_name + '%'};
-                delete data.product_name;
-            }
-            if (data.product_description) {
-                data.where.product_description = {$like: '%' + data.product_description + '%'};
-                delete data.product_description;
-            }
-            if (data.repayment_model) {
-                data.where.repayment_model = {$like: '%' + data.repayment_model + '%'};
-                delete data.repayment_model;
-            }
-            if (data.repayment_method) {
-                data.where.repayment_method = data.repayment_method;
-                delete data.repayment_method;
-            }
-            if (data.interest) {
-                data.where.interest = data.interest;
-                delete data.interest;
-            }
-            if (data.deleted) {
-                data.where.deleted_flag = 1;
-                delete data.deleted;
-            }
-
-            // default sort order
-            
-            data.order = [['id', 'DESC']];
-
-            // if sort order is passed in the query string
-            if (data.sort) {
-                data.order = [[data.sort.toString(), 'DESC']]
-            }
-            
-            // selection for lender id
-            if (params.lender_id) data.where.lender_id =  params.lender_id;
-            
-            return [ models.product.findAndCountAll(data), data];
-        }
-
-        else if (params.lender_id && !data.fetch_all) {
-            data.where.lender_id =  params.lender_id
-            return [ models.product.findAll(data), data];
-        }
 
         
         // filter by product - id : returns an object
-        else if (params.product_id) {
+        if (params.product_id) {
             data.fetch_one = true;
+            data.where = {
+                id: params.product_id
+            }
             return [
                 models.product.findOne(data), data
             ]
         }
 
+        data.where = {
+            
+        }
         // else get all products in the system
+        if (data.profile.role != 'admin') {
+            data.where = {
+                profile_id: data.profile.id
+            }
+        }
+        else {
+            if (data.profile_id) data.where.profile_id = data.profile_id
+        }
+        if (data.profile_id) data.where.profile_id = data.profile_id
+        if (data.product_name) data.where.product_name = { $like:  '%' + data.product_name + '%'}
+        if (data.product_description) data.where.product_description = {$like: '%' + data.product_description + '%'}
+        if (data.repayment_model) data.where.repayment_model = {$like: '%' + data.repayment_model + '%'}
+        if (data.min_loan_amount) data.where.min_loan_amount = data.min_loan_amount
+        if (data.max_loan_amount) data.where.max_loan_amount = data.max_loan_amount
+        if (data.tenor_type) data.where.tenor_type = data.tenor_type
+        if (data.interest) data.where.interest = data.interest
+
         return [
             models.product.findAndCountAll(data), data
         ]

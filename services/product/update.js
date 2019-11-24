@@ -7,7 +7,7 @@ const assert = require('mlar')('assertions');
 
 var spec = morx.spec({}) 
 			   .build('product_id', 'required:true, eg:lender')   
-			   .build('lender_id', 'required:false, eg:lender')   
+			   .build('profile_id', 'required:false, eg:lender')   
 			   .build('product_name', 'required:false, eg:lender')   
 			   .build('product_description', 'required:false, eg:1')   
 			   .build('repayment_model', 'required:false, eg:lender')   
