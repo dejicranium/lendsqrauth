@@ -8,6 +8,7 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       unique: true
     },
+    image: DataTypes.STRING,
     business_name: DataTypes.STRING,
     active: DataTypes.BOOLEAN,
     disabled: DataTypes.BOOLEAN,
