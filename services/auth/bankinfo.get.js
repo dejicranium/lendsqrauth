@@ -33,6 +33,11 @@ function service(data){
                 'id',
                 'bvn',
                 'account_number',
+                'bank_code',
+                'bank_name',
+                'is_default',
+                'is_active',
+                'user_id',
                 'created_on'
             ]
         }
