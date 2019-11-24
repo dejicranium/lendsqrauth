@@ -6,11 +6,7 @@ const profile_middleware = require('mlar')('profileVerifyMiddleware');
 
 function vinfo(req, res, next){ 
         const data = {...req.body, ...req.query, ...req.headers, ...req.params};
-<<<<<<< HEAD
-        data.fetch_all = true;
-=======
         data.profile = req.profile;
->>>>>>> cc26c9353086ac1372969cb67289c892945cc6d0
         service(data)
         .then(response => {
             utils.jsonS(res, response, "Products"); 
