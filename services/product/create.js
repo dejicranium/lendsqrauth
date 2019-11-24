@@ -32,20 +32,6 @@ function service(data){
 
 		if (params.product_name.length > 255) throw new Error("Product name cannot be more than 255 characters");
 		
-
-		// make sure that the lender is a valid profile;
-		let lenderProfile = models.profile.findOne({
-			where: {
-				id: params.profile_id
-			},
-			
-		});
-		
-		if (!lenderProfile) {
-			throw new Error("Lender indicated by lender_id doesn't exist");
-		}
-		
-
         let getProductName = models.product.findOne({
             where: {
                 profile_id: params.profile_id,
