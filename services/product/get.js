@@ -50,6 +50,9 @@ function service(data){
                 profile_id: data.profile.id
             }
         }
+        else {
+            if (data.profile_id) data.where.profile_id = data.profile_id
+        }
         if (data.profile_id) data.where.profile_id = data.profile_id
         if (data.product_name) data.where.product_name = { $like:  '%' + data.product_name + '%'}
         if (data.product_description) data.where.product_description = {$like: '%' + data.product_description + '%'}
