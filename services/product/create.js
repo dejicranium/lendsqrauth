@@ -32,7 +32,7 @@ function service(data){
 		const params = validParameters.params;
 		params.repayment_method = params.repayment_method.toLowerCase();
 
-		if (!params.repayment_method.includes('card', 'direct debit', 'bank transfer', 'cheque', 'cash'))
+		if (!['card', 'direct debit', 'bank transfer', 'cheque', 'cash'].includes(params.repayment_method))
 			throw new Error("Repayment method can only be card, direct debit, bank transfer, cheque or cash")
 		if (params.product_name.length > 255) throw new Error("Product name cannot be more than 255 characters");
 
