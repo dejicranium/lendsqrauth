@@ -4,6 +4,8 @@ const morx = require('morx');
 const q = require('q'); 
 const validators = require('mlar')('validators'); 
 const assert = require('mlar')('assertions'); 
+const profile_middleware = require('mlar')('profileVerifyMiddleware');
+
 
 var spec = morx.spec({}) 
 			   .build('product_id', 'required:true, eg:lender')   
@@ -28,7 +30,9 @@ function service(data){
 	}) 
 	.spread((product, params) => { 
         if (!product) throw new Error("No product found");
-        if (product.deleted_flag === 0) throw new Error("Product no longer exits");
+        if (data.profile.id !== product.profile_id) throw new Error("Can't delete another profile's product")
+
+        if (product.deleted_flag === 0) throw new Error("Product has already been deleted");
         if (product.status === 'active') throw new Error("Cannot delete active product");
 
 
