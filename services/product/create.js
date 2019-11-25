@@ -7,21 +7,20 @@ const assert = require('mlar')('assertions');
 
 var spec = morx.spec({}) 
 			   //.build('profile_id', 'required:true, eg:lender')   
-			   .build('product_name', 'required:true, eg:lender')   
-			   .build('product_description', 'required:false, eg:1')   
-			   .build('repayment_model', 'required:false, eg:lender')   
-			   .build('repayment_method', 'required:false, eg:lender')   
-			   .build('min_loan_amount', 'required:false, eg:lender')   
-			   .build('max_loan_amount', 'required:false, eg:lender')   
-			   .build('tenor_type', 'required:false, eg:lender')   
-			   .build('min_tenor', 'required:false, eg:lender')   
-			   .build('max_tenor', 'required:false, eg:lender')   
-			   .build('interest_period', 'required:false, eg:lender')   
-			   .build('interest', 'required:false, eg:lender')   
-			   .build('status', 'required:false, eg:lender')   
-			   .build('urL_slug', 'required:false, eg:lender')   
-			              
-			   .end();
+			.build('product_name', 'required:true, eg:lender')   
+			.build('product_description', 'required:false, eg:1')   
+			.build('repayment_model', 'required:false, eg:lender')   
+			.build('repayment_method', 'required:false, eg:lender')   
+			.build('min_loan_amount', 'required:false, eg:lender')   
+			.build('max_loan_amount', 'required:false, eg:lender')   
+			.build('tenor_type', 'required:false, eg:lender')   
+			.build('min_tenor', 'required:false, eg:lender')   
+			.build('max_tenor', 'required:false, eg:lender')   
+			.build('interest_period', 'required:false, eg:lender')   
+			.build('interest', 'required:false, eg:lender')   
+			.build('status', 'required:false, eg:lender')   
+			.build('urL_slug', 'required:false, eg:lender')   
+			.end();
 
 function service(data){
 
@@ -33,14 +32,7 @@ function service(data){
 		
 		if (params.max_tenor) assert.digitsOnly(params.max_tenor, null, 'max tenor')
 		if (params.min_tenor) assert.digitsOnly(params.min_tenor, null, 'min tenor')
-		if (params.interest) {
-			try {
-				parseDouble(params.interest)
-			}
-			catch(e) {
-				throw new Error ("Interest should be an integer or double");
-			}
-		}
+		if (typeof params.interest == "number") throw new Error("Interest must be a number")
 
 		if (params.min_loan_amount) {
 			assert.digitsOnly(params.min_loan_amount) 
@@ -50,30 +42,31 @@ function service(data){
 		if (params.max_loan_amount) {
 			assert.digitsOnly(params.max_loan_amount) 
 			params.max_loan_amount = parseFloat(params.max_loan_amount).toFixed(2);
-
 		}
-
-
-		params.repayment_method = params.repayment_method.toLowerCase();
-		params.repayment_model = params.repayment_model.toLowerCase()
-		params.interest_period = params.interest_period.toLowerCase();
-		params.tenor_type = params.tenor_type.toLowerCase();
-
-
-		if (!['card', 'direct debit', 'bank transfer', 'cheque', 'cash'].includes(params.repayment_method))
-			throw new Error("Repayment method can only be card, direct debit, bank transfer, cheque or cash")
-		
-		if (!['equal installments', 'reducing balance'].includes(params.repayment_model))
-			throw new Error('Repayment model can be either `equal installments` or `reducing balance`')
-
-		if (!['per day', 'per month', 'per annum'].includes(params.interest_period))
-			throw new Error('Interest period should be one of `per day`, `per month` or `per annum`')
-		
-		if (!['days', 'weeks', 'months', 'years'].includes(params.tenor_type))
+		if (params.repayment_method) {
+			params.repayment_method = params.repayment_method.toLowerCase();
+			if (!['card', 'direct debit', 'bank transfer', 'cheque', 'cash'].includes(params.repayment_method)){
+				throw new Error("Repayment method can only be card, direct debit, bank transfer, cheque or cash")
+	
+			}
+		}
+		if (params.repayment_model) {
+			params.repayment_model = params.repayment_model.toLowerCase();
+			if (!['equal installments', 'reducing balance'].includes(params.repayment_model)) {
+				throw new Error('Repayment model can be either `equal installments` or `reducing balance`')
+			}
+		}
+		if (params.tenor_type) {
+			params.tenor_type = params.tenor_type.toLowerCase();
+			if (!['days', 'weeks', 'months', 'years'].includes(params.tenor_type))
 			throw new Error('Tenor type should be one of `days`, `weeks`, `months`, `years`')
-		
-		
-			if (params.product_name.length > 255) throw new Error("Product name cannot be more than 255 characters");
+		}
+		if (params.interest_period) {
+			params.interest_period = params.interest_period.toLowerCase();
+			if (!['per day', 'per month', 'per annum'].includes(params.interest_period))
+			throw new Error('Interest period should be one of `per day`, `per month` or `per annum`')
+		}
+		if (params.product_name.length > 255) throw new Error("Product name cannot be more than 255 characters");
 		
         let getProductName = models.product.findOne({
             where: {

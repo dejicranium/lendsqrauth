@@ -18,6 +18,9 @@ function vinfo(req, res, next){
 vinfo.routeConfig = {};
 vinfo.routeConfig.path = "/:product_id/status"; 
 vinfo.routeConfig.method = "put"; 
-vinfo.routeConfig.middlewares = [auth_middleware, routemeta('enable_disable', 'none')];
+vinfo.routeConfig.middlewares = [
+    auth_middleware, 
+    
+    routemeta('enable_disable', 'none')];
 module.exports = vinfo;
 

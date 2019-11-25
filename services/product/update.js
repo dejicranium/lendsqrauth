@@ -6,37 +6,82 @@ const validators = require('mlar')('validators');
 const assert = require('mlar')('assertions'); 
 
 var spec = morx.spec({}) 
-			   .build('product_id', 'required:true, eg:lender')   
-			   .build('profile_id', 'required:false, eg:lender')   
-			   .build('product_name', 'required:false, eg:lender')   
-			   .build('product_description', 'required:false, eg:1')   
-			   .build('repayment_model', 'required:false, eg:lender')   
-			   .build('repayment_method', 'required:false, eg:lender')   
-			   .build('min_loan_amount', 'required:false, eg:lender')   
-			   .build('max_loan_amount', 'required:false, eg:lender')   
-			   .build('min_tenor_type', 'required:false, eg:lender')   
-			   .build('max_tenor_type', 'required:false, eg:lender')   
-			   .build('min_tenor', 'required:false, eg:lender')   
-			   .build('max_tenor', 'required:false, eg:lender')   
-			   .build('interest', 'required:false, eg:lender')   
-			   .build('status', 'required:false, eg:lender')   
-			   .build('urL_slug', 'required:false, eg:lender')   
-			              
-			   .end();
+			.build('product_id', 'required:true, eg:1')   
+			.build('product_name', 'required:true, eg:lender')   
+			.build('product_description', 'required:false, eg:1')   
+			.build('repayment_model', 'required:false, eg:lender')   
+			.build('repayment_method', 'required:false, eg:lender')   
+			.build('min_loan_amount', 'required:false, eg:lender')   
+			.build('max_loan_amount', 'required:false, eg:lender')   
+			.build('tenor_type', 'required:false, eg:lender')   
+			.build('min_tenor', 'required:false, eg:lender')   
+			.build('max_tenor', 'required:false, eg:lender')   
+			.build('interest_period', 'required:false, eg:lender')   
+			.build('interest', 'required:false, eg:lender')   
+			.build('status', 'required:false, eg:lender')   
+			.build('urL_slug', 'required:false, eg:lender')      
+			.end();
 
 function service(data){
 
 	var d = q.defer();
 	const globalUserId = data.USER_ID || 1;
+
 	q.fcall( async () => {
 		const validParameters = morx.validate(data, spec, {throw_error : true});
 		const params = validParameters.params;
+		
+		if (params.max_tenor) assert.digitsOnly(params.max_tenor, null, 'max tenor')
+		if (params.min_tenor) assert.digitsOnly(params.min_tenor, null, 'min tenor')
+		if (typeof params.interest == "number") throw new Error("Interest must be a number")
 
-		if (params.product_name && params.product_name.length > 255) throw new Error("Product name cannot be more than 255 characters");
+		if (params.min_loan_amount) {
+			assert.digitsOnly(params.min_loan_amount) 
+			params.min_loan_amount = parseFloat(params.min_loan_amount).toFixed(2);
 
+		}
+
+		if (params.max_loan_amount) {
+			assert.digitsOnly(params.max_loan_amount) 
+			params.max_loan_amount = parseFloat(params.max_loan_amount).toFixed(2);
+
+		}
+
+	
+		if (params.repayment_method) {
+			params.repayment_method = params.repayment_method.toLowerCase();
+			if (!['card', 'direct debit', 'bank transfer', 'cheque', 'cash'].includes(params.repayment_method)){
+				throw new Error("Repayment method can only be card, direct debit, bank transfer, cheque or cash")
+	
+			}
+		}
+		if (params.repayment_model) {
+			params.repayment_model = params.repayment_model.toLowerCase();
+			if (!['equal installments', 'reducing balance'].includes(params.repayment_model)) {
+				throw new Error('Repayment model can be either `equal installments` or `reducing balance`')
+	
+			}
+		}
+		if (params.tenor_type) {
+			params.tenor_type = params.tenor_type.toLowerCase();
+			if (!['days', 'weeks', 'months', 'years'].includes(params.tenor_type))
+			throw new Error('Tenor type should be one of `days`, `weeks`, `months`, `years`')
+		
+
+		}
+		if (params.interest_period) {
+			params.interest_period = params.interest_period.toLowerCase();
+		
+			if (!['per day', 'per month', 'per annum'].includes(params.interest_period))
+			throw new Error('Interest period should be one of `per day`, `per month` or `per annum`')
+		
+		}
+
+		if (params.product_name.length > 255) throw new Error("Product name cannot be more than 255 characters");
+		
         let getProduct = models.product.findOne({
             where: {
-                id: params.product_id
+                id: params.product_id,
             }
         })
 
@@ -44,16 +89,17 @@ function service(data){
         
 	}) 
 	.spread((product, params) => { 
-        if (!product) throw new Error("No product found");
-        if(product.status == 'active') throw new Error("Cannot update active product");
-        
-        // set modification details
+        if (!product) throw new Error("No such product exists");
+		if (product.profile_id != data.profile.id) throw new Error("Can't update someone else's product");
+		
+		// set creation details
+		//params.profile_id = data.profile.id
         params.modified_on = new Date();
         params.modified_by = globalUserId;
-
-        return product.update({...params})
+		
+        return product.update({where:{...params}})
     }).then((product)=>{
-        if (!product) throw new Error("An error occured while updating product");        
+        if (!product) throw new Error("An error occured while creating product");        
        
         d.resolve(product);
     })
