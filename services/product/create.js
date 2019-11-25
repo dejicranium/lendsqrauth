@@ -85,7 +85,7 @@ function service(data){
 		params.profile_id = data.profile.id
         params.created_on = new Date();
         params.created_by = globalUserId;
-		params.status = 'active';
+		params.status = 'draft';
 
         return models.product.create({...params})
     }).then((product)=>{

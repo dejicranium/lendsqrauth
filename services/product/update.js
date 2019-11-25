@@ -95,12 +95,27 @@ function service(data){
 		// set creation details
 		//params.profile_id = data.profile.id
         params.modified_on = new Date();
-        params.modified_by = globalUserId;
+		params.modified_by = globalUserId;
 		
-        return product.update({where:{...params}})
-    }).then((product)=>{
+		params.status = 'draft';
+		return product.update({where:{...params}})
+		
+    }).then(async (product)=>{
         if (!product) throw new Error("An error occured while creating product");        
-       
+		
+		
+		// see whether loan is draft or not
+		//let loan_is_draft = true;
+
+		let p = product;
+		if (p.max_tenor !== undefined && p.product_name !== undefined && p.product_description !== undefined && p.repayment_method !== undefined
+			&& p.repayment_model !== undefined && p.min_loan_amount !== undefined && p.max_loan_amount !== undefined && p.tenor_type !== undefined
+			&& p.min_tenor !== undefined && p.max_tenor !== undefined && p.interest_period !== undefined && p.interest !== undefined) {
+				await product.update({status: 'inactive'})
+			}
+			
+		
+
         d.resolve(product);
     })
 	.catch( (err) => {

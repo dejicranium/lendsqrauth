@@ -29,8 +29,31 @@ function service(data){
 	}) 
 	.spread((product, params) => { 
         if (!product) throw new Error("No product found");
-        if (product.deleted_flag == 0) throw new Error("Product no longer exits");
+        let p = product;
+
+        if (params.status == 'active') {
+            if (p.max_tenor !== undefined && p.product_name !== undefined && p.product_description !== undefined && p.repayment_method !== undefined
+                && p.repayment_model !== undefined && p.min_loan_amount !== undefined && p.max_loan_amount !== undefined && p.tenor_type !== undefined
+                && p.min_tenor !== undefined && p.max_tenor !== undefined && p.interest_period !== undefined && p.interest !== undefined) {
+                    
+                }
+            else {
+                let fields = Object.keys(p);
+                let incomplete_fields = [];
+                
+                fields.forEach(field=> {
+                    if (p[field] == undefined) {
+                        incomplete_fields.push(field);
+                    }
+                })
+
+                throw new Error(incomplete_fields.join(',') + " have not been provided")
+            }
+        }
+
+        
         if (product.status === 'active') throw new Error("Cannot update active product");
+        if (product.deleted_flag == 0) throw new Error("Product no longer exits");
         if (product.status === 'active') throw new Error("Cannot update active product");
         if(product.status === true) params.status == 'active';
         else  params.status == 'deactivated';
