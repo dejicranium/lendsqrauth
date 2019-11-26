@@ -42,14 +42,6 @@ function service(data){
 		if (!role) throw new Error("Could not find role");
 		if (role.name == 'borrower' || role.name == 'collaborator' || role.name == 'admin') {
 			// see if user already had a borrower profile
-			
-			/*let userBorrowerProfile = await models.profile.findOne({
-				where: {
-					user_id : params.user_id,
-					role_id: role.id
-				}
-			})
-			*/
 			throw new Error(`Can't register as ${role.name}`);
 		}
 
@@ -84,9 +76,12 @@ function service(data){
 	})
 	.spread(async (profile, params)=> {
 		if (!profile) throw new Error("An error occured while creating user's profile");    
+		params.profile_id = profile.id
+
+		await models.business_info.create(params);
+		
 		
 		if (params.contact_first_name || params.contact_last_name || params.contact_phone || params.contact_email ){
-			params.profile_id = profile.id
 			await models.profile_contact.create(params)
 		} 
         d.resolve("Successfully created user's profile");

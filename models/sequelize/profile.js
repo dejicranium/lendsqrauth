@@ -3,18 +3,6 @@ module.exports = (sequelize, DataTypes) => {
   const profile = sequelize.define('profile', {
     role_id: DataTypes.INTEGER,
     user_id: DataTypes.INTEGER,
-    url: DataTypes.STRING,
-    business_logo: DataTypes.STRING,
-    business_name: DataTypes.STRING,
-    business_phone: DataTypes.STRING,
-    rc_number: {
-      type: DataTypes.STRING,
-      unique: true
-    },
-    certificate_of_incorporation: DataTypes.STRING,
-    tin_number: DataTypes.STRING,
-    state: DataTypes.STRING,
-    country: DataTypes.STRING,
     created_on: {
       type: DataTypes.DATE,
     },
@@ -37,6 +25,7 @@ module.exports = (sequelize, DataTypes) => {
     profile.hasMany(models.collection, {foreignKey: 'lender_id'});
     profile.hasMany(models.collection, {foreignKey: 'borrower_id'});
     profile.hasMany(models.collection_payment_requests, {foreignKey: 'borrower_id'});
+    profile.hasOne(models.business_info, {foreignKey: 'profile_id'})
   };
   return profile;
 };

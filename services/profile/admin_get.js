@@ -30,7 +30,7 @@ function service(data){
                     id: params.profile_id, 
                 },
                 include: [{
-                    model: models.profile_contact}]
+                    model: models.business_info}]
             }), data];
     
         }

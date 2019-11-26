@@ -63,6 +63,12 @@ function service(data){
 				attributes: {
 					exclude: DEFAULT_EXCLUDES
 				}
+			},
+			{
+				model: models.business_info,
+				attributes: {
+					exclude: DEFAULT_EXCLUDES
+				}
 			}
 		]
 		
