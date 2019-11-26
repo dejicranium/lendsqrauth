@@ -22,4 +22,4 @@ module.exports = (sequelize, DataTypes) => {
     profile_contact.belongsTo(models.profile, {foreignKey: 'profile_id'})
   };
   return profile_contact;
-};
+};'use strict';

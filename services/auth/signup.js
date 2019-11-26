@@ -9,8 +9,8 @@ const makeRequest = require('mlar')('makerequest');
 const crypto = require('crypto');
 
 var spec = morx.spec({}) 
-			   .build('first_name', 'required:true, eg:Tina')   
-               .build('last_name', 'required:true, eg:Braxton') 
+			   .build('first_name', 'required:false, eg:Tina')   
+               .build('last_name', 'required:false, eg:Braxton') 
                .build('password', 'required:true, eg:tinatona98') 
                .build('password_confirmation', 'required:true, eg:tinatona98') 
                .build('business_name', 'required:false, eg:Tina Comms')
@@ -67,6 +67,9 @@ function service(data){
     
         if (role.name == "business_lender" && params.business_name == undefined) 
             throw new Error("Business accounts must have a business name");
+        
+        if (role.name == "individual_lender" && (!params.first_name || !params.last_name )) 
+            throw new Error("Individual accounts must have both first name and last name");
         
         
         // hash password

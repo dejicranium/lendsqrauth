@@ -69,6 +69,16 @@ function service(data){
 			await profile_contact.update({...params});
 
 		}
+		await models.business_info.findOrCreate({
+			where: {
+				profile_id: profile.id
+			},
+			defaults: {
+				...params
+			} })
+			.spread((info, created) => {
+				if (!created) info.update({...params})
+			})
 		
         d.resolve("Successfully updated user's profile");
     })
