@@ -35,8 +35,8 @@ function service(data){
         if (product.deleted_flag === 0) throw new Error("Product has already been deleted");
         if (product.status === 'active') throw new Error("Cannot delete active product");
 
-
         // set modification details
+        params.status = 'deleted';
         params.deleted_flag = 1;
         params.deleted_on = new Date();
         params.deleted_by = globalUserId;

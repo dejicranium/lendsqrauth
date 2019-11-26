@@ -18,7 +18,6 @@ var spec = morx.spec({})
 			.build('max_tenor', 'required:false, eg:lender')   
 			.build('interest_period', 'required:false, eg:lender')   
 			.build('interest', 'required:false, eg:lender')   
-			.build('status', 'required:false, eg:lender')   
 			.build('urL_slug', 'required:false, eg:lender')      
 			.end();
 
@@ -95,12 +94,31 @@ function service(data){
 		// set creation details
 		//params.profile_id = data.profile.id
         params.modified_on = new Date();
-        params.modified_by = globalUserId;
+		params.modified_by = globalUserId;
 		
-        return product.update({where:{...params}})
-    }).then((product)=>{
+		let p = product;
+		
+
+		return product.update({...params})
+		
+    }).then(async (product)=>{
         if (!product) throw new Error("An error occured while creating product");        
-       
+		let p = product;
+		let params = {};
+		if (p.max_tenor == null || p.product_name == null || p.product_description == null || p.repayment_method == null
+			|| p.repayment_model == null || p.min_loan_amount == null || p.max_loan_amount == null || p.tenor_type == null
+			|| p.min_tenor == null || p.max_tenor == null || p.interest_period == null || p.interest == null) {
+				params.status = 'draft';
+			}
+		else {
+			params.status = 'inactive';
+		}
+
+		await product.update({...params});
+
+		// see whether loan is draft or not
+		//let loan_is_draft = true;
+
         d.resolve(product);
     })
 	.catch( (err) => {

@@ -53,7 +53,7 @@ function service(data){
         else {
             if (data.profile_id) data.where.profile_id = data.profile_id
         }
-        if (data.profile_id) data.where.profile_id = data.profile_id
+        
         if (data.product_name) data.where.product_name = { $like:  '%' + data.product_name + '%'}
         if (data.product_description) data.where.product_description = {$like: '%' + data.product_description + '%'}
         if (data.repayment_model) data.where.repayment_model = {$like: '%' + data.repayment_model + '%'}
@@ -61,7 +61,10 @@ function service(data){
         if (data.max_loan_amount) data.where.max_loan_amount = data.max_loan_amount
         if (data.tenor_type) data.where.tenor_type = data.tenor_type
         if (data.interest) data.where.interest = data.interest
-
+        
+        // do not show deleted products 
+        data.where.status = {$ne : 'deleted'}        
+        
         return [
             models.product.findAndCountAll(data), data
         ]
