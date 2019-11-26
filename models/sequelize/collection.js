@@ -31,7 +31,7 @@ module.exports = (sequelize, DataTypes) => {
     // associations can be defined here
     collection.belongsTo(models.profile, {foreignKey: 'borrower_id', as:'borrower'});
     collection.belongsTo(models.profile, {foreignKey: 'lender_id', as:'lender'});
-    collection.belongsTo(models.product, {foreignKey: 'product_id', as:'product'});
+    collection.belongsTo(models.product, {foreignKey: 'product_id'});
   };
   return collection;
 };

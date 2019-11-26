@@ -40,9 +40,7 @@ function service(data){
             delete data.name;
         }
 
-        data.attributes = {
-            include: ['name', 'id']
-        }
+        data.attributes = ['name']
 
         return models.role.findAndCountAll(data)
 	}) 
