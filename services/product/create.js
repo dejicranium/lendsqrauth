@@ -70,7 +70,7 @@ function service(data){
 		
         let getProductName = models.product.findOne({
             where: {
-                profile_id: params.profile_id,
+                profile_id: data.profile.id,
                 product_name: params.product_name
             }
         })
@@ -85,12 +85,26 @@ function service(data){
 		params.profile_id = data.profile.id
         params.created_on = new Date();
         params.created_by = globalUserId;
-		params.status = 'draft';
-
+		
+			
         return models.product.create({...params})
-    }).then((product)=>{
+    }).then( async (product)=>{
         if (!product) throw new Error("An error occured while creating product");        
-       
+	   
+		let p = product;
+		let updateData = {};
+		
+		if (p.max_tenor == null || p.product_name == null || p.product_description == null || p.repayment_method == null
+			|| p.repayment_model == null || p.min_loan_amount == null || p.max_loan_amount == null || p.tenor_type == null
+			|| p.min_tenor == null || p.max_tenor == null || p.interest_period == null || p.interest == null) {
+				updateData.status = 'draft';
+			}
+		else {
+			updateData.status = 'inactive';
+		}
+		
+		await product.update({...updateData});
+
         d.resolve(product.id);
     })
 	.catch( (err) => {

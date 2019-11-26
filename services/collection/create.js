@@ -76,6 +76,7 @@ function service(data){
             }
 
 		}
+
 		
 		let user_with_email_exists = false;
 
@@ -116,9 +117,6 @@ function service(data){
 
 			if (user_account && user_account.email) {
 				user_with_email_exists = true;
-			
-
-
 
 				if (user_account.profiles) {
 					
@@ -143,9 +141,7 @@ function service(data){
 					}
 
 					else {
-				
 						let user_borrower_profile = profiles.find(profile => profile.role_id == borrower_role.id);
-
 						return [
 							user_borrower_profile,
 							'OLD-PROFILE',

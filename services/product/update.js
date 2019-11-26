@@ -18,7 +18,6 @@ var spec = morx.spec({})
 			.build('max_tenor', 'required:false, eg:lender')   
 			.build('interest_period', 'required:false, eg:lender')   
 			.build('interest', 'required:false, eg:lender')   
-			.build('status', 'required:false, eg:lender')   
 			.build('urL_slug', 'required:false, eg:lender')      
 			.end();
 
@@ -97,24 +96,28 @@ function service(data){
         params.modified_on = new Date();
 		params.modified_by = globalUserId;
 		
-		params.status = 'draft';
-		return product.update({where:{...params}})
+		let p = product;
+		
+
+		return product.update({...params})
 		
     }).then(async (product)=>{
         if (!product) throw new Error("An error occured while creating product");        
-		
-		
+		let p = product;
+		let params = {};
+		if (p.max_tenor == null || p.product_name == null || p.product_description == null || p.repayment_method == null
+			|| p.repayment_model == null || p.min_loan_amount == null || p.max_loan_amount == null || p.tenor_type == null
+			|| p.min_tenor == null || p.max_tenor == null || p.interest_period == null || p.interest == null) {
+				params.status = 'draft';
+			}
+		else {
+			params.status = 'inactive';
+		}
+
+		await product.update({...params});
+
 		// see whether loan is draft or not
 		//let loan_is_draft = true;
-
-		let p = product;
-		if (p.max_tenor !== undefined && p.product_name !== undefined && p.product_description !== undefined && p.repayment_method !== undefined
-			&& p.repayment_model !== undefined && p.min_loan_amount !== undefined && p.max_loan_amount !== undefined && p.tenor_type !== undefined
-			&& p.min_tenor !== undefined && p.max_tenor !== undefined && p.interest_period !== undefined && p.interest !== undefined) {
-				await product.update({status: 'inactive'})
-			}
-			
-		
 
         d.resolve(product);
     })

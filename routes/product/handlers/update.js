@@ -6,7 +6,7 @@ const profile_middleware = require('mlar')('profileVerifyMiddleware');
 
 function vinfo(req, res, next){ 
         const data = {...req.body, ...req.query, ...req.headers, ...req.params};
-        
+        data.profile = req.profile;
         service(data)
         .then(response => {
             utils.jsonS(res, response, "Product updated"); 
