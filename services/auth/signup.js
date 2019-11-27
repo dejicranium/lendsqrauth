@@ -31,10 +31,10 @@ function service(data){
         
         assert.emailFormatOnly(params.email);  // validate email, throw error if it's some weird stuff
         
-        if (params.first_name.length < 3) {
+        if (params.first_name && params.first_name.length < 3) {
             throw new Error("Name cannot be less than 3 characters")
         }
-        if (params.last_name.length < 3) {
+        if (params.last_name && params.last_name.length < 3) {
             throw new Error("Name cannot be less than 3 characters")
         }
 
@@ -148,13 +148,7 @@ function service(data){
         payload.data.token = userToken;
         await makeRequest(url, 'POST', payload, requestHeaders);
 
-        let response = {
-            first_name: user.first_name,
-            last_name: user.last_name,
-            email: user.email
-        }
-        
-        d.resolve(response);
+        d.resolve(user);
     })
 	.catch( (err) => {
 
