@@ -7,16 +7,24 @@ const q = require('q');
 module.exports  = function(role) {
 
     let middleware = (req, res, next) => {
-        
         let profile_role= req.profile ? req.profile.role : null
-
-        if (role == profile_role)
+        
+        if (typeof role == 'object') {
+            role.forEach(r=> {
+                if (r == profile_role) {
+                    next();
+                    return
+                }
+            })
+        }
+        if (role == profile_role){
             next();
-                
+            return
+        }
         
         else
             utils.jsonF(res, null, `Profile not an ${role} type.`);
-
+            return;
         
     }
 
