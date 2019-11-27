@@ -2,6 +2,7 @@ const models = require('mlar')('models');
 const q = require('q'); 
 const paginate = require('mlar')('paginate');
 const moment = require('moment');
+const DEFAULT_EXCLUDES = require('mlar')('appvalues').DEFAULT_EXCLUDES;
 
 function service(data){
 
@@ -17,7 +18,8 @@ function service(data){
     params.page = page;
     params.offset = offset;
     params.attributes = {};
-    params.attributes.exclude = ['password'];
+    params.attributes.exclude = ['password', ...DEFAULT_EXCLUDES, 'business_name', 'active', 'deleted', 'disabled']
+
 
     // for filter conditions 
     params.where = {};

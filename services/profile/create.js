@@ -72,13 +72,14 @@ function service(data){
 
 		params.created_on = new Date();
 	
-        return [models.profile.create({...params}), params];
+        return [models.profile.create({...params}), params, role];
 	})
-	.spread(async (profile, params)=> {
+	.spread(async (profile, params, role)=> {
 		if (!profile) throw new Error("An error occured while creating user's profile");    
 		params.profile_id = profile.id
-
-		await models.business_info.create(params);
+		if (role.name=="business_lender") {
+			await models.business_info.create(params);
+		}
 		
 		
 		if (params.contact_first_name || params.contact_last_name || params.contact_phone || params.contact_email ){
