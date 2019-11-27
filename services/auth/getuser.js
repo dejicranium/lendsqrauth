@@ -25,7 +25,7 @@ function service(data){
             id: data.user_id
         },
         attributes: {
-            exclude: ['password']
+            exclude: ['password', ...DEFAULT_EXCLUDES, 'business_name', 'active', 'deleted', 'disabled']
         }
     }
 

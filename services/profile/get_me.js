@@ -5,6 +5,7 @@ const q = require('q');
 const validators = require('mlar')('validators'); 
 const assert = require('mlar')('assertions'); 
 const paginate = require('mlar')('paginate');
+const DEFAULT_EXCLUDES = require('mlar')('appvalues').DEFAULT_EXCLUDES;
 
 var spec = morx.spec({})  
 			   .end();
@@ -22,6 +23,25 @@ function service(data){
             where: {
                 id: data.profile.id
             },
+            include: [ 
+                { 
+                    model: models.user ,
+                    attributes: {
+                        exclude: ['password', ...DEFAULT_EXCLUDES, 'business_name', 'active', 'deleted', 'disabled']
+
+                    }
+                },
+                {
+                    model: models.business_info,
+                    attributes: {
+                        exclude: DEFAULT_EXCLUDES
+                    }
+                },
+                {
+                    model: models.role,
+                    attributes: ['name']
+                }
+            ],
             attributes: ['id', 'role_id', 'user_id', 'parent_profile_id']
         })
 	}) 

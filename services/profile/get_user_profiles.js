@@ -57,13 +57,14 @@ function service(data){
 					}
 				},
 				attributes: {
-					exclude: [ ...DEFAULT_EXCLUDES, 'business_name']
+					exclude: ['password', ...DEFAULT_EXCLUDES, 'business_name', 'active', 'deleted', 'disabled']
+
 				}
 			},
 			{
 				model: models.user,
 				attributes: {
-					exclude: DEFAULT_EXCLUDES
+					exclude: ['password', ...DEFAULT_EXCLUDES, 'business_name', 'active', 'deleted', 'disabled']
 				}
 			},
 			{
