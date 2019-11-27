@@ -68,7 +68,7 @@ function service(data){
 
     }).spread( (user, token)=> {
         if (!token) throw new Error("Could not create new token");
-        let fields = "id,first_name,last_name,phone,email,business_name,active,deleted,disabled,type,subtype".split(',')
+        let fields = "id,first_name,last_name,phone,email,image,type".split(',')
         
         let response = {};
         user = obval.select(fields).from(user);
