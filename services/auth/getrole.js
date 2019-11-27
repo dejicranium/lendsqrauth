@@ -21,8 +21,8 @@ function service(data){
 	q.fcall( async () => {
 		var validParameters = morx.validate(data, spec, {throw_error:true});
 		let params = validParameters.params;
-         
-        return models.role.findOne({ where: { id: params.role_id }})
+        
+        return models.role.findOne({ where: { id: params.role_id }, attributes: ['name']})
 	}) 
 	.then((role) => { 
         if (!role) throw new Error(`Could not find role`);

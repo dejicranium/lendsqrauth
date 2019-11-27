@@ -42,7 +42,9 @@ function service(data){
 
 		data.attributes = {
 			exclude : [
-				'role_id'
+				'role_id',
+				...DEFAULT_EXCLUDES,
+				'parent_profile_id'
 			]
 		}
 
@@ -55,7 +57,7 @@ function service(data){
 					}
 				},
 				attributes: {
-					exclude: DEFAULT_EXCLUDES
+					exclude: [ ...DEFAULT_EXCLUDES, 'business_name']
 				}
 			},
 			{

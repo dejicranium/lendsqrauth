@@ -9,21 +9,11 @@ const makeRequest = require('mlar')('makerequest');
 
 
 var spec	=   morx.spec({}) 
-				.build('borrower_first_name', 'required:false, eg:lender')   
-				.build('borrower_last_name', 'required:false, eg:lender')   
-				.build('borrower_email', 'required:false, eg:itisdeji@gmail.com')   
-				.build('borrower_phone', 'required:false, eg:08100455706')   
-				.build('borrower_bvn', 'required:false, eg:42341234552')   
-				.build('product_id', 'required:false, eg:lender')   
-				.build('tenor', 'required:false, eg:1')   
-				.build('product_id', 'required:false, eg:1')   
-				.build('disbursement_mode', 'required:false, eg:1000000')   
-				.build('loan_status', 'required:false, eg:lender')   
-				.build('disbursement_date', 'required:false, eg:lender')   
-				.build('num_of_collections', 'required:false, eg:lender')   
-				.build('repayment_id', 'required:false, eg:1')   
-				.build('start_date', 'required:false, eg:lender')   
-							
+				.build('borrower_first_name', 'required:true, eg:lender')   
+				.build('borrower_last_name', 'required:true, eg:lender')   
+				.build('borrower_email', 'required:true, eg:itisdeji@gmail.com')   
+				.build('borrower_phone', 'required:true, eg:08100455706')   
+				.build('borrower_bvn', 'required:true, eg:42341234552')   
 				.end();
 
 function service(data){
@@ -34,7 +24,13 @@ function service(data){
 		const validParameters = morx.validate(data, spec, {throw_error : true});
 		const params = validParameters.params;
 
+		if (params.borrower_first_name.length < 3) throw new Error("Names must be more than 2 characters")
+		if (params.borrower_last_name.length < 3) throw new Error("Names must be more than 2 characters")
 
+		assert.digitsOnly(params.borrower_bvn, null, 'BVN')
+		assert.digitsOnly(params.borrower_phone, null, 'Phone')
+		assert.emailFormatOnly(params.borrower_email, null, 'Email')
+		
 		//all or none
 		assert.mustBeAllOrNone(
 			[

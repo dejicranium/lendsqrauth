@@ -22,7 +22,12 @@ function service(data){
         let getProduct = models.product.findOne({
             where: {
                 id: params.product_id
-            }
+            },
+            include: [
+                {
+                    model: models.collection
+                }
+            ]
         })
 
         return [getProduct, params]
@@ -31,7 +36,7 @@ function service(data){
 	.spread((product, params) => { 
         if (!product) throw new Error("No product found");
         if (data.profile.id !== product.profile_id) throw new Error("Can't delete another profile's product")
-
+        if (product.collections.length > 0) throw new Error("You cannot delete a product with collections")
         if (product.deleted_flag === 0) throw new Error("Product has already been deleted");
         if (product.status === 'active') throw new Error("Cannot delete active product");
 

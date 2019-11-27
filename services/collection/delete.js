@@ -12,7 +12,7 @@ var spec = morx.spec({})
 function service(data){
 
 	var d = q.defer();
-	const globalUserId = data.USER_ID || 1;
+	const globalUserId = data.user.id || 1
 	q.fcall( async () => {
 		const validParameters = morx.validate(data, spec, {throw_error : true});
 		const params = validParameters.params;
@@ -20,14 +20,19 @@ function service(data){
         return [models.collection.findOne({
             where: {
                 id: params.collection_id
-            }
+            },
+            include: [
+                {
+                    model: models.product,
+                    required: false
+                }
+            ]
         }), params]
         
 	}) 
 	.spread((collection, params) => { 
         if (!collection) throw new Error("No collection found");
 
-        // set modification details
         params.deleted_flag = 1;
         params.deleted_on = new Date();
         params.deleted_by = globalUserId;
