@@ -94,7 +94,6 @@ function service(data){
 					}
 				]
 			});
-
 			
 			// fetch borrower_role before hand 
 			let borrower_role = await models.role.findOne({
@@ -106,7 +105,7 @@ function service(data){
 			let create_new_borrower_profile = function(user_id) {
 				return models.profile.create({
 					role_id: borrower_role.id,
-					parent_profile_id: 1, // TODO: get real parent_profile_id
+					parent_profile_id: data.profile.id, // TODO: get real parent_profile_id
 					user_id: user_id
 				});
 			} 
@@ -163,23 +162,17 @@ function service(data){
 					})
 				}
 				else {
-					
 					account = await models.user.findOne({
 						email: params.borrower_email,
 					})
-
 				}
-
-
 				return [
 					// create a new account 					
 					create_new_borrower_profile(account.id),
 					"new-profile",
 					params
 				]
-
 			}
-
 		}
 	})
 

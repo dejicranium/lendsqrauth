@@ -50,6 +50,14 @@ function service(data){
         if (params.disbursement_date)
             assert.dateFormatOnly(params.disbursement_date, null, 'Disbursement Date') 
         
+        if (params.start_date)
+            assert.dateFormatOnly(params.start_date, null, 'Start Date') 
+        
+        if (params.num_of_collections) {
+            assert.digitsOnly(params.num_of_collections, null, 'No. of collections') 
+
+        }
+        
         // checks the product we are assigning to
         let product = null;
         if (params.product_id) {
