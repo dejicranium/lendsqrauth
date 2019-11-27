@@ -148,7 +148,13 @@ function service(data){
         payload.data.token = userToken;
         await makeRequest(url, 'POST', payload, requestHeaders);
 
-        d.resolve(user);
+        let response = {
+            first_name: user.first_name,
+            last_name: user.last_name,
+            email: user.email
+        }
+        
+        d.resolve(response);
     })
 	.catch( (err) => {
 
