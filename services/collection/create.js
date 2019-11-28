@@ -53,7 +53,7 @@ function service(data){
 		)
 		
 
-		/*
+		
 		if (params.borrower_bvn) {
 			// first verifiy that there is a bvn
 			const requestHeaders = {
@@ -74,7 +74,7 @@ function service(data){
 
 		}
 
-		*/
+		
 		let user_with_email_exists = false;
 
 		if (params.borrower_email) {

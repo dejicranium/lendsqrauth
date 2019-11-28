@@ -41,7 +41,7 @@ function service(data){
 
         assert.mustBeValidPassword(params.password);
 
-        let role = await models.role.findAll({where: {name: params.type }});
+        let role = await models.role.findOne({where: {name: params.type }});
         if (!role) throw new Error("No such role exists. Change `type`");
 
         // make request to verify phone number
@@ -72,7 +72,6 @@ function service(data){
         if (role.name == "individual_lender" && (!params.first_name || !params.last_name )) 
             throw new Error("Individual accounts must have both first name and last name");
         
-        
         if (role.name == "borrower" && (!params.first_name || !params.last_name )) 
             throw new Error("Individual must have both first name and last name");
         
@@ -84,10 +83,9 @@ function service(data){
 	}) 
 	.spread(async (user, params, role) => { 
         if (user) throw new Error("User with these credentials exists");
-        
-
         // set role
-        params.role_id = role.id;  delete params.type;
+        params.role_id = role.id;  
+        delete params.type;
 
         params.created_on = new Date();
 
