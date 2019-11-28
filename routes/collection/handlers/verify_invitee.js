@@ -1,13 +1,14 @@
 var utils = require('mlar')('mt1l');
-const signupService = require('mlar').mreq('services', 'auth/signup');
 const routemeta = require('mlar')('routemeta');
+const auth_middleware = require('mlar')('authmiddleware');
+const service = require('mlar').mreq('services', 'collection/verify_invitee_is_user');
 
 function vinfo(req, res, next){ 
         const data = {...req.body, ...req.query, ...req.headers, ...req.params};
-        data.create_profile = true;
-        signupService(data)
+        
+        service(data)
         .then(response => {
-            utils.jsonS(res, null, "Account created successfully"); 
+            utils.jsonS(res, response, "The process completed succesfully"); 
         })
         .catch(error => {
             utils.jsonF(res, null, error.message); 
@@ -15,8 +16,8 @@ function vinfo(req, res, next){
 }
 
 vinfo.routeConfig = {};
-vinfo.routeConfig.path = "/signup"; 
+vinfo.routeConfig.path = "/invitation/verify-borrower"; 
 vinfo.routeConfig.method = "post"; 
-vinfo.routeConfig.middlewares = [ routemeta('auth_sign_up', 'none')];
+vinfo.routeConfig.middlewares = [routemeta('verify_borrower_is_user', 'none')];
 module.exports = vinfo;
 

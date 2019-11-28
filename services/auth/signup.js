@@ -16,7 +16,8 @@ var spec = morx.spec({})
                .build('business_name', 'required:false, eg:Tina Comms')
                .build('email', 'required:true, eg:tinaton@gmail.com') 
                .build('phone', 'required:true, eg:0810045800') 
-               .build('type', 'required:true, eg:1')
+               .build('type', 'required:false, eg:1')
+               .build('create_profile', 'required:true, eg:1')
 			   .end();
 
 function service(data){
@@ -72,6 +73,10 @@ function service(data){
             throw new Error("Individual accounts must have both first name and last name");
         
         
+        if (role.name == "borrower" && (!params.first_name || !params.last_name )) 
+            throw new Error("Individual must have both first name and last name");
+        
+        
         // hash password
         params.password = await bcrypt.hash(params.password, 10);
         
@@ -86,20 +91,30 @@ function service(data){
 
         params.created_on = new Date();
 
-        return models.sequelize.transaction((t1) => {
-            // create a user and his profile            
-            return q.all([
-                models.user.create(params, {transaction: t1}), 
-                models.profile.create({role_id: params.role_id}, {transaction: t1})
-            ]);
-        })
+        if (params.create_profile == true) {
+            return models.sequelize.transaction((t1) => {
+                // create a user and his profile            
+                return q.all([
+                    models.user.create(params, {transaction: t1}), 
+                    models.profile.create({role_id: params.role_id}, {transaction: t1})
+                ]);
+            })
+        }
+
+       else{
+            return [models.user.create(params), null] 
+            
+        }
         
     }).spread(async (user, profile)=>{
         if (!user) throw new Error("An error occured while creating user's account");
-        if (!profile) throw new Error("Could not create a profile user")
+        //if (!profile) throw new Error("Could not create a profile user")
     
         // update created profile
-        await profile.update({user_id: user.id})
+        if (profile) {
+            await profile.update({user_id: user.id})
+
+        }
 
         // create activation token
         const userToken = await crypto.randomBytes(32).toString('hex');

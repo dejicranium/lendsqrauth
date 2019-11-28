@@ -25,5 +25,6 @@
 	"assertions":"/utils/assertions",
 	"validators":"/utils/validators",
 	"testutils":"/utils/testutils",
-	"makerequest":"/utils/request"
+	"makerequest":"/utils/request",
+	"signupservice":"/services/auth/signup"
 }

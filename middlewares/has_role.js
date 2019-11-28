@@ -10,12 +10,10 @@ module.exports  = function(role) {
         let profile_role= req.profile ? req.profile.role : null
         
         if (typeof role == 'object') {
-            role.forEach(r=> {
-                if (r == profile_role) {
-                    next();
-                    return
-                }
-            })
+            if (role.includes(profile_role)) {
+                next()
+                return;
+            }
         }
         if (role == profile_role){
             next();

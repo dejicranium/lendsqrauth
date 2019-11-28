@@ -64,7 +64,7 @@ function service(data){
 		if (params.interest_period) {
 			params.interest_period = params.interest_period.toLowerCase();
 			if (!['per day', 'per month', 'per annum'].includes(params.interest_period))
-			throw new Error('Interest period should be one of `per day`, `per month` or `per annum`')
+				throw new Error('Interest period should be one of `per day`, `per month` or `per annum`')
 		}
 		if (params.product_name.length > 255) throw new Error("Product name cannot be more than 255 characters");
 		

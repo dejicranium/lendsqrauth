@@ -6,6 +6,7 @@ const validators = require('mlar')('validators');
 const assert = require('mlar')('assertions'); 
 const config = require('../../config');
 const makeRequest = require('mlar')('makerequest');
+const crypto = require('crypto');
 
 
 var spec	=   morx.spec({}) 
@@ -52,7 +53,7 @@ function service(data){
 		)
 		
 
-		
+		/*
 		if (params.borrower_bvn) {
 			// first verifiy that there is a bvn
 			const requestHeaders = {
@@ -73,7 +74,7 @@ function service(data){
 
 		}
 
-		
+		*/
 		let user_with_email_exists = false;
 
 		if (params.borrower_email) {
@@ -135,7 +136,7 @@ function service(data){
 						]
 					}
 
-					else {
+					else {  // when user already has a profile
 						let user_borrower_profile = profiles.find(profile => profile.role_id == borrower_role.id);
 						return [
 							user_borrower_profile,
@@ -154,23 +155,10 @@ function service(data){
 				}
 			}
 			else {
-				let account = null;
-				if (!user_with_email_exists) {
-					account = await models.user.create({
-						email: params.borrower_email,
-						created_on: new Date()
-					})
-				}
-				else {
-					account = await models.user.findOne({
-						email: params.borrower_email,
-					})
-				}
-				return [
-					// create a new account 					
-					create_new_borrower_profile(account.id),
-					"new-profile",
-					params
+				return[
+					'none',
+					'none',
+					params,
 				]
 			}
 		}
@@ -181,14 +169,26 @@ function service(data){
 			params.borrower_name = params.borrower_first_name + " " + params.borrower_last_name;
 		}
 
-		if ( borrower_profile && borrower_profile != 'null') {
+		if ( borrower_profile && borrower_profile != 'none') {
 			params.borrower_id = borrower_profile.id;
 		}
 
+		params.lender_id = data.profile.id; // set the lender profile to the person making this request
+
 		return models.collection.create(params);
 	})
-	.then(collection => {
+	.then(async collection => {
 		if (!collection) throw new Error("Could not create collection");
+		// create new auth_token for this
+
+		let invitation_meta = {
+			collection_id: collection.id
+		}
+	
+		let token =	crypto.randomBytes(32).toString('hex');
+
+		await models.auth_token.create({type: 'borrower_invitation', token: token, meta: JSON.stringify(invitation_meta), is_used: 0})
+
 
 		d.resolve(collection)
 	})
