@@ -105,7 +105,7 @@ function service(data){
 		
 		await product.update({...updateData});
 
-        d.resolve(product.id);
+        d.resolve(product);
     })
 	.catch( (err) => {
 
