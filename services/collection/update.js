@@ -4,6 +4,9 @@ const morx = require('morx');
 const q = require('q'); 
 const validators = require('mlar')('validators'); 
 const assert = require('mlar')('assertions'); 
+const requests = require('mlar')('requests');
+const makeRequest = require('mlar')('makerequest');
+const config = require('../../config');
 
 var spec = morx.spec({}) 
         .build('collection_id', 'required: false')
@@ -26,7 +29,8 @@ var spec = morx.spec({})
 function service(data){
 
 	var d = q.defer();
-	const globalUserId = data.USER_ID || 1;
+    const globalUserId = data.USER_ID || 1;
+    let tenor_just_added = false;
 
 	q.fcall( async () => {
 		const validParameters = morx.validate(data, spec, {throw_error : true});
@@ -94,30 +98,40 @@ function service(data){
         params.modified_on = new Date();
 		params.modified_by = globalUserId;
 		
-		let p = product;
+        let p = product;
+        
+        tenor_just_added = !collection.tenor && params.tenor
+        
+    
+
+		return  collection.update({...params})
 		
+    }).then(async (collection)=>{
+        let product =  await models.product.findOne({where: {id: collection.product_id}})
+        
+        if(product.id) {
+            // check whether the most essential parts of a collection are available before sending email
+            // if tenor is just being added
+            if (tenor_just_added) {
+                // set email
+                let lender_identity = data.profile.business_name || data.user.first_name + ' ' + data.user.last_name
+                
+                let payload =  {
+                    lender: lender_identity,
+                    accept_url : config.base_url + 'reject-borrower-invite',
+                    reject_url: config.base_url + 'accept-borrower-invite',
+                    borrower: collection.borrower_name,
+                    interest: product.interest,
+                    interest_period: product.interest_period,
+                    tenor: collection.tenor
+                }
+                
+                await requests.inviteBorrower(collection.borrower_email, payload);
 
-		return product.update({...params})
-		
-    }).then(async (product)=>{
-        if (!product) throw new Error("An error occured while creating product");        
-		let p = product;
-		let params = {};
-		if (p.max_tenor == null || p.product_name == null || p.product_description == null || p.repayment_method == null
-			|| p.repayment_model == null || p.min_loan_amount == null || p.max_loan_amount == null || p.tenor_type == null
-			|| p.min_tenor == null || p.max_tenor == null || p.interest_period == null || p.interest == null) {
-				params.status = 'draft';
-			}
-		else {
-			params.status = 'inactive';
-		}
-
-		await product.update({...params});
-
-		// see whether loan is draft or not
-		//let loan_is_draft = true;
-
-        d.resolve(product);
+            }
+        }
+        
+        d.resolve(collection);
     })
 	.catch( (err) => {
 

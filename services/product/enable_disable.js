@@ -35,30 +35,30 @@ function service(data){
         if (!product) throw new Error("No product found");
         // check if the profile who created this is the same as the person trying to accepti it.
         if (data.profile.id !== product.profile_id) throw new Error("You cannot update another profile's product")
-        if (product.status == 'draft') throw new Error("Cannot operate on a draft product");
+        if (product.status == 'draft' || product.status == 'deleted') throw new Error("Cannot operate on a draft/deleted product");
 
         let p = product
         if (params.status.toLowerCase() == 'active' && product.status !== 'active')  {
             if (p.max_tenor == null || p.product_name == null || p.product_description == null || p.repayment_method == null
                 || p.repayment_model == null || p.min_loan_amount == null || p.max_loan_amount == null || p.tenor_type == null
                 || p.min_tenor == null || p.max_tenor == null || p.interest_period == null || p.interest == null) {
-                    
-                    let required_fields = [
-                        'max_tenor', 'product_name', 'product_description',
-                        'repayment_method', 'repayment_model', 'min_loan_amount', 'max_loan_amount',
-                        'tenor_type', 'min_tenor', 'max_tenor', 'interest_period', 'interest'
-                    ]
+                
+                let required_fields = [
+                    'max_tenor', 'product_name', 'product_description',
+                    'repayment_method', 'repayment_model', 'min_loan_amount', 'max_loan_amount',
+                    'tenor_type', 'min_tenor', 'max_tenor', 'interest_period', 'interest'
+                ]
 
-                    let fields = Object.keys(p.dataValues);
-                    let incomplete_fields = []
-                    
-                    fields.forEach(field => {
-                        if (required_fields.includes(field) && p[field] == null) incomplete_fields.push(field)
-                    });
+                let fields = Object.keys(p.dataValues);
+                let incomplete_fields = []
+                
+                fields.forEach(field => {
+                    if (required_fields.includes(field) && p[field] == null) incomplete_fields.push(field)
+                });
                     
                    
-                    throw new Error("Some fields are missing: " + incomplete_fields.join(', '));
-                }
+                throw new Error("Some fields are missing: " + incomplete_fields.join(', '));
+            }
         }
         if (product.status === 'active') throw new Error("Cannot update active product");
         if (product.deleted_flag == 0) throw new Error("Product has been deleted");

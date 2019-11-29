@@ -10,5 +10,6 @@ module.exports = {
     JWTexpiresIn: process.env.JWTexpiresIn || 86000,
     sender_email: process.env.sender_email || 'support@lendsqr.com',
     notif_base_url: process.env.notif_base_url || 'https://v2-test.lendsqr.com/api/v1/notification/',
-    utility_base_url: process.env.utility_base_url || 'https://v2-test.lendsqr.com/api/v1/util/'
+    utility_base_url: process.env.utility_base_url || 'https://v2-test.lendsqr.com/api/v1/util/',
+    base_url: process.env.base_url || 'https://v2-test.lendsqr.com/',
 }

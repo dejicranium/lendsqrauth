@@ -87,9 +87,17 @@ function service(data){
         return [getProduct, params]
         
 	}) 
-	.spread((product, params) => { 
+	.spread(async (product, params) => { 
         if (!product) throw new Error("No such product exists");
 		if (product.profile_id != data.profile.id) throw new Error("Can't update someone else's product");
+		
+		// check if there's already a product with the product name
+		if (params.product_name) {
+			let existing_product = await models.product.findOne({where: {name: params.product_name}})
+			if (existing_product.id) {
+				throw new Error("Please use a unique product name");
+			} 
+		}
 		
 		// set creation details
 		//params.profile_id = data.profile.id
@@ -104,10 +112,12 @@ function service(data){
     }).then(async (product)=>{
         if (!product) throw new Error("An error occured while creating product");        
 		let p = product;
+
+		d.resolve(p)
 		let params = {};
 		if (p.max_tenor == null || p.product_name == null || p.product_description == null || p.repayment_method == null
 			|| p.repayment_model == null || p.min_loan_amount == null || p.max_loan_amount == null || p.tenor_type == null
-			|| p.min_tenor == null || p.max_tenor == null || p.interest_period == null || p.interest == null) {
+			|| p.min_tenor == null || p.interest_period == null || p.interest == null) {
 				params.status = 'draft';
 			}
 		else {

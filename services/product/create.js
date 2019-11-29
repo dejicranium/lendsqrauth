@@ -70,7 +70,7 @@ function service(data){
 		
         let getProductName = models.product.findOne({
             where: {
-                profile_id: data.profile.id,
+                //profile_id: data.profile.id,
                 product_name: params.product_name
             }
         })
@@ -79,7 +79,7 @@ function service(data){
         
 	}) 
 	.spread((product, params) => { 
-        if (product) throw new Error("Product name must be unique for lender");
+        if (product) throw new Error("Product name is not unique");
 
 		// set creation details
 		params.profile_id = data.profile.id
@@ -96,7 +96,7 @@ function service(data){
 		
 		if (p.max_tenor == null || p.product_name == null || p.product_description == null || p.repayment_method == null
 			|| p.repayment_model == null || p.min_loan_amount == null || p.max_loan_amount == null || p.tenor_type == null
-			|| p.min_tenor == null || p.max_tenor == null || p.interest_period == null || p.interest == null) {
+			|| p.min_tenor == null || p.interest_period == null || p.interest == null) {
 				updateData.status = 'draft';
 			}
 		else {

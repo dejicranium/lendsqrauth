@@ -1,5 +1,5 @@
 const axios = require('axios');
-const q = require('q')
+const q = require('q');
 
 
 module.exports = (url, method, payload, headers, caller=null) => {

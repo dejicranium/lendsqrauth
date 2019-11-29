@@ -36,7 +36,8 @@ function service(data){
         return [ 
             models.user_bank.findOne({where: { account_number: params.account_number }}),  
             models.user_bank.findOne({where: {bvn: params.bvn}}),
-            params ]
+            params, 
+        ]
 
         
    
@@ -58,7 +59,7 @@ function service(data){
                 bvn: params.bvn
             }
             let phoneNumberFromBVN = null;
-            let verifiedBVN = await makeRequest(url, 'POST', payload, requestHeaders, 'verify B  VN');
+            let verifiedBVN = await makeRequest(url, 'POST', payload, requestHeaders, 'verify BVN');
     
             if (verifiedBVN && verifiedBVN.mobile) {
                 phoneNumberFromBVN = verifiedBVN.mobile;

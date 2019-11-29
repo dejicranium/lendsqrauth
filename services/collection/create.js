@@ -7,7 +7,7 @@ const assert = require('mlar')('assertions');
 const config = require('../../config');
 const makeRequest = require('mlar')('makerequest');
 const crypto = require('crypto');
-
+const requests = require('mlar')('requests');
 
 var spec	=   morx.spec({}) 
 				.build('borrower_first_name', 'required:true, eg:lender')   
@@ -53,7 +53,7 @@ function service(data){
 		)
 		
 
-		
+		/*
 		if (params.borrower_bvn) {
 			// first verifiy that there is a bvn
 			const requestHeaders = {
@@ -72,7 +72,7 @@ function service(data){
                 throw new Error("Could not verify BVN");
             }
 
-		}
+		}*/
 
 		
 		let user_with_email_exists = false;
@@ -189,7 +189,19 @@ function service(data){
 
 		await models.auth_token.create({type: 'borrower_invitation', token: token, meta: JSON.stringify(invitation_meta), is_used: 0})
 
-
+		// set email
+		/*
+		let lender_identity = data.profile.business_name || data.user.first_name + ' ' + data.user.last_name
+		
+		let data =  {
+			lender: lender_identity,
+			accept_url : config.base_url + 'reject-borrower-invite',
+			reject_url: config.base_url + 'accept-borrower-invite',
+			borrower: data.borrower_first_name + ' ' + data.borrower_last_name,
+		}
+		
+		await requests.inviteBorrower(data.borrower_email, lender_identity, accept_link, reject_link);
+		*/
 		d.resolve(collection)
 	})
 	.catch(err => {
