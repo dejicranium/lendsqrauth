@@ -33,12 +33,11 @@ function service(data){
 	}) 
 	.spread((product, params) => { 
         if (!product) throw new Error("No product found");
-
         // check if the profile who created this is the same as the person trying to accepti it.
         if (data.profile.id !== product.profile_id) throw new Error("You cannot update another profile's product")
+        if (product.status == 'draft') throw new Error("Cannot operate on a draft product");
 
-        let p = product;
-
+        let p = product
         if (params.status.toLowerCase() == 'active' && product.status !== 'active')  {
             if (p.max_tenor == null || p.product_name == null || p.product_description == null || p.repayment_method == null
                 || p.repayment_model == null || p.min_loan_amount == null || p.max_loan_amount == null || p.tenor_type == null

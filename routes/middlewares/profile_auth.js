@@ -7,6 +7,8 @@ const jwt_decode = require('jwt-decode');
 
 module.exports = async function (req, res, next) {
     let prof_token = req.headers.profile_token
+    let auth_token = req.auth_token;
+
     const d = q.defer();
 
     try {
@@ -25,12 +27,24 @@ module.exports = async function (req, res, next) {
             return
         }
         try {
+            
+            let decoded_auth_token = jwt_decode(auth_token);
+            
+            let user_profiles = decoded_auth_token.profiles;
+
             let decoded_dict = jwt_decode(prof_token);
             if (decoded_dict) {
                 req.profile = decoded_dict
+
+                // check to make sure that the profile is among the logged in user's profiles 
+                
+                if (!user_profiles.includes(req.profile.id)) {
+                    utils.jsonF(res, null, "User-Profile mismatch"); 
+                    return 
+                }
+                // else  go on
                 next()
                 return;
-    
             }
         }
         catch(err) {
@@ -38,26 +52,6 @@ module.exports = async function (req, res, next) {
             return;
         }
         
-        /*models.auth_token.findOne({
-            where: {
-                type: 'session',
-                token: prof_token,
-            },
-            include: [{model: models.user, include:[{model: models.profile}]}]
-
-
-           
-        }).then(resp=> {
-            if (!resp) utils.jsonF(res, null, "Invalid access token");
-            req.user = resp.user
-    
-            req.decoded = decoded
-            next()
-        })
-        .catch(err=> {
-             utils.jsonF(res, null, err);
-        })
-        */
     })
     return d.promise
 }
