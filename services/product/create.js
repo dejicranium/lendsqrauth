@@ -32,8 +32,9 @@ function service(data){
 		
 		if (params.max_tenor) assert.digitsOnly(params.max_tenor, null, 'max tenor')
 		if (params.min_tenor) assert.digitsOnly(params.min_tenor, null, 'min tenor')
-		if (typeof params.interest == "number") throw new Error("Interest must be a number")
-
+		if (params.interest) {
+			if (typeof params.interest != "number") throw new Error("Interest must be a number")
+		}
 		if (params.min_loan_amount) {
 			assert.digitsOnly(params.min_loan_amount) 
 			params.min_loan_amount = parseFloat(params.min_loan_amount).toFixed(2);

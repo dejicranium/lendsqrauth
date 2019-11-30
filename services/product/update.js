@@ -32,8 +32,10 @@ function service(data){
 		
 		if (params.max_tenor) assert.digitsOnly(params.max_tenor, null, 'max tenor')
 		if (params.min_tenor) assert.digitsOnly(params.min_tenor, null, 'min tenor')
-		if (typeof params.interest == "number") throw new Error("Interest must be a number")
-
+		if (params.interest) {
+			if (typeof params.interest != "number") throw new Error("Interest must be a number")
+		}
+		
 		if (params.min_loan_amount) {
 			assert.digitsOnly(params.min_loan_amount) 
 			params.min_loan_amount = parseFloat(params.min_loan_amount).toFixed(2);
@@ -45,7 +47,7 @@ function service(data){
 			params.max_loan_amount = parseFloat(params.max_loan_amount).toFixed(2);
 
 		}
-
+	
 	
 		if (params.repayment_method) {
 			params.repayment_method = params.repayment_method.toLowerCase();
@@ -66,7 +68,6 @@ function service(data){
 			if (!['days', 'weeks', 'months', 'years'].includes(params.tenor_type))
 			throw new Error('Tenor type should be one of `days`, `weeks`, `months`, `years`')
 		
-
 		}
 		if (params.interest_period) {
 			params.interest_period = params.interest_period.toLowerCase();
@@ -98,7 +99,7 @@ function service(data){
 				throw new Error("Please use a unique product name");
 			} 
 		}
-		
+
 		// set creation details
 		//params.profile_id = data.profile.id
         params.modified_on = new Date();
