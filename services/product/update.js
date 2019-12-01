@@ -94,7 +94,7 @@ function service(data){
 		
 		// check if there's already a product with the product name
 		if (params.product_name) {
-			let existing_product = await models.product.findOne({where: {name: params.product_name}})
+			let existing_product = await models.product.findOne({where: {product_name: params.product_name}})
 			if (existing_product.id) {
 				throw new Error("Please use a unique product name");
 			} 
