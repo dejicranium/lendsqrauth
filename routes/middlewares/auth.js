@@ -19,7 +19,7 @@ module.exports = async function (req, res, next) {
     }
     jwt.verify(auth_token, config.JWTsecret, function(err, decoded){
 
-        if (err) utils.json401(res, null, "1-Invalid access token"); 
+        if (err) utils.json401(res, null, "Invalid access token"); 
         if (decoded && decoded.expiry < new Date())  utils.json401(res, null, "Expired access token");
         models.auth_token.findOne({
             where: {
@@ -29,7 +29,7 @@ module.exports = async function (req, res, next) {
             include: [{model: models.user, include:[{model: models.profile}]}]
            
         }).then(resp=> {
-            if (!resp) utils.json401(res, null, "2-Invalid access token");
+            if (!resp) utils.json401(res, null, "Invalid access token");
             req.user = resp.user
             req.auth_token = auth_token;
             req.decoded = decoded

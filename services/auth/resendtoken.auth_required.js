@@ -71,8 +71,7 @@ function service(data){
                 })
             }
 
-            // send otp to phone;
-            let url =  config.notif_base_url + "sms/send";
+            let url =  config.notif_base_url + "sms/send"; // notification servicer
             
             let payload = {
                 recipient: params.phone,
@@ -80,17 +79,16 @@ function service(data){
                 sender_id:1
             }
 
+            // send otp to phone;
             return makeRequest(url, 'POST', payload, requestHeaders);
 
         }
         else {
-
             // send email 
             let payload= {
                 context_id: null,
                 sender: config.sender_email,
                 sender_id: 1,
-                
             }
 
             if (params.type == 'token' && params.subtype == 'resend_invitation') {

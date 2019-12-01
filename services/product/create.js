@@ -67,7 +67,10 @@ function service(data){
 			if (!['per day', 'per month', 'per annum', 'flat'].includes(params.interest_period))
 				throw new Error('Interest period should be one of `per day`, `per month` or `per annum`')
 		}
-		if (params.product_name.length > 255) throw new Error("Product name cannot be more than 255 characters");
+		if (params.product_name) {
+			if (params.product_name.length > 255) throw new Error("Product name cannot be more than 255 characters");
+
+		}
 		
         let getProductName = models.product.findOne({
             where: {

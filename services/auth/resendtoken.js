@@ -95,8 +95,13 @@ function service(data){
             }
 
             if (params.type == 'token' && params.subtype == 'user_activation') {
+                // see whether user exists
+
                 let user = await models.user.findOne({ where: {email: params.email}});
                 if (!user.email) throw new Error("No such user found");
+
+                // check if user is already active.
+                if (user.active) throw new Error("User is already active");
 
                 let fullname =  user.business_name ||  user.first_name + ' ' + user.last_name;
                 
