@@ -77,7 +77,9 @@ function service(data){
 		
 		}
 
-		if (params.product_name.length > 255) throw new Error("Product name cannot be more than 255 characters");
+		if (params.product_name) {
+			if (params.product_name.length > 255) throw new Error("Product name cannot be more than 255 characters");
+		}
 		
         let getProduct = models.product.findOne({
             where: {
