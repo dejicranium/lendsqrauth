@@ -30,20 +30,44 @@ function service(data){
 		const validParameters = morx.validate(data, spec, {throw_error : true});
 		const params = validParameters.params;
 		
+		// min tenor and max tenor amount must exist together,
+		assert.mustBeAllOrNone([params.min_tenor, params.max_tenor], ['Min Tenor', 'Max Tenor'])
+	
 		if (params.max_tenor) assert.digitsOnly(params.max_tenor, null, 'max tenor')
 		if (params.min_tenor) assert.digitsOnly(params.min_tenor, null, 'min tenor')
+		
+		if (params.max_tenor && params.min_tenor) {
+			if (params.min_tenor > params.max_tenor) {
+				throw new Error("Min tenor cannot be greater than max tenor")
+			}
+		}
+		
+		// interest must be a digit or a float
 		if (params.interest) {
 			assert.digitsOrDecimalOnly(params.interest, null, 'interest')
 		}
+
+		// max loan amount and min_loan amount must exist together,
+		assert.mustBeAllOrNone([params.min_loan_amount, params.max_loan_amount], ['Min Loan Amount', 'Max Loan Amount'])
+		
+		// must be digits or float
 		if (params.min_loan_amount) {
-			assert.digitsOnly(params.min_loan_amount) 
+			assert.digitsOrDecimalOnly(params.min_loan_amount) 
 			params.min_loan_amount = parseFloat(params.min_loan_amount).toFixed(2);
 
 		}
+		// digits or float
 		if (params.max_loan_amount) {
-			assert.digitsOnly(params.max_loan_amount) 
+			assert.digitsOrDecimalOnly(params.max_loan_amount) 
 			params.max_loan_amount = parseFloat(params.max_loan_amount).toFixed(2);
 		}
+
+		if (params.min_loan_amount && params.max_loan_amount) {
+			// min loan amount cannot be greater than max loan amount.
+			if (parseFloat(params.min_loan_amount) > parseFloat(params.max_loan_amount)) 
+				throw new Error("Min loan amount cannot be greater than max loan maount");
+		}
+
 		if (params.repayment_method) {
 			params.repayment_method = params.repayment_method.toLowerCase();
 			if (!['card', 'direct debit', 'bank transfer', 'cheque', 'cash'].includes(params.repayment_method)){

@@ -4,6 +4,7 @@ const routemeta = require('mlar')('routemeta');
 const auth_middleware = require('mlar')('authmiddleware');
 const has_perm_middleware = require('mlar')('hasPermMiddleware');
 const profile_middleware = require('mlar')('profileVerifyMiddleware');
+const has_role = require('mlar')('hasRoleMiddleware');
 
 function vinfo(req, res, next){ 
         const data = {...req.body, ...req.header, ...req.params, ...req.query};
@@ -24,6 +25,7 @@ vinfo.routeConfig.method = "post";
 vinfo.routeConfig.middlewares = [
     auth_middleware, 
     profile_middleware,
+    has_role(['individual_lender', 'business_lender']),
     routemeta('add_team_member', 'none')];
 module.exports = vinfo;
 

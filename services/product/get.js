@@ -42,11 +42,13 @@ function service(data){
             ]
         }
 
-        data.where = {
-            
-        }
+        data.where = {};
+
         // else get all products in the system
-        if (data.profile.role != 'admin') {
+
+
+        // for call to get all products, allow admin and borrowers to see all products
+        if ( ! ['admin', 'borrower'].includes(data.profile.role)) {
             data.where = {
                 profile_id: data.profile.id
             }

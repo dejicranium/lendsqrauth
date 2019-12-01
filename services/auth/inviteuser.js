@@ -38,7 +38,7 @@ function service(data){
         }
         // check to make sure that only a lender can do this;
         
-        if (data.profile.role !== 'individual_lender' && data.profile.role !== 'business_lender') {
+        if (data.profile.role != 'individual_lender' && data.profile.role != 'business_lender') {
             throw new Error("Only lenders can add team members")
         }
         

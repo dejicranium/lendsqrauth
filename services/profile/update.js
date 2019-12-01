@@ -42,11 +42,22 @@ function service(data){
 
         
 	}) 
-	.spread((profile, params) => { 
+	.spread(async (profile, params) => { 
 		if (!profile) throw new Error("Profile does not exist");
+
 		if ((profile.user_id != data.user.id) && data.profile.role != 'admin') 
 			throw new Error("Only admins can update someone else's profile");
 
+		if (params.rc_number) {
+			// check for rc_number - which must be unique;
+			let profile_with_rc_number = await models.business_info.findOne({where: {rc_number: params.rc_number}})
+			if (profile_with_rc_number.id) {
+				throw new Error("Profile with RC Number already exists");
+			}
+		}
+
+
+		
         return [
 			profile.update({...params}),
 			params

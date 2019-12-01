@@ -3,6 +3,7 @@ const routemeta = require('mlar')('routemeta');
 const auth_middleware = require('mlar')('authmiddleware');
 const service = require('mlar').mreq('services', 'product/get');
 const profile_middleware = require('mlar')('profileVerifyMiddleware');
+const has_role = require('mlar')('hasRoleMiddleware');
 
 function vinfo(req, res, next){ 
         const data = {...req.body, ...req.query, ...req.headers, ...req.params};
