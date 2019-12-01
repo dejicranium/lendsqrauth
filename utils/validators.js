@@ -3,6 +3,10 @@ module.exports = {
         return /^\d+$/.test(entity);
     },
 
+    isDigitsOrDecimal(entity) {
+        return /^[1-9]\d*(\.\d+)?$/.test(entity)
+    },
+
     isOfLength(entity, length) {
         length = parseInt(length);
         entity = entity.toString();

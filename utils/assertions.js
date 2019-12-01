@@ -9,6 +9,14 @@ module.exports ={
         }
     },
 
+    digitsOrDecimalOnly(entity, error=null, param=null) {
+        if (!validator.isDigitsOrDecimal(entity)) {
+            if (error) throw new Error(error);
+            const errorField = param ? param.toString() : entity;
+            throw new Error(`${errorField} contains non-digits`);
+        }
+    },
+
     bvnFormatOnly(bvn, error=null, param=null){
         param =  'BVN';
         module.exports.digitsOnly(bvn, error, param);

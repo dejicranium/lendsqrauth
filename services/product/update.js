@@ -33,7 +33,7 @@ function service(data){
 		if (params.max_tenor) assert.digitsOnly(params.max_tenor, null, 'max tenor')
 		if (params.min_tenor) assert.digitsOnly(params.min_tenor, null, 'min tenor')
 		if (params.interest) {
-			if (typeof params.interest != "number") throw new Error("Interest must be a number")
+			assert.digitsOrDecimalOnly(params.interest, null, 'interest');
 		}
 		
 		if (params.min_loan_amount) {
