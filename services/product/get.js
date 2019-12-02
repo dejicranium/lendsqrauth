@@ -67,6 +67,7 @@ function service(data){
         
         // do not show deleted products 
         data.where.status = {$ne : 'deleted'}        
+        data.where.deleted_flag = {$ne : 1}        
         
         return [
             models.product.findAndCountAll(data), 
