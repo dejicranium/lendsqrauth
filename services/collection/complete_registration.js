@@ -26,7 +26,6 @@ var spec = morx.spec({})
 // TODO: make type borrower
 // TODO: 
 function service(data){
-    const DECLINED_STATUS = 'borrower_declined';
 	var d = q.defer();
 	const globalUserId = data.USER_ID || 1;
 	q.fcall( async () => {
@@ -74,7 +73,7 @@ function service(data){
 
             // update the collection 
             collection.update({
-                loan_status:'active',
+                status:'active',
                 borrower_id: new_borrower_profile.id
             })
 

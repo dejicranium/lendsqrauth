@@ -53,6 +53,7 @@ function service(data){
         let newToken = await jwt.sign(
             {   
                 id: profile.id,
+                parent_profile_id: profile.parent_profile_id,
                 email: globalUser.email, 
                 user_id: globalUser.id, 
                 role: role ? role.name : null,

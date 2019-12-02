@@ -46,7 +46,7 @@ function service(data){
         await instance.update({is_used: 1});
         // update collection;
 
-        collection.loan_status = DECLINED_STATUS;
+        collection.status = DECLINED_STATUS;
         return collection.save();
     })
     .then((saved) => {

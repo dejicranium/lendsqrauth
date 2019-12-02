@@ -85,4 +85,7 @@ module.exports = {
         return d.promise
     },
 
+    createCollectionShedule(data) {
+        
+    }
 }

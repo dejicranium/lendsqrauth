@@ -7,6 +7,7 @@ const assert = require('mlar')('assertions');
 const requests = require('mlar')('requests');
 const makeRequest = require('mlar')('makerequest');
 const config = require('../../config');
+const resolvers = require('mlar')('resolvers');
 
 var spec = morx.spec({}) 
         .build('collection_id', 'required: false')
@@ -17,11 +18,13 @@ var spec = morx.spec({})
         .build('borrower_bvn', 'required:false, eg:42341234552')   
         .build('product_id', 'required:false, eg:lender')   
         .build('tenor', 'required:false, eg:1')   
+        .build('amount', 'required:false, eg:1')   
         .build('product_id', 'required:false, eg:1')   
         .build('disbursement_mode', 'required:false, eg:1000000')   
         .build('loan_status', 'required:false, eg:lender')   
         .build('disbursement_date', 'required:false, eg:lender')   
         .build('num_of_collections', 'required:false, eg:lender')   
+        .build('collection_frequency', 'required:false, eg:lender')   
         .build('repayment_id', 'required:false, eg:1')   
         .build('start_date', 'required:false, eg:lender') 
         .end();
@@ -35,7 +38,44 @@ function service(data){
 	q.fcall( async () => {
 		const validParameters = morx.validate(data, spec, {throw_error : true});
         const params = validParameters.params;
+
+        let collection = null;
+        let product = null;
+
+        collection = await models.collection.findOne({
+            where: {
+                id: params.collection_id
+            }
+        })
+
+        if (!collection || !collection.id) throw new Error("Could not find collection")
+
+        // see whether there is a product id attached to the collection or if user is trying to input one
+
+        if (collection.product_id) {
+            product = await models.product.findOne({
+                where: {
+                    id: collection.product_id
+                }
+            })
+        }
+
+        else if (params.product_id) {
+            product = await models.product.findOne({
+                where: {
+                    id: params.product_id
+                }
+            })
+        }
         
+        else {
+            throw new Error("You need to provide a product id to proceed")
+        }
+
+        if (!product || !product.id) throw new Error("Could not find product being attached to this collection")
+        if (product.status !== 'active') throw new Error("You cannot create a collection for a product that isn't active");
+        if (product.profile_id !== data.profile.id) throw new Error("You can't use a product that isn't attached to this profile")
+
         if (params.borrower_first_name && params.borrower_first_name.length < 3)
 		    throw new Error("Names must be more than 2 characters")
         
@@ -45,6 +85,31 @@ function service(data){
         if (params.borrower_bvn)
             assert.digitsOnly(params.borrower_bvn, null, 'BVN')
         
+        if (params.amount) {
+            assert.digitsOrDecimalOnly(params.amount, null, 'Amount')
+            params.amount = parseFloat(params.amount).toFixed(2);
+
+            // make sure that the amount is not greater than the products' max or lesser than the product's min amount
+            if (params.amount < parseFloat(product.min_loan_amount)) 
+                throw new Error("Collection amount cannot be less than product's min loan amount")
+            if (params.amount > parseFloat(product.max_loan_amount)) 
+                throw new Error("Collection amount cannot be more than product's max loan amount")
+        }
+        
+        if (params.tenor) {
+            assert.digitsOnly(params.tenor, null, 'Tenor');
+            
+            // make sure that the tenor is not greater than the products' max or lesser than the product's min tenor
+            if (parseInt(params.tenor) > parseInt(product.max_tenor)) 
+                throw new Error("Collection tenor cannot be more than product's max tenor")
+            
+            if (parseInt(params.tenor) < parseInt(product.min_tenor))
+                throw new Error("Collection tenor cannot be less than product's min tenor")
+        }
+
+        // inherit tenor type from product's tenor type
+        params.tenor_type = product.tenor_type;
+
         if (params.borrower_phone)
 		    assert.digitsOnly(params.borrower_phone, null, 'Phone')
         
@@ -62,28 +127,9 @@ function service(data){
 
         }
         
-        // checks the product we are assigning to
-        let product = null;
-        if (params.product_id) {
-            await models.product.findOne({where: {id: params.product_id}})
-                .then(_product=>{
-                    product = _product;
-                    if (!_product) throw new Error("No matching product found")
-                    
-                    // you cannot create loans on an inactive product
-                    if (_product.status != 'active') throw new Error("You cannot create collection for an product that is not active");
-                })
-        }
-
         return [
             product,
-
-            models.collection.findOne({
-                where: {
-                    id: params.collection_id
-                }
-            }),
-
+            collection,
             params
         ]
         
@@ -92,22 +138,17 @@ function service(data){
         if (!collection) throw new Error("No such product exists");
 
         // you can't change a loan's product id after it has been set
-        if (params.product_id && collection.product_id !== null) throw new Error("Cannot re-update product id of a created collection");
+        if (params.product_id && collection.product_id) throw new Error("Cannot re-update product id of a created collection");
 		
 		//params.profile_id = data.profile.id
         params.modified_on = new Date();
 		params.modified_by = globalUserId;
-		
-        let p = product;
         
-        tenor_just_added = !collection.tenor && params.tenor
+        tenor_just_added = !collection.tenor && params.tenor  // tenor_just_added was declared at the beginning of the function
         
-    
-
-		return  collection.update({...params})
+		return  [collection.update({...params}), product]
 		
-    }).then(async (collection)=>{
-        let product =  await models.product.findOne({where: {id: collection.product_id}})
+    }).spread(async (collection, product)=>{
         
         if(product.id) {
             // check whether the most essential parts of a collection are available before sending email
@@ -125,10 +166,31 @@ function service(data){
                     interest_period: product.interest_period,
                     tenor: collection.tenor
                 }
-                
                 await requests.inviteBorrower(collection.borrower_email, payload);
+            }
+
+            if (!['borrower_declined', 'active'].includes(collection.status)) {
+                let required_fields = ['product_id',
+                 'tenor',
+                'amount',
+                'tenor_type', 
+                'loan_status',
+                'disbursement_mode',
+                'disbursement_date', 
+                'num_of_collections', 
+                'collection_frequency', 
+                'start_date']
+                
+                // see whether collection is in draft;
+
+                let new_status = resolvers.resolveCompletionStatus(collection, required_fields, 'draft', 'inactive');
+
+                await collection.update({status: new_status})
 
             }
+            
+            
+            
         }
         
         d.resolve(collection);

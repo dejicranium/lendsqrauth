@@ -28,5 +28,6 @@
 	"makerequest":"/utils/request",
 	"signupservice":"/services/auth/signup",
 	"constants":"/utils/constants",
-	"requests":"/utils/requests"
+	"requests":"/utils/requests",
+	"resolvers":"/utils/resolvers"
 }

@@ -42,6 +42,12 @@ module.exports = {
       tenor: {
         type: Sequelize.STRING
       },
+      amount: {
+        type: Sequelize.DOUBLE
+      },
+      tenor_type: {
+        type: Sequelize.STRING
+      },
       borrower_id: {
         type: Sequelize.INTEGER
       },
@@ -58,6 +64,9 @@ module.exports = {
         type: Sequelize.STRING
       },
       loan_status: {
+        type: Sequelize.STRING
+      },
+      status: {
         type: Sequelize.STRING
       },
       repayment_id: {
