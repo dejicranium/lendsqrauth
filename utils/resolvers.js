@@ -14,11 +14,20 @@ module.exports = {
             'yearly': '1 year',
             'daily': '1 day'
         };
+        let interest_milestones = {
+            'per week': '1 week',
+            'per month' :'1 month',
+            e
+        }
         let schedules = [];
 
 
         for (let i = 1; i < data.num_of_collections + 1; i++) {
+            let scheduleObject = {};
+
+            (parseFloat(data.interest) / 100) / 
             
+
         }
     },
 
