@@ -43,7 +43,7 @@ function service(data){
         if (!password) throw new Error("Invalid credential(s)");
         
         let permissions =  await models.sequelize.query(`
-        SELECT p.name as name from permissions as p INNER JOIN entity_permissions AS ep ON p.id = ep.permission_id WHERE  (ep.entity = 'role' AND ep.entity_id = ${profile.role_id} ) OR (ep.entity = 'profile' AND ep.entity_id = ${profile.id}) `
+            SELECT p.name as name from permissions as p INNER JOIN entity_permissions AS ep ON p.id = ep.permission_id WHERE  (ep.entity = 'role' AND ep.entity_id = ${profile.role_id} ) OR (ep.entity = 'profile' AND ep.entity_id = ${profile.id}) `
         )
         
 
@@ -56,13 +56,13 @@ function service(data){
         let newToken = await jwt.sign(
             {   
                 id: profile.id,
+                parent_profile_id: profile.parent_profile_id,
                 email: user.email, 
                 user_id: user.id, 
                 role: 'admin',
                 permissions: user_permissions
             }, 
-            config.JWTsecret, {expiresIn: config.JWTexpiresIn
-            }
+            config.JWTsecret, {expiresIn: config.JWTexpiresIn}
         )
 
         // we need to create a profile token, 
@@ -93,14 +93,15 @@ function service(data){
         else if (user.deleted) throw new Error("Account has been deleted")            
         else if (!user.active && !user.disabled && !user.deleted) throw new Error("User is inactive");
         
-        let user_profiles = models.profile.findAll({where: {user_id: user.id}})
+        let user_profiles = await models.profile.findAll({where: {user_id: user.id}})
         user_profiles = user_profiles.map(profile => profile.id)
-
+        
         let newToken = await jwt.sign({
-            email: user.email, 
             profiles: user_profiles, 
+            email: user.email, 
             user_id: user.id, 
-            subtype: user.subtype}, config.JWTsecret, {expiresIn: config.JWTexpiresIn})
+            subtype: user.subtype
+        }, config.JWTsecret, {expiresIn: config.JWTexpiresIn})
 
         if (!token) {
             // create and store token

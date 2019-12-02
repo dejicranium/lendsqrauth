@@ -6,10 +6,10 @@ const profile_middleware = require('mlar')('profileVerifyMiddleware');
 
 function vinfo(req, res, next){ 
         const data = {...req.body, ...req.query, ...req.headers, ...req.params};
-        //data.profile = req.profile;
+        data.profile = req.profile;
         service(data)
         .then(response => {
-            utils.jsonS(res, response, "Products"); 
+            utils.jsonS(res, data.profile, "Products"); 
         })
         .catch(error => {
             utils.jsonF(res, null, error.message); 
@@ -21,7 +21,7 @@ vinfo.routeConfig.path = "/";
 vinfo.routeConfig.method = "get"; 
 vinfo.routeConfig.middlewares = [
     auth_middleware, 
-    //profile_middleware,
+    profile_middleware,
     routemeta('get_products', 'none')];
 module.exports = vinfo;
 

@@ -49,6 +49,7 @@ function service(data){
         if (permissions && permissions[0] && permissions[0]) {
             user_permissions = permissions[0].map(perm=> perm.name);
         }
+
        
         let newToken = await jwt.sign(
             {   

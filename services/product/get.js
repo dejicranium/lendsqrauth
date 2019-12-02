@@ -29,7 +29,7 @@ function service(data){
 	q.fcall( async () => {
 		var validParameters = morx.validate(data, spec, {throw_error:true});
         let params = validParameters.params;
-/*
+
         
         // filter by product - id : returns an object
         if (params.product_id) {
@@ -67,7 +67,7 @@ function service(data){
         
         // do not show deleted products 
         data.where.status = {$ne : 'deleted'}        
-        */
+        
         return [
             models.product.findAndCountAll(data), 
             data

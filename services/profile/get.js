@@ -36,8 +36,6 @@ function service(data){
 				}
 			}
 	
-	
-	
 			let user_profiles = await models.profile.findAll({where: {user_id: data.user.id}});
 			let user_profiles_ids = user_profiles.map(prof => prof.id);
 	
