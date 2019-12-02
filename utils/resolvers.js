@@ -25,7 +25,7 @@ module.exports = {
         for (let i = 1; i < data.num_of_collections + 1; i++) {
             let scheduleObject = {};
 
-            (parseFloat(data.interest) / 100) / 
+            
             
 
         }

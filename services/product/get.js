@@ -29,7 +29,7 @@ function service(data){
 	q.fcall( async () => {
 		var validParameters = morx.validate(data, spec, {throw_error:true});
         let params = validParameters.params;
-
+/*
         
         // filter by product - id : returns an object
         if (params.product_id) {
@@ -48,7 +48,7 @@ function service(data){
 
 
         // for call to get all products, allow admin and borrowers to see all products
-        if ( ! ['admin', 'borrower'].includes(data.profile.role)) {
+        if ( !['admin', 'borrower'].includes(data.profile.role)) {
             data.where = {
                 profile_id: data.profile.id
             }
@@ -67,9 +67,10 @@ function service(data){
         
         // do not show deleted products 
         data.where.status = {$ne : 'deleted'}        
-        
+        */
         return [
-            models.product.findAndCountAll(data), data
+            models.product.findAndCountAll(data), 
+            data
         ]
          
 	}) 
@@ -82,7 +83,7 @@ function service(data){
         
         d.resolve(paginate(products.rows, 'products', products.count, data.limit, data.page));
     })
-	.catch( (err) => {
+	.catch((err) => {
 		d.reject(err);
 	});
 

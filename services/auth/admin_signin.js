@@ -32,7 +32,6 @@ function service(data){
         // check the user's profiles to see whether he has an admin profile.
         let admin_role = await models.role.findOne({where: {name: 'admin'}});
         let user_admin_profile = models.profile.findOne({where: {user_id: user.id, role_id: admin_role.id }})
-
         return [user_admin_profile, user, bcrypt.compare(params.password, user.password)]
 
          
@@ -53,7 +52,7 @@ function service(data){
         if (permissions && permissions[0] && permissions[0]) {
             user_permissions = permissions[0].map(perm=> perm.name);
         }
-       
+
         let newToken = await jwt.sign(
             {   
                 id: profile.id,
@@ -90,10 +89,18 @@ function service(data){
     })
     .spread(async (user, profile_token, token) => {
         if (user.disabled) throw new Error("User is disabled")
+        
         else if (user.deleted) throw new Error("Account has been deleted")            
         else if (!user.active && !user.disabled && !user.deleted) throw new Error("User is inactive");
         
-        let newToken = await jwt.sign({email: user.email, user_id: user.id, subtype: user.subtype}, config.JWTsecret, {expiresIn: config.JWTexpiresIn})
+        let user_profiles = models.profile.findAll({where: {user_id: user.id}})
+        user_profiles = user_profiles.map(profile => profile.id)
+
+        let newToken = await jwt.sign({
+            email: user.email, 
+            profiles: user_profiles, 
+            user_id: user.id, 
+            subtype: user.subtype}, config.JWTsecret, {expiresIn: config.JWTexpiresIn})
 
         if (!token) {
             // create and store token
@@ -104,7 +111,9 @@ function service(data){
             }) ]
 
         }
-        return  [user,  profile_token, token.update({
+        return  [
+            user,  
+            profile_token, token.update({
             token: newToken,
             is_used: 0
         })]

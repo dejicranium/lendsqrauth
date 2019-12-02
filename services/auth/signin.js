@@ -53,7 +53,13 @@ function service(data){
         // ids of the user's profiles 
         user_profiles = user_profiles.map(profile => profile.id)
     
-        let newToken = await jwt.sign({profiles: user_profiles, email: user.email, user_id: user.id, subtype: user.subtype}, config.JWTsecret, {expiresIn: config.JWTexpiresIn})
+        let newToken = await jwt.sign({
+            profiles: user_profiles,
+            email: user.email, 
+            user_id: user.id, 
+            subtype: user.subtype
+        }, 
+        config.JWTsecret, {expiresIn: config.JWTexpiresIn})
         
         if (!token) {
             // create and store token
