@@ -31,6 +31,11 @@ function service(data){
 		let params = validParameters.params;
         
         assert.emailFormatOnly(params.email);  // validate email, throw error if it's some weird stuff
+        assert.mustBeValidPassword(params.password);
+
+
+        // make sure that the type is not an integer 
+        if (typeof params.type == 'number') throw new Error("Type cannot be a number");
         
         if (params.first_name && params.first_name.length < 3) {
             throw new Error("Name cannot be less than 3 characters")
@@ -39,10 +44,10 @@ function service(data){
             throw new Error("Name cannot be less than 3 characters")
         }
 
-        assert.mustBeValidPassword(params.password);
 
         let role = await models.role.findOne({where: {name: params.type }});
         if (!role) throw new Error("No such role exists. Change `type`");
+
 
         // make request to verify phone number
         const verifiedPhone = await makeRequest(
@@ -53,13 +58,13 @@ function service(data){
             'validate phone number'
         )
         
+
         if (verifiedPhone) {
             if (verifiedPhone.phone == undefined && verifiedPhone.countryCode == undefined) throw new Error("Phone number not valid");
         }
         if (verifiedPhone.status == 'error'){
             throw new Error("Could not validate phone number");
         }
-        
         if (validators.areMutuallyExclusive([params.password, params.password_confirmation]))
              throw new Error("Passwords do not match");
 
@@ -74,7 +79,6 @@ function service(data){
         
         if (role.name == "borrower" && (!params.first_name || !params.last_name )) 
             throw new Error("Individual must have both first name and last name");
-        
         
         // hash password
         params.password = await bcrypt.hash(params.password, 10);
@@ -112,6 +116,14 @@ function service(data){
         if (profile) {
             await profile.update({user_id: user.id})
 
+            // if the user is  business lender, then create a business info record
+            if (params.type == 'business_lender'){ 
+                await models.business_info.create({
+                    profile_id: profile.id,
+                    business_name: data.business_name
+                })
+            }
+           
         }
 
         // create activation token

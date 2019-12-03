@@ -114,7 +114,22 @@ function service(data){
 	.spread(async (product, params) => { 
         if (!product) throw new Error("No such product exists");
 		if (product.profile_id != data.profile.id) throw new Error("Can't update someone else's product");
+		
 
+		if (params.product_name ) {
+			let similar  = await models.product.findOne({where: {product_name: params.product_name}})
+			
+			// if user is updating the name 
+			if ((params.product_name && product.product_name) && params.product_name !== product.product_name) {
+				if (similar && similar.id && similar.id != product.id) throw new Error("Product name already exists");
+			}
+			
+			else if (params.product_name && (similar && similar.id)) {
+				throw new Error("product name already exists")
+			}
+
+			
+		}
 		// set creation details
 		//params.profile_id = data.profile.id
         params.modified_on = new Date();
