@@ -7,7 +7,7 @@ const assert = require('mlar')('assertions');
 const config = require('../../config');
 const makeRequest = require('mlar')('makerequest');
 const generateRandom = require('mlar')('testutils').generateRandom;
-
+const requests = require('mlar')('requests');
 var spec = morx.spec({}) 
                .build('bvn', 'required:true')
                .build('account_number', 'required:true')
@@ -69,7 +69,10 @@ function service(data){
                 throw new Error("Could not verify BVN");
             }
 
-            // create new user_bank details 
+            // verify bank details 
+            requests.verifyBank({...params})
+
+            //if all successful ---
 
             // generate otp 
             let OTP = generateRandom('digits', 6);

@@ -87,5 +87,27 @@ module.exports = {
 
     createCollectionShedule(data) {
         
+    },
+    verifyBank(data) {
+        const d = q.defer();
+        
+        q.fcall(() => {
+
+            let url = config.notif_base_url + 'verify/bank';
+            let payload = {
+                account_number: data.account_number,
+                bank_code: data.bank_code
+            }
+            
+            return makeRequest(url, 'POST', payload, constants.requestHeaders, 'verify bank account');
+        })
+        .then(response=> {
+            d.resolve(response)
+        })
+        .catch(err=> {
+            d.reject(err);
+        })
+
+        return d.promise
     }
 }

@@ -44,12 +44,18 @@ function service(data){
         if (params.subtype == 'verify_bank_otp' && !params.phone) throw new Error("You must provide a phone");
         if (params.subtype == 'resend_invitation' && !params.email) throw new Error("You must provide an email");
         
+        // make sure the type and subtype pair are correct
+        if (params.type != 'otp' && params.subtype == 'verify_bank_otp') {
+            throw new Error("Type for `verify_bank_otp` should be `otp`")
+        }
+        
         const requestHeaders = {
             'Content-Type' : 'application/json',
         }
 
         if (params.type == 'otp') {
             let OTP = generateRandom('digits', 6);
+
             let token_create = await models.auth_token.findOrCreate({
                 where:{ 
                     type: 'verify_bank_otp',
@@ -86,7 +92,6 @@ function service(data){
         else {
             // send email 
             let payload= {
-                context_id: null,
                 sender: config.sender_email,
                 sender_id: 1,
             }
