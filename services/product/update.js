@@ -66,7 +66,7 @@ function service(data){
 		if (params.min_loan_amount && params.max_loan_amount) {
 			// min loan amount cannot be greater than max loan amount.
 			if (parseFloat(params.min_loan_amount) > parseFloat(params.max_loan_amount)) 
-				throw new Error("Min loan amount cannot be greater than max loan maount");
+				throw new Error("Min loan amount cannot be greater than max loan amount");
 		}
 
 	

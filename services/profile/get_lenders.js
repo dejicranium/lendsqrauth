@@ -7,13 +7,12 @@ const assert = require('mlar')('assertions');
 const paginate = require('mlar')('paginate');
 
 /**
- * This endpoint gets a list of borrowers
- * But the kindof borrowers that are returned depends on the parameters passed
- * where `profile_id` is passed, it means we are trying to get all the borrowers attached 
- * to a `profile_id`
+ * This endpoint gets a list of lenders
+ * But the kindof lenders that are returned depends on the parameters passed
+ * 
  */
 var spec = morx.spec({}) 
-			   .build('profile_id', 'required:false, eg:1')   			    
+			   .build('type', 'required:false, eg:1')   			    
 			   .end();
 
 function service(data){
@@ -30,33 +29,24 @@ function service(data){
 		const validParameters = morx.validate(data, spec, {throw_error : true});
 		const params = validParameters.params;
 		
-		// get the borrower role.
-
-		let borrowerRole = await models.role.findOne({where: {name: 'borrower'}});
-		let borrowerRoleId = borrowerRole.id;
-		
-		
-		// if we are getting the borrowers linked to a lender (using profile_id)
-		if (params.profile_id) {
-		
-			data.where = {
-				role_id: borrowerRoleId,
-				parent_profile_id: params.profile_id,
-			}
-		}
-		
-		else { 
+		// get the lender  role.
+		if (params.type) {
+			let profile_role = await models.role.findOne({where: {name: params.type}})
 			data.where =  {
-				role_id: borrowerRoleId
-			}
-
-			// if a lender is making the request, get only his borrowers
-			if (['individual_lender', 'business_lender'].includes(data.profile.role)) {
-				data.where.parent_profile_id = data.profile.id
+				role_id: profile_role.id
 			}
 		}
 		
+		else {
+			let lender_roles = await models.role.findAll({where: {name: {$in: ['individual_lender', 'business_lender']}}})
+			lender_role_ids = lender_roles.map(role=> role.id);
 
+			data.where = {
+				role_id: { $in: lender_role_ids}
+			}
+		}
+
+       
         return models.profile.findAndCountAll(data);
 
         

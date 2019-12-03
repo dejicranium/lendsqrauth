@@ -7,6 +7,7 @@
 	"profileVerifyMiddleware":"/routes/middlewares/profile_auth",
 	"hasPermMiddleware":"/middlewares/has_permission",
 	"hasRoleMiddleware":"/middlewares/has_role",
+	"blockRoleMiddleware":"/middlewares/block_role",
 	"appvalues":"/utils/appvalues",
 	"obval":"/utils/obval",
 	"errorer":"/utils/errorer",
