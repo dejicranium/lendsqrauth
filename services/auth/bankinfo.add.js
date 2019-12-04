@@ -69,6 +69,28 @@ function service(data){
                 throw new Error("Could not verify BVN");
             }
 
+
+            // store the fact that bvn has been berified 
+            let verificationData = {
+                    verified: 1,
+                    bvn: params.bvn,
+                    phone: verifiedBVN.mobile,
+                    user_id: data.user.id
+            }
+            await models.bvn_verifications.findOrCreate({
+                where: {
+                    user_id: data.user.id,
+                    
+                },
+                defaults: verificationData
+            })
+            .spread(async (verification, created)=> {
+                if (!created) {
+                    verification.update(verificationData)
+                }
+            })
+
+
             // verify bank details 
             requests.verifyBank({...params})
 
