@@ -164,7 +164,7 @@ function service(data){
                     borrower: collection.borrower_name,
                     interest: product.interest,
                     interest_period: product.interest_period,
-                    tenor: collection.tenor
+                    tenor: collection.tenor  + ' ' + product.tenor_type
                 }
                 await requests.inviteBorrower(collection.borrower_email, payload);
             }

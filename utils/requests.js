@@ -88,6 +88,30 @@ module.exports = {
     createCollectionShedule(data) {
         
     },
+
+    validatePhone(data) {
+        const d = q.defer();
+        
+        q.fcall(() => {
+
+            let url = config.utility_base_url + 'verify/phone';
+            let payload = {
+                phone: data.phone,
+            }
+            
+            return makeRequest(url, 'POST', payload, constants.requestHeaders, 'verify phone');
+        })
+        .then(response=> {
+            d.resolve(response)
+        })
+        .catch(err=> {
+            d.reject(err);
+        })
+
+        return d.promise
+    },
+
+    
     verifyBank(data) {
         const d = q.defer();
         

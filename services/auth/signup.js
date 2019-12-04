@@ -151,7 +151,7 @@ function service(data){
             });
         }
         
-        let fullname =  user.business_name ||  user.first_name + ' ' + user.last_name;
+        let fullname =  data.business_name ||  data.first_name + ' ' + data.last_name;
         // send email 
         let payload= {
             context_id: 69,

@@ -1,16 +1,18 @@
 var utils = require('mlar')('mt1l');
-const service = require('mlar').mreq('services', 'auth/deleterole');
 const routemeta = require('mlar')('routemeta');
 const auth_middleware = require('mlar')('authmiddleware');
+const service = require('mlar').mreq('services', 'auth/getinvitations');
 const has_role = require('mlar')('hasRoleMiddleware');
-const profile_middleware = require('mlar')('profileVerifyMiddleware');
+const profile_verify = require('mlar')('profileVerifyMiddleware');
+const block_role = require('mlar')('blockRoleMiddleware');
 
 function vinfo(req, res, next){ 
         const data = {...req.body, ...req.query, ...req.headers, ...req.params};
-        
+        data.user = req.user;
+        data.profile = req.profile;
         service(data)
         .then(response => {
-            utils.jsonS(res, response, "Role has been deleted successfully"); 
+            utils.jsonS(res, response, "Invitations"); 
         })
         .catch(error => {
             utils.jsonF(res, null, error.message); 
@@ -18,12 +20,12 @@ function vinfo(req, res, next){
 }
 
 vinfo.routeConfig = {};
-vinfo.routeConfig.path = "/roles/:role_id/delete"; 
-vinfo.routeConfig.method = "delete"; 
+vinfo.routeConfig.path = "/team/invitations"; 
+vinfo.routeConfig.method = "get"; 
 vinfo.routeConfig.middlewares = [
     auth_middleware, 
-    profile_middleware,
-    has_role('admin'), 
-    routemeta('auth_delete_role', 'none')];
+    profile_verify,
+    block_role('borrower'),
+    routemeta('get_invitations', 'none')];
 module.exports = vinfo;
 

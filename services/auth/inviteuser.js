@@ -11,10 +11,11 @@ const moment = require('moment')
 const config = require('../../config');
 const makeRequest = require('mlar')('makerequest');
 const crypto = require('crypto');
+const requests = require('mlar')('requests');
+
+
 
 var spec = morx.spec({}) 
-			   .build('first_name', 'required:true, eg:1')   
-			   .build('last_name', 'required:true, eg:1')   
 			   .build('email', 'required:true, eg:1')   
 			   .build('phone', 'required:true, eg:1')   
 			   .end();
@@ -22,28 +23,47 @@ var spec = morx.spec({})
 function service(data){
 
 	var d = q.defer();
+
 	const globalProfileId = data.profile.id;
     const globalUserId = data.user.id;
-            
+    
+
+
     const requestHeaders = {
         'Content-Type' : 'application/json',
     }
     
     q.fcall( async () => {
-		var validParameters = morx.validate(data, spec, {throw_error:true});
+
+
+        var validParameters = morx.validate(data, spec, {throw_error:true});
         let params = validParameters.params;
-        
+            
+
+        assert.emailFormatOnly(params.email);
+        /*
+        if(params.first_name.length < 3) throw new Error("Name cannot be less than 3")
+        if(params.last_name.length < 3) throw new Error("Name cannot be less than 3")
+    */
+
+        if (data.user.email == params.email) throw new Error("Cannot send an invitation to yourself");
+
+
         const requestHeaders = {
             'Content-Type' : 'application/json',
         }
+
+        // verify phone number
+        requests.validatePhone({phone: params.phone});
+
+
         // check to make sure that only a lender can do this;
-        
         if (data.profile.role != 'individual_lender' && data.profile.role != 'business_lender') {
             throw new Error("Only lenders can add team members")
         }
         
-        
-        // through the email, find out  whether user already exist
+
+        // through the email, find out  whether user already exists
         return [
             models.user_invites.findOne({where: {inviter: data.user.id, invitee: params.email}}),
             models.user.findOne({where:{email: params.email }}), 
@@ -55,6 +75,8 @@ function service(data){
         if (invitation && invitation.status !== 'declined') {
             throw new Error("Invitation has been sent already");
         }
+
+
         if (user) {
             
             // prepare to copy the details of the user's profile into a new and change only the role_id  (should be collaborator) and parent_profile_id
@@ -63,6 +85,7 @@ function service(data){
                     user_id: user.id
                 }
             })
+
 
             // get or create the collaborator's role
             let collaboratorRole = null;
@@ -74,9 +97,12 @@ function service(data){
                 collaboratorRole = role;
             });
             
+
             let collaboratorRoleId = collaboratorRole.id;
+
             // copy existing profile to new profile object
             let newProfile = {};
+
             params.collaborator_role_id =  collaboratorRoleId;
             
             let paramsToCopy = {...userProfile}
@@ -85,15 +111,16 @@ function service(data){
             paramsToCopy.parent_profile_id = globalProfileId;
             paramsToCopy.create_on = new Date();
             newProfile = paramsToCopy;
+    
 
-
-            let newProfileContact = {
+            let newProfileContact = { /*
                 contact_first_name: params.first_name,
                 contact_last_name: params.last_name,
-                contact_email: params.email,
+                contact_email: params.email, */
                 contact_phone: params.phone,
                 created_on: new Date(),
             }
+
 
             return models.sequelize.transaction((t1) => {
                 return q.all([
@@ -106,7 +133,7 @@ function service(data){
         else {
 
             // create an incomplete user
-            return [params, models.user.create({ created_by: globalUserId }),'user-created']
+            return [params, models.user.create({ email: params.email, created_by: globalUserId }),'user-created']
         }
 
     }).spread(async (params, created1, created2) => {
@@ -116,8 +143,7 @@ function service(data){
 
         let new_profile_id = created1.id; // created1 is profile.id if no new user was created;
 
-        if ( created2 == 'user-created' ) {
-            
+        if ( created2 == 'user-created' ) { // if a new user was created.
             // create profile 
             let new_profile = await models.profile.create({
                 role_id: params.collaborator_role_id,
@@ -129,29 +155,44 @@ function service(data){
         }
         // invitation token 
         let invite_token = await crypto.randomBytes(32).toString('hex');
+        
+
+
+        
         // create a user invite record
-        await models.user_invites.create({
-            invitee: params.email,
-            inviter: data.user.id,
-            token: invite_token,
-            profile_created_id: new_profile_id,
-            user_created_id: created2 == 'user-created' ? created1.id : null
+        let invitation = await models.user_invites.findOrCreate({ 
+            where: {
+                invitee: params.email,
+                inviter: data.profile.id,
+            },
+            defaults: {
+                invitee: params.email,
+                inviter: data.profile.id,
+                token: invite_token,
+                profile_created_id: new_profile_id,  // we need to track the profile that was created as a result of this process
+                user_created_id: created2 == 'user-created' ? created1.id : null
+            }
+            
         })
+
+        if (!invitation[1]) {
+            invitation[0].update({
+                status: 'pending'
+            })
+        }
+
 
         // send email 
         let payload= {
-            context_id: 69,
+            context_id: 87,
             sender: config.sender_email,
             recipient: params.email,
             sender_id: 1,
             data:{
-                email: params.email,
-                name: params.first_name + ' ' + params.last_name
+                token: invite_token
 	        }
         }
-
         const url = config.notif_base_url + "email/send";
-        // send the welcome email 
         await makeRequest(url, 'POST', payload, requestHeaders);
         
         d.resolve("Invited team member")
