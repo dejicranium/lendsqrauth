@@ -21,8 +21,8 @@ function service(data){
 	const page = data.page ? Number(data.page) : 1;
     const limit = data.limit ? Number(data.limit) : 20;
     const offset = page ? (page - 1) * limit : false;	
-    			data.limit = limit;
-			data.offset = offset;
+	data.limit = limit;
+	data.offset = offset;
 	q.fcall( async () => {
 		const validParameters = morx.validate(data, spec, {throw_error : true});
 		const params = validParameters.params;
@@ -35,8 +35,8 @@ function service(data){
 			data.where =  {
 				role_id: profile_role.id
 			}
-			
-			return models.profile.findAndCountAll(data);
+		;
+			return models.profile.findAndCountAll({where: {role_id: profile_role.id}});
 
 		}
 
