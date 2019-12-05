@@ -164,10 +164,6 @@ function service(data){
 	})
 
 	.spread ( async (borrower_profile, profile_created, params) => {
-		if (params.borrower_first_name && params.borrower_last_name) {
-			params.borrower_name = params.borrower_first_name + " " + params.borrower_last_name;
-		}
-
 		if ( borrower_profile && borrower_profile != 'none') {
 			params.borrower_id = borrower_profile.id;
 		}

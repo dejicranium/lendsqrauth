@@ -42,7 +42,8 @@ function service(data){
 			if (data.loan_status) query.where.loan_status = data.loan_status;
 			if (data.tenor) query.where.tenor = data.tenor;
 			if (data.borrower_id) query.where.borrower_id = data.borrower_id;
-			if (data.borrower_name) query.where.borrower_name = data.borrower_name;
+			if (data.borrower_first_name) query.where.borrower_first_name = data.borrower_first_name;
+			if (data.borrower_last_name) query.where.borrower_last_name = data.borrower_last_name;
 			if (data.lender_name) query.where.num_of_collections = data.num_of_collections;
 			if (data.collection_frequency) query.where.collection_frequency = data.collection_frequency;
 

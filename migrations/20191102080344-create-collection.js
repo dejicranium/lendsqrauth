@@ -14,7 +14,6 @@ module.exports = {
       borrower_name: {
         type: Sequelize.STRING,
       },
-      
       borrower_email: {
         type: Sequelize.STRING,
       },

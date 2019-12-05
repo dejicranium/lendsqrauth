@@ -21,44 +21,50 @@ function service(data){
 	const page = data.page ? Number(data.page) : 1;
     const limit = data.limit ? Number(data.limit) : 20;
     const offset = page ? (page - 1) * limit : false;	
-    
-    data.limit = limit;
-    data.offset = offset;
-
+    			data.limit = limit;
+			data.offset = offset;
 	q.fcall( async () => {
 		const validParameters = morx.validate(data, spec, {throw_error : true});
 		const params = validParameters.params;
 		
 		// get the lender  role.
+
 		if (params.type) {
 			let profile_role = await models.role.findOne({where: {name: params.type}})
+			
 			data.where =  {
 				role_id: profile_role.id
 			}
+			
+			return models.profile.findAndCountAll(data);
+
 		}
-		
+
+		// get all lenders
+
 		else {
+
+
 			let lender_roles = await models.role.findAll({where: {name: {$in: ['individual_lender', 'business_lender']}}})
 			lender_role_ids = lender_roles.map(role=> role.id);
 
 			data.where = {
 				role_id: { $in: lender_role_ids}
 			}
+			return models.profile.findAndCountAll(data);
+
 		}
+		
 
-       
-        return models.profile.findAndCountAll(data);
-
-        
 	}) 
 	.then((profile) => { 
+
         if (!profile)  throw new Error("No profiles");
         d.resolve(paginate(profile.rows, 'profiles', profile.count, limit,page));
+
     })
 	.catch( (err) => {
-
 		d.reject(err);
-
 	});
 
 	return d.promise;

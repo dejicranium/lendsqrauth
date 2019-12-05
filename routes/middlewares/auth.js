@@ -14,12 +14,12 @@ module.exports = async function (req, res, next) {
     
     const d = q.defer();
     if (!auth_token) {
-        utils.jsonF(res, '345', "Access token required"); 
+        utils.jsonF(res, null, "Access token required"); 
         return;
     }
     jwt.verify(auth_token, config.JWTsecret, function(err, decoded){
 
-        if (err) utils.json401(res, '324', "Invalid access token"); 
+        if (err) utils.json401(res, null, "Invalid access token"); 
         if (decoded && decoded.expiry < new Date())  utils.json401(res, null, "Expired access token");
         models.auth_token.findOne({
             where: {
@@ -29,7 +29,7 @@ module.exports = async function (req, res, next) {
             include: [{model: models.user, include:[{model: models.profile}]}]
            
         }).then(resp=> {
-            if (!resp) utils.json401(res, 'sit', "Invalid access token");
+            if (!resp) utils.json401(res, null, "Invalid access token");
             req.user = resp.user
             req.auth_token = auth_token;
             req.decoded = decoded
@@ -37,7 +37,7 @@ module.exports = async function (req, res, next) {
             return
         })
         .catch(err=> {
-             utils.json401(res, '3243', err);
+             utils.json401(res, null, err);
              return;
         })
 

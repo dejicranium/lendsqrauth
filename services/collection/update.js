@@ -161,7 +161,7 @@ function service(data){
                     lender: lender_identity,
                     accept_url : config.base_url + 'reject-borrower-invite',
                     reject_url: config.base_url + 'accept-borrower-invite',
-                    borrower: collection.borrower_name,
+                    borrower: collection.borrower_first_name + " " + collection.borrower_last_name,
                     interest: product.interest,
                     interest_period: product.interest_period,
                     tenor: collection.tenor  + ' ' + product.tenor_type

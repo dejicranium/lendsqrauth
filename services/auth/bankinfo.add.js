@@ -26,18 +26,25 @@ function service(data){
     const requestHeaders = {
         'Content-Type' : 'application/json',
     }
+
+
     q.fcall( async () => {
 		const validParameters = morx.validate(data, spec, {throw_error : true});
         let params = validParameters.params;
         assert.bvnFormatOnly(params.bvn);
         assert.nubanFormatOnly(params.account_number);
+
+
         
         
-        return [ 
-            models.user_bank.findOne({where: { account_number: params.account_number }}),  
+        return 
+        [
+            models.user_bank.findOne({where: { account_number: params.account_number, bvn: params.bvn }}),  
             models.user_bank.findOne({where: {bvn: params.bvn}}),
+    
             params, 
         ]
+
 
         
    

@@ -78,7 +78,6 @@ function service(data){
             }
 
             let url =  config.notif_base_url + "sms/send"; // notification servicer
-            
             let payload = {
                 recipient: params.phone,
                 message: `Your OTP is ${OTP}`,
