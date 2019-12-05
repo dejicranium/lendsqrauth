@@ -16,7 +16,7 @@ var spec = morx.spec({})
                .build('business_name', 'required:false, eg:Tina Comms')
                .build('email', 'required:true, eg:tinaton@gmail.com') 
                .build('phone', 'required:true, eg:0810045800') 
-               .build('type', 'required:false, eg:1')
+               .build('type', 'required:true, eg:1')
                .build('create_profile', 'required:true, eg:1')
 			   .end();
 
@@ -117,7 +117,7 @@ function service(data){
             await profile.update({user_id: user.id})
 
             // if the user is  business lender, then create a business info record
-            if (params.type == 'business_lender'){ 
+            if (data.type == 'business_lender'){ 
                 await models.business_info.create({
                     profile_id: profile.id,
                     business_name: data.business_name
