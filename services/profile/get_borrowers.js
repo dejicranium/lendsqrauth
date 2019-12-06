@@ -43,12 +43,16 @@ function service(data){
 				role_id: borrowerRoleId,
 				parent_profile_id: params.profile_id,
 			}
+			data.include = [{model: models.user}];
+
 		}
 		
 		else { 
 			data.where =  {
 				role_id: borrowerRoleId
 			}
+			data.include = [{model: models.user}];
+
 
 			// if a lender is making the request, get only his borrowers
 			if (['individual_lender', 'business_lender'].includes(data.profile.role)) {

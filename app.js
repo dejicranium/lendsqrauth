@@ -64,7 +64,10 @@ app.use(bodyParser.json());
 
 app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization, requestId, token, api_secret, lendi_auth_token, profile_token, access_token");
+  res.header("Access-Control-Allow-Headers", "Origin, Access-Control-Max-Age, X-Requested-With, Content-Type, Accept, Authorization, requestId, token, api_secret, lendi_auth_token, profile_token, access_token");
+  res.header("Access-Control-Request-Headers", "content-type, Content-Type");
+  res.header("Access-Control-Request-Headers", 'PUT, POST, GET, DELETE, OPTIONS');
+  res.header("Access-Control-Allow-Headers", "Origin, Access-Control-Max-Age, X-Requested-With, Content-Type, Accept, Authorization, requestId, token, api_secret, lendi_auth_token, profile_token, access_token");
   res.header('Access-Control-Allow-Methods', 'PUT, POST, GET, DELETE, OPTIONS');
 
   //let log_dat = {...req.body, ...req.query, ...req.headers};

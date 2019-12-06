@@ -35,7 +35,7 @@ function service(data){
 			data.where =  {
 				role_id: profile_role.id
 			}
-		;
+			data.include = [{model: models.user}];
 			return models.profile.findAndCountAll({where: {role_id: profile_role.id}});
 
 		}
@@ -51,6 +51,8 @@ function service(data){
 			data.where = {
 				role_id: { $in: lender_role_ids}
 			}
+
+			data.include = [{model: models.user}]
 			return models.profile.findAndCountAll(data);
 
 		}
