@@ -43,7 +43,7 @@ function service(data){
 				role_id: borrowerRoleId,
 				parent_profile_id: params.profile_id,
 			}
-			data.include = [{model: models.user}];
+			data.include = [{model: models.user, attributes: {exclude: ['password']}}];
 
 		}
 		
@@ -51,7 +51,7 @@ function service(data){
 			data.where =  {
 				role_id: borrowerRoleId
 			}
-			data.include = [{model: models.user}];
+			data.include = [{model: models.user, attributes: {exclude: ['password']}}];
 
 
 			// if a lender is making the request, get only his borrowers
