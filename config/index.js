@@ -12,4 +12,5 @@ module.exports = {
     notif_base_url: process.env.notif_base_url || 'https://v2-test.lendsqr.com/api/v1/notification/',
     utility_base_url: process.env.utility_base_url || 'https://v2-test.lendsqr.com/api/v1/util/',
     base_url: process.env.base_url || 'https://v2-test.lendsqr.com/',
+    admin_reg_token: process.env.admin_reg_token || 'saraytheiconoclast%32$6'
 }

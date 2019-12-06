@@ -12,8 +12,8 @@ const paginate = require('mlar')('paginate');
  * 
  */
 var spec = morx.spec({}) 
-			   .build('type', 'required:false, eg:1')   			    
-			   .end();
+			.build('type', 'required:false, eg:1')   			    
+			.end();
 
 function service(data){
 
@@ -35,7 +35,8 @@ function service(data){
 			data.where =  {
 				role_id: profile_role.id
 			}
-			data.include = [{model: models.user, attributes: {exclude: ['password']}}];
+			data.include = [
+				{model: models.user, attributes: {exclude: ['password']}}];
 			return models.profile.findAndCountAll({where: {role_id: profile_role.id}});
 
 		}
