@@ -36,8 +36,13 @@ function service(data){
 				role_id: profile_role.id
 			}
 			data.include = [
-				{model: models.user, attributes: {exclude: ['password']}}];
-			return models.profile.findAndCountAll({where: {role_id: profile_role.id}});
+				{
+					model: models.user, attributes: {
+						exclude: ['password']
+					}
+				}
+			]
+			return models.profile.findAndCountAll(data);
 
 		}
 
