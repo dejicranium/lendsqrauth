@@ -13,6 +13,7 @@ const paginate = require('mlar')('paginate');
  */
 var spec = morx.spec({}) 
 			.build('type', 'required:false, eg:1')   			    
+			.build('profile_type', 'required:false, eg:1')   			    
 			.end();
 
 function service(data){
@@ -20,9 +21,11 @@ function service(data){
 	var d = q.defer();
 	const page = data.page ? Number(data.page) : 1;
     const limit = data.limit ? Number(data.limit) : 20;
-    const offset = page ? (page - 1) * limit : false;	
+	const offset = page ? (page - 1) * limit : false;	
+	
 	data.limit = limit;
 	data.offset = offset;
+
 	q.fcall( async () => {
 		const validParameters = morx.validate(data, spec, {throw_error : true});
 		const params = validParameters.params;
@@ -46,11 +49,29 @@ function service(data){
 
 		}
 
+		// when you append profile type to the query string
+		if (params.profile_type) {
+			data.include = [
+				{
+					model: models.user, attributes: {
+						exclude: ['password']
+					},
+				}, 
+				{
+					model: models.role, 
+					where: {
+						id: params.profile_type
+					}
+				}
+			]
+			return models.profile.findAndCountAll(data);
+		}
+
+
+
 		// get all lenders
 
 		else {
-
-
 			let lender_roles = await models.role.findAll({where: {name: {$in: ['individual_lender', 'business_lender']}}})
 			lender_role_ids = lender_roles.map(role=> role.id);
 
