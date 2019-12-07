@@ -2,6 +2,7 @@
 module.exports = (sequelize, DataTypes) => {
   const product = sequelize.define('product', {
     profile_id: DataTypes.INTEGER,
+    uuid: DataTypes.STRING,
     product_name: DataTypes.STRING,
     product_description: DataTypes.STRING,
     repayment_model: DataTypes.STRING,

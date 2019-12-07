@@ -26,9 +26,7 @@ function service(data){
 	const offset = page ? (page - 1) * limit : false;	
 
 	q.fcall( async () => {
-
         return models.role.findAll({where: {name: {$like: 'lender'}}, attributes: ['id', 'name']})
-
     })
     .then(roles=> {
 

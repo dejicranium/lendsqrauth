@@ -7,6 +7,7 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.DATE,
     },
     parent_profile_id: DataTypes.INTEGER,
+    uuid: DataTypes.STRING,
     deleted_flag: DataTypes.BOOLEAN,
     created_by: DataTypes.INTEGER,
     modified_on: DataTypes.DATE,

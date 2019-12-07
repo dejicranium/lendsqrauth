@@ -148,7 +148,8 @@ function service(data){
             let new_profile = await models.profile.create({
                 role_id: params.collaborator_role_id,
                 user_id: created1.id,
-                parent_profile_id: globalProfileId
+                parent_profile_id: globalProfileId,
+                uuid: Math.random().toString(36).substr(2, 9),
             })
             new_profile_id = new_profile.id
             

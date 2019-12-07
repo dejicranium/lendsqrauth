@@ -121,11 +121,9 @@ function service(data){
 			
 			// if user is updating the name 
 			if ((params.product_name && product.product_name) && params.product_name !== product.product_name) {
-				if (similar && similar.id && similar.id != product.id) throw new Error("Product name already exists");
 			}
 			
 			else if (params.product_name && (similar && similar.id)) {
-				throw new Error("product name already exists")
 			}
 
 			

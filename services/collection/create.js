@@ -106,7 +106,8 @@ function service(data){
 				return models.profile.create({
 					role_id: borrower_role.id,
 					parent_profile_id: data.profile.id, // TODO: get real parent_profile_id
-					user_id: user_id
+					user_id: user_id,
+					uuid: Math.random().toString(36).substr(2, 9),
 				});
 			} 
 
@@ -169,7 +170,7 @@ function service(data){
 		}
 
 		params.lender_id = data.profile.id; // set the lender profile to the person making this request
-
+		params.status = "draft";
 		return models.collection.create(params);
 	})
 	.then(async collection => {

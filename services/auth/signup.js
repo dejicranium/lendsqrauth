@@ -92,7 +92,6 @@ function service(data){
         delete params.type;
 
         params.created_on = new Date();
-
         if (params.create_profile == true) {
             return models.sequelize.transaction((t1) => {
                 // create a user and his profile            
@@ -114,7 +113,9 @@ function service(data){
     
         // update created profile
         if (profile) {
-            await profile.update({user_id: user.id})
+            let uuid = Math.random().toString(36).substr(2, 9);
+
+            await profile.update({user_id: user.id, uuid: uuid})
 
             // if the user is  business lender, then create a business info record
             if (data.type == 'business_lender'){ 

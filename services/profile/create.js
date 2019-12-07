@@ -71,6 +71,7 @@ function service(data){
 		}
 
 		params.created_on = new Date();
+		params.uuid = Math.random().toString(36).substr(2, 9);
 	
         return [models.profile.create({...params}), params, role];
 	})
