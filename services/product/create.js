@@ -113,7 +113,8 @@ function service(data){
 		params.profile_id = data.profile.id
         params.created_on = new Date();
         params.created_by = globalUserId;
-		
+		params.uuid = Math.random().toString(36).substr(2, 9);
+
 			
         return models.product.create({...params})
     }).then( async (product)=>{
