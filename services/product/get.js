@@ -63,6 +63,7 @@ function service(data){
         if (data.max_loan_amount) data.where.max_loan_amount = data.max_loan_amount
         if (data.tenor_type) data.where.tenor_type = data.tenor_type
         if (data.interest) data.where.interest = data.interest
+        if (data.status) data.where.status = {$like : '%' + data.status + '%' }
         
         // do not show deleted products 
         data.where.status = {$ne : 'deleted'}        

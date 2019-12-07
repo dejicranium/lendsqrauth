@@ -54,6 +54,11 @@ function service(data){
             $like: '%' + data.business_name + '%'
         }
     }
+    if (data.status) {
+        params.where.status = {
+            $like: '%' + data.status + '%'
+        }
+    }
 /*
     if (data.role) {
         params.include[0].where = data.role;
