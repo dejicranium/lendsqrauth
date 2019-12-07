@@ -27,7 +27,7 @@ function service(data){
 
 	q.fcall( async () => {
 
-        return models.role.findAll({where: {role: {$like: 'lender'}}, attributes: ['id', 'name']})
+        return models.role.findAll({where: {name: {$like: 'lender'}}, attributes: ['id', 'name']})
 
     })
     .then(roles=> {
