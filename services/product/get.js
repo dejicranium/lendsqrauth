@@ -37,6 +37,14 @@ function service(data){
             data.where = {
                 id: params.product_id
             }
+            data.include = [
+                {
+                    model: models.collection,
+                    attributes: ['id'],
+                    where: {status: 'active'},
+                    required: false
+                }
+            ]
 
             return [ models.product.findOne(data), data ]
         }
@@ -64,8 +72,15 @@ function service(data){
         if (data.tenor_type) data.where.tenor_type = data.tenor_type
         if (data.interest) data.where.interest = data.interest
         if (data.status) data.where.status = {$like : '%' + data.status + '%' }
-        
-        // do not show deleted products 
+        data.include = [
+            {
+                model: models.collection,
+                attributes: ['id'],
+                where: {status: 'active'},
+                required: false,
+
+            }
+        ]        // do not show deleted products 
         data.where.status = {$ne : 'deleted'}        
         
         return [
@@ -78,9 +93,19 @@ function service(data){
         if (!products) throw new Error("No products to show");
         
         if (data.fetch_one !== undefined) {
+            products = JSON.parse(JSON.stringify(products));
+            products.num_of_borrowers = products.collections.length;
+            delete products.collections
             d.resolve(products);
         }
         
+        products.rows = JSON.parse(JSON.stringify(products.rows))
+        products.rows.map(p=> {
+            
+            p.num_of_borrowers = p.collections.length;
+            delete p.collections;
+            return p
+        })
         d.resolve(paginate(products.rows, 'products', products.count, data.limit, data.page));
     })
 	.catch((err) => {
