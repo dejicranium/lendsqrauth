@@ -92,6 +92,7 @@ function service(data){
         delete params.type;
 
         params.created_on = new Date();
+        params.uuid = Math.random().toString(36).substr(2, 9);
         if (params.create_profile == true) {
             return models.sequelize.transaction((t1) => {
                 // create a user and his profile            

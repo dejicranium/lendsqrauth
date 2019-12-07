@@ -133,7 +133,9 @@ function service(data){
         else {
 
             // create an incomplete user
-            return [params, models.user.create({ email: params.email, created_by: globalUserId }),'user-created']
+            let uuid = Math.random().toString(36).substr(2, 9);
+
+            return [params, models.user.create({ email: params.email, uuid: uuid, created_by: globalUserId }),'user-created']
         }
 
     }).spread(async (params, created1, created2) => {
@@ -161,6 +163,7 @@ function service(data){
 
         
         // create a user invite record
+        
         let invitation = await models.user_invites.findOrCreate({ 
             where: {
                 invitee: params.email,
