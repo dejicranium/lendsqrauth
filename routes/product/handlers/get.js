@@ -19,6 +19,10 @@ function vinfo(req, res, next){
 vinfo.routeConfig = {};
 vinfo.routeConfig.path = "/:product_id(\\d+)"; 
 vinfo.routeConfig.method = "get"; 
-vinfo.routeConfig.middlewares = [auth_middleware, profile_middleware, routemeta('get_product', 'none')];
+vinfo.routeConfig.middlewares = [
+    auth_middleware, 
+    profile_middleware, 
+    routemeta('get_product', 'none')
+];
 module.exports = vinfo;
 

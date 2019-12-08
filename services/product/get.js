@@ -60,6 +60,7 @@ function service(data){
                 profile_id: data.profile.id
             }
         }
+
         else {
             if (data.profile_id) data.where.profile_id = data.profile_id
         }
@@ -82,7 +83,9 @@ function service(data){
             }
         ]        // do not show deleted products 
         data.where.status = {$ne : 'deleted'}        
-        
+        if (['borrower'].includes(data.profile.role)) {
+            data.where.status = {$ne: 'draft'};
+        }
         return [
             models.product.findAndCountAll(data), 
             data

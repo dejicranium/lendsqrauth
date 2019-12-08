@@ -30,14 +30,13 @@ function service(data){
 		const validParameters = morx.validate(data, spec, {throw_error : true});
 		const params = validParameters.params;
 		
-		// get the lender  role.
 
+		data.where = {};
+		// get the lender  role.
 		if (params.type) {
 			let profile_role = await models.role.findOne({where: {name: params.type}})
 			
-			data.where =  {
-				role_id: profile_role.id
-			}
+			data.where.role_id = profile_role.id
 			data.include = [
 				{
 					model: models.user, attributes: {
@@ -45,12 +44,12 @@ function service(data){
 					}
 				}
 			]
-			return models.profile.findAndCountAll(data);
+
 
 		}
 
 		// when you append profile type to the query string
-		if (params.profile_type) {
+		else if  (params.profile_type) {
 			data.include = [
 				{
 					model: models.user, attributes: {
@@ -64,7 +63,6 @@ function service(data){
 					}
 				}
 			]
-			return models.profile.findAndCountAll(data);
 		}
 
 
@@ -75,15 +73,40 @@ function service(data){
 			let lender_roles = await models.role.findAll({where: {name: {$in: ['individual_lender', 'business_lender']}}})
 			lender_role_ids = lender_roles.map(role=> role.id);
 
-			data.where = {
-				role_id: { $in: lender_role_ids}
-			}
-
+			data.where.role_id = { $in: lender_role_ids}
 			data.include = [{model: models.user, attributes: {exclude: ['password']}}];
-			return models.profile.findAndCountAll(data);
-
 		}
+
+		if (data.first_name) {
+			data.where.first_name = {$like: '%' + data.first_name + '%'}
+			delete data.first_name
+		}
+		if (data.last_name) {
+			data.where.last_name = {$like: '%' + data.last_name + '%'}
+			delete data.last_name
+		}
+		if (data.uuid) {
+			data.where.uuid = {$like: '%' + data.uuid + '%'}
+			delete data.uuid
+		}
+		if (data.from) {
+			data.where.created_on = {$gte: moment(date.from)}
+			delete data.from
 		
+		}
+		if (data.to) {
+			data.where.created_on = {$lte: moment(date.from).add(1, 'day')}
+			delete data.to
+		}
+
+		if (data.status) {
+			if (data.status.toLowerCase() == 'active') data.include[0].where.active = 1;
+			if (data.status.toLowerCase() == 'disabled')data.include[0].where.disabled = 1;
+			if (data.status.toLowerCase() == 'deleted')data.include[0].where.deleted = 1;
+		}
+
+		return models.profile.findAndCountAll(data);
+
 
 	}) 
 	.then((profile) => { 
