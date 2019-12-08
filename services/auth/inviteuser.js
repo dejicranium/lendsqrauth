@@ -59,7 +59,7 @@ function service(data) {
             return [
                 models.user_invites.findOne({
                     where: {
-                        inviter: data.user.id,
+                        inviter: data.profile.id,
                         invitee: params.email
                     }
                 }),
