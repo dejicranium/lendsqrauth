@@ -43,6 +43,7 @@ function service(data) {
             // check if the profile who created this is the same as the person trying to accepti it.
             if (data.profile.id !== product.profile_id) throw new Error("You cannot update another profile's product")
             if (product.status == 'draft' || product.status == 'deleted') throw new Error("Cannot operate on a draft/deleted product");
+
             if (product_utils.productHasActiveCollection(product)) {
                 throw new Error("Cannot update a product with at least one active collection")
             }
