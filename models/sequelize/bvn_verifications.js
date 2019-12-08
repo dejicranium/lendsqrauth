@@ -6,7 +6,7 @@ module.exports = (sequelize, DataTypes) => {
     bvn: DataTypes.INTEGER,
     phone: DataTypes.STRING
   }, {});
-  bvn_verifications.associate = function(models) {
+  bvn_verifications.associate = function (models) {
     // associations can be defined here
   };
   return bvn_verifications;

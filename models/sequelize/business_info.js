@@ -25,12 +25,14 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.DATE,
     },
   }, {
-    freezeTableName:true,
+    freezeTableName: true,
     timestamps: false
   });
-  business_info.associate = function(models) {
+  business_info.associate = function (models) {
     // associations can be defined here
-    business_info.belongsTo(models.profile, {foreignKey: 'profile_id'})
+    business_info.belongsTo(models.profile, {
+      foreignKey: 'profile_id'
+    })
   };
   return business_info;
 };
