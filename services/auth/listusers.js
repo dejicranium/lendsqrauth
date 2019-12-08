@@ -24,9 +24,9 @@ function service(data){
     // for filter conditions 
     params.where = {};
 
-    // include role 
-   //params.include = [{model: models.profile, required: false}];
 
+    // include the profiles of the user
+    params.include = [{model: models.profile, required: false}]; 
 
     if (data.first_name) {
         params.where.first_name = {
