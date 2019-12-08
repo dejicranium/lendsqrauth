@@ -25,9 +25,14 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     timestamps: false,
   });
-  product.associate = function(models) {
+  product.associate = function (models) {
     // associations can be defined here
-    product.hasMany(models.collection, {foreignKey: 'product_id'})
+    product.hasMany(models.collection, {
+      foreignKey: 'product_id'
+    })
+    product.belongsTo(models.profile, {
+      foreignKey: 'profile_id'
+    })
   };
   return product;
 };

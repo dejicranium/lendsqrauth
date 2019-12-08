@@ -150,5 +150,7 @@ function service(data) {
 	return d.promise;
 
 }
+
+
 service.morxspc = spec;
 module.exports = service;

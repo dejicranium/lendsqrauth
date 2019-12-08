@@ -118,17 +118,22 @@ function service(data) {
 			if (product.profile_id != data.profile.id) throw new Error("Can't update someone else's product");
 
 
-			if (params.product_name) {
-				let similar = await models.product.findOne({
+			if (params.product_name && product.product_name && (params.product_name != product.product_name)) {
+				let similar = await models.product.findAll({
 					where: {
 						product_name: params.product_name
-					}
+					},
+					include: [{
+						model: models.profile,
+						required: false
+					}]
 				})
-
 				// if user is updating the name 
-				if ((params.product_name && product.product_name) && params.product_name !== product.product_name) {}
 
-
+				if (similar && similar.length) {
+					let similar_owned_by_profile = similar.find(i => i.profile.id == data.profile.id);
+					if (similar_owned_by_profile) throw new Error("You already have a product named " + params.product_name)
+				}
 
 
 			}
