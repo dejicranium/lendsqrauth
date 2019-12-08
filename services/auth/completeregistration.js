@@ -155,6 +155,7 @@ function service(data){
         // prepare to send email verification email
         payload.context_id = 81;
         payload.data.token = userToken;
+        payload.data.url = config.base_url + 'activate?token=' + userToken;
         await makeRequest(url, 'POST', payload, requestHeaders);
 
         

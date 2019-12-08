@@ -84,7 +84,7 @@ function service(data){
         ]        // do not show deleted products 
         data.where.status = {$ne : 'deleted'}        
         if (['borrower'].includes(data.profile.role)) {
-            data.where.status = {$ne: 'draft'};
+            data.where.status = {$notIn: ['draft', 'inactive']};
         }
         return [
             models.product.findAndCountAll(data), 

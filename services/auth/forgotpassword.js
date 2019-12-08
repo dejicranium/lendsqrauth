@@ -80,7 +80,7 @@ function service(data){
             data:{
                 email: user.email,
                 name: fullname,
-                url: `https://lendsqr.com/reset/password?token=${tokencreated.token}&u_id=${user.id}`,
+                url: config.base_url + 'reset-password?token=' + tokencreated.token,
                 token: tokencreated.token
             }
         }
