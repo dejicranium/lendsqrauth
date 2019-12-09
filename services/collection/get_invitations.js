@@ -69,6 +69,10 @@ function service(data) {
                 },
             }]
 
+            data.order = [
+                ['id', 'DESC']
+            ]
+
             return [models.borrower_invites.findAndCountAll(data), data];
 
         })
