@@ -10,24 +10,29 @@ const profile_middleware = require('mlar')('profileVerifyMiddleware');
  * @param {*} res 
  * @param {*} next 
  */
-function vinfo(req, res, next){ 
-        const data = {...req.body, ...req.query, ...req.headers, ...req.params};
-        
-        data.ignore_default_user_id  = true; // do not default user_id to the user making the request;
-        
-        service(data)
+function vinfo(req, res, next) {
+    const data = {
+        ...req.body,
+        ...req.query,
+        ...req.headers,
+        ...req.params
+    };
+
+    data.ignore_default_user_id = true; // do not default user_id to the user making the request;
+
+    service(data)
         .then(response => {
             message = 'Bank details';
-            utils.jsonS(res, response, message); 
+            utils.jsonS(res, response, message);
         })
         .catch(error => {
-            utils.jsonF(res, null, error.message); 
+            utils.jsonF(res, null, error.message);
         })
 }
 
 vinfo.routeConfig = {};
-vinfo.routeConfig.path = "/admin/users/:user_id/bank"; 
-vinfo.routeConfig.method = "get"; 
+vinfo.routeConfig.path = "/admin/users/:user_id/bank";
+vinfo.routeConfig.method = "get";
 vinfo.routeConfig.middlewares = [
     auth_middleware,
     profile_middleware,
@@ -35,4 +40,3 @@ vinfo.routeConfig.middlewares = [
     routemeta('get_user_bank_info', 'none')
 ];
 module.exports = vinfo;
-
