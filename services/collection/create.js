@@ -54,26 +54,33 @@ function service(data) {
 			)
 
 
-			/*
-		if (params.borrower_bvn) {
-			// first verifiy that there is a bvn
 			const requestHeaders = {
-				'Content-Type' : 'application/json',
+				'Content-Type': 'application/json',
 			}
-            let  url = config.utility_base_url + "verify/bvn";
-            let payload = {
-                bvn: params.borrower_bvn
-            }
-			
-			let verifiedBVN = await makeRequest(url, 'POST', payload, requestHeaders, 'Verify BVN');
 
-            if (verifiedBVN && verifiedBVN.mobile) {
-            }
-            else {
-                throw new Error("Could not verify BVN");
-            }
+			if (params.borrower_bvn) {
+				// first verifiy that there is a bvn
+				let url = config.utility_base_url + "verify/bvn";
+				let payload = {
+					bvn: params.borrower_bvn
+				}
 
-		}*/
+				let verifiedBVN = await makeRequest(url, 'POST', payload, requestHeaders, 'Verify BVN');
+
+				if (verifiedBVN && verifiedBVN.mobile) {} else {
+					throw new Error("Could not verify BVN");
+				}
+
+			}
+			// make request to verify phone number
+			const verifiedPhone = await makeRequest(
+				config.utility_base_url + 'verify/phone/',
+				'POST', {
+					phone: params.borrower_phone
+				},
+				requestHeaders,
+				'validate phone number'
+			)
 
 
 			let user_with_email_exists = false;
