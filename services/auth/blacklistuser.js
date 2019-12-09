@@ -10,7 +10,7 @@ const DEFAULT_EXCLUDES = require('mlar')('appvalues').DEFAULT_EXCLUDES;
 
 var spec = morx.spec({})
     .build('user_id', 'required:true') // to be used by admin
-    .build('status', 'required:true')
+    .build('reason', 'required:false') // to be used by admin
     .end();
 
 function service(data) {
@@ -33,17 +33,13 @@ function service(data) {
         })
         .spread((user, params) => {
             if (!user) throw new Error("User does not exist");
-            if (params.status == 'activate' && user.status == 'active') throw new Error("User is already active");
-            if (params.status == 'deactivate' && user.status == 'deactivated') throw new Error("User is already deactivated");
-
-            let updateParams = {};
-            if (params.status == 'deactivate') {
-                updateParams.status = 'deactivated';
-            } else if (params.status == 'activate') {
-                updateParams.status = 'active'
+            let updateData = {
+                status: 'blacklisted'
             }
-
-            return user.update(updateParams)
+            if (params.reason) {
+                updateData.status_reason = params.reason
+            }
+            return user.update(updateData);
 
         }).then((user) => {
             if (!user) throw new Error("An error occured while updating user's account");

@@ -11,19 +11,19 @@ const generateRandom = require('mlar')('testutils').generateRandom;
 
 describe('#Create permission', () => {
     const params = {
-       name: 'approve_loans',
-       description: 'Allows permitted user to approve loans'
-       
+        name: 'approve_loans',
+        description: 'Allows permitted user to approve loans'
+
     }
 
-    it("should create a new permission", (done) => {
-        creator(params).then((result)=>{
-            result.should.be.a('object');
-            done();
-        })
-        .catch(err=> {
-            done(err);
-        })
+    it.skip("should create a new permission", (done) => {
+        creator(params).then((result) => {
+                result.should.be.a('object');
+                done();
+            })
+            .catch(err => {
+                done(err);
+            })
 
     })
 })

@@ -21,14 +21,14 @@ describe('#Sign up user', () => {
         type: 1,
     }
 
-    it ('should successfully sign up a user', (done) => {
-        signup(signup_params).then((result)=>{
-            result.should.be.a('object');
-            done();
-        })
-        .catch(err=> {
-            done(err);
-        })
+    it.skip('should successfully sign up a user', (done) => {
+        signup(signup_params).then((result) => {
+                result.should.be.a('object');
+                done();
+            })
+            .catch(err => {
+                done(err);
+            })
 
     })
 })

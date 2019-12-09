@@ -11,29 +11,33 @@ module.exports = (sequelize, DataTypes) => {
     },
     image: DataTypes.STRING,
     business_name: DataTypes.STRING,
+    status_reason: DataTypes.TEXT,
     active: DataTypes.BOOLEAN,
     disabled: DataTypes.BOOLEAN,
     deleted: DataTypes.BOOLEAN,
     password: DataTypes.STRING,
     password: DataTypes.STRING,
-    created_on:  {
+    created_on: {
       type: DataTypes.DATE,
       defaultValue: new Date()
     },
+    status: DataTypes.STRING,
     created_by: DataTypes.INTEGER,
     modified_on: DataTypes.DATE,
     modified_by: DataTypes.DATE,
     deleted_on: DataTypes.DATE,
     deleted_by: DataTypes.INTEGER,
-    
+
   }, {
     timestamps: false
 
   });
-  user.associate = function(models) {
+  user.associate = function (models) {
     // associations can be defined here
     //user.hasMany(models.role, {foreignKey: 'user_id'})
-    user.hasMany(models.profile, {foreignKey: 'user_id'})
+    user.hasMany(models.profile, {
+      foreignKey: 'user_id'
+    })
   };
   return user;
 };

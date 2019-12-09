@@ -1,5 +1,5 @@
 var utils = require('mlar')('mt1l');
-const service = require('mlar').mreq('services', 'auth/delete');
+const service = require('mlar').mreq('services', 'auth/blacklistuser');
 const routemeta = require('mlar')('routemeta');
 const auth_middleware = require('mlar')('authmiddleware');
 const has_role = require('mlar')('hasRoleMiddleware');
@@ -15,7 +15,7 @@ function vinfo(req, res, next) {
 
     service(data)
         .then(response => {
-            utils.jsonS(res, response, "User has been deleted successfully");
+            utils.jsonS(res, response, "User has been blacklisted successfully");
         })
         .catch(error => {
             utils.jsonF(res, null, error.message);
@@ -23,8 +23,8 @@ function vinfo(req, res, next) {
 }
 
 vinfo.routeConfig = {};
-vinfo.routeConfig.path = "/admin/users/:user_id";
-vinfo.routeConfig.method = "delete";
+vinfo.routeConfig.path = "/admin/users/:user_id/blacklist";
+vinfo.routeConfig.method = "put";
 vinfo.routeConfig.middlewares = [
     auth_middleware,
     profile_middleware,

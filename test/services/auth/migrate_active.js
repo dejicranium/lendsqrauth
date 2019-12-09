@@ -4,20 +4,19 @@ const should = require('chai').should();
 
 const chai = require('chai');
 
-const createrole = require('mlar').mreq('services', 'auth/createrole');
-const generateRandom = require('mlar')('testutils').generateRandom;
+const listout = require('mlar').mreq('services', 'auth/migrate_active');
 
 
 
-describe('#Create role', () => {
+describe('#Get users service', () => {
     const params = {
-        type: 'lender'
 
     }
 
-    it.skip("should create a new role", (done) => {
-        createrole(params).then((result) => {
+    it('should lists registered users', (done) => {
+        listout(params).then((result) => {
                 result.should.be.a('object');
+                result.should.have.property('users');
                 done();
             })
             .catch(err => {
