@@ -17,10 +17,17 @@ var spec = morx.spec({})
 	.build('borrower_bvn', 'required:true, eg:42341234552')
 	.end();
 
+
+
+
+
 function service(data) {
 
 	var d = q.defer();
 	const globalUserId = data.USER_ID || 1;
+	let invitation_data = {
+
+	}
 	q.fcall(async () => {
 			const validParameters = morx.validate(data, spec, {
 				throw_error: true
@@ -169,20 +176,55 @@ function service(data) {
 			if (borrower_profile && borrower_profile != 'none') {
 				params.borrower_id = borrower_profile.id;
 			}
-
 			params.lender_id = data.profile.id; // set the lender profile to the person making this request
 			params.status = "draft";
+
+
+
+
+			invitation_data = {
+				inviter_id: data.profile.id,
+				date_invited: new Date(),
+				borrower_name: data.borrower_first_name + " " + data.borrower_last_name,
+			}
+
+
+
+
+			if (borrower_profile && borrower_profile.id) {
+				invitation_data.profile_created_id = borrower_profile.id
+			}
+
+
 			return models.collection.create(params);
 		})
 		.then(async collection => {
 			if (!collection) throw new Error("Could not create collection");
+
+
 			// create new auth_token for this
+			invitation_data.collection_id = collection.id;
+			invitation_data.token = crypto.randomBytes(32).toString('hex');
+
+
+			// create borrower invites
+			await models.borrower_invites.create(invitation_data);
+
+
+
+
+
+
+
+
+
+			let token = crypto.randomBytes(32).toString('hex');
+
 
 			let invitation_meta = {
 				collection_id: collection.id
 			}
 
-			let token = crypto.randomBytes(32).toString('hex');
 
 			await models.auth_token.create({
 				type: 'borrower_invitation',

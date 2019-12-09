@@ -31,11 +31,23 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     timestamps: false
   });
-  collection.associate = function(models) {
+  collection.associate = function (models) {
     // associations can be defined here
-    collection.belongsTo(models.profile, {foreignKey: 'borrower_id', as:'borrower'});
-    collection.belongsTo(models.profile, {foreignKey: 'lender_id', as:'lender'});
-    collection.belongsTo(models.product, {foreignKey: 'product_id'});
+    collection.belongsTo(models.profile, {
+      foreignKey: 'borrower_id',
+      as: 'borrower'
+    });
+    collection.belongsTo(models.profile, {
+      foreignKey: 'lender_id',
+      as: 'lender'
+    });
+    collection.belongsTo(models.product, {
+      foreignKey: 'product_id'
+    });
+    collection.hasMany(models.borrower_invites, {
+      foreignKey: 'collection_id'
+    });
+
   };
   return collection;
 };

@@ -25,6 +25,7 @@ var spec = morx.spec({})
 
 // TODO: make type borrower
 // TODO: 
+// TODO: make sure that if there is no profile, create one for a user
 function service(data) {
     var d = q.defer();
     const globalUserId = data.USER_ID || 1;
@@ -33,31 +34,45 @@ function service(data) {
                 throw_error: true
             });
             const params = validParameters.params;
+
+
+
+
+
+            return models.borrower_invites.findOne({
+                where: {
+                    token: params.token
+                }
+            })
+
+            /*
             return models.auth_token.findOne({
                 where: {
                     token: params.token,
                     type: 'borrower_invitation',
                 }
-            })
+            })*/
         })
         .then(async (instance) => {
 
             if (!instance) throw new Error("Invalid token")
 
-            if (instance.is_used) throw new Error("Token has already been used");
+            if (instance.token_is_used) throw new Error("Token has already been used");
+
+            /*
             let auth_meta = JSON.parse(instance.meta);
             if (!auth_meta.collection_id) throw new Error("No collection is linked to this token")
-
+            */
             return [models.collection.findOne({
                 where: {
-                    id: auth_meta.collection_id
+                    id: instance.collection_id
                 }
             }), instance];
         })
         .spread(async (collection, instance) => {
             if (!collection) throw new Error("Could not find collection associated with this invitation");
 
-            // signup needs a type
+            // signup needs a type and shouldn't create a profile
             data.create_profile = false;
             data.type = "borrower";
             return [signup(data), collection, instance]
@@ -84,12 +99,13 @@ function service(data) {
                 // update the collection 
                 collection.update({
                     status: 'active',
-                    borrower_id: new_borrower_profile.id
+                    borrower_id: new_borrower_profile.id,
                 })
 
                 // invalidate token 
                 await instance.update({
-                    is_used: true
+                    token_is_used: true,
+                    status: 'Accepted'
                 })
 
             }

@@ -1,7 +1,8 @@
 var utils = require('mlar')('mt1l');
 const routemeta = require('mlar')('routemeta');
 const auth_middleware = require('mlar')('authmiddleware');
-const service = require('mlar').mreq('services', 'collection/reject_invitation');
+const service = require('mlar').mreq('services', 'collection/get_invitations');
+const profile_middleware = require('mlar')('profileVerifyMiddleware');
 
 function vinfo(req, res, next) {
     const data = {
@@ -10,10 +11,11 @@ function vinfo(req, res, next) {
         ...req.headers,
         ...req.params
     };
-
+    data.user = req.user;
+    data.profile = req.profile;
     service(data)
         .then(response => {
-            utils.jsonS(res, response, "Collection invitation rejected");
+            utils.jsonS(res, response, "Invitations");
         })
         .catch(error => {
             utils.jsonF(res, null, error.message);
@@ -21,7 +23,11 @@ function vinfo(req, res, next) {
 }
 
 vinfo.routeConfig = {};
-vinfo.routeConfig.path = "/invitations/reject";
-vinfo.routeConfig.method = "post";
-vinfo.routeConfig.middlewares = [routemeta('reject_collection_invitation', 'none')];
+vinfo.routeConfig.path = "/invitations";
+vinfo.routeConfig.method = "get";
+vinfo.routeConfig.middlewares = [
+    auth_middleware,
+    profile_middleware,
+    routemeta('get_collection', 'none')
+];
 module.exports = vinfo;
