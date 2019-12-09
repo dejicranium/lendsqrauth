@@ -33,6 +33,13 @@ function service(data) {
 
             }
 
+            if (data.search) {
+                data.where.borrower_name = {
+                    $like: '%' + data.search + '%'
+                }
+            }
+
+
             if (data.to && data.from) {
                 let start = moment(moment(queryData.from).format('YYYY-MM-DD') + ' 00:00:00', moment.ISO_8601);
                 let stop = moment(moment(queryData.to).format('YYYY-MM-DD') + ' 23:59:59', moment.ISO_8601)
