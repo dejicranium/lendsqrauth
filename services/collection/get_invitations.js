@@ -46,8 +46,8 @@ function service(data) {
                 delete data.status;
             }
 
-            if (data.inviter_id) {
-                data.where.inviter_id = data.inviter_id;
+            if (data.profile_id) {
+                data.where.inviter_id = data.profile_id;
                 delete data.inviter_id;
             }
 
