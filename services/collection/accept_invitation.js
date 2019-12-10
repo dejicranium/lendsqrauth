@@ -16,9 +16,8 @@ var spec = morx.spec({})
     .end();
 
 function service(data) {
-    const DECLINED_STATUS = 'Declined';
+    const ACCEPTED_STATUS = 'Accepted';
     var d = q.defer();
-    const globalUserId = data.USER_ID || 1;
     q.fcall(async () => {
             const validParameters = morx.validate(data, spec, {
                 throw_error: true
@@ -33,14 +32,6 @@ function service(data) {
                 }
             })
 
-
-
-
-            /*return models.auth_token.findOne({
-                where: {
-                    token: params.token
-                }
-            })*/
         })
         .then(async (instance) => {
 
@@ -65,38 +56,21 @@ function service(data) {
         .spread(async (collection, instance) => {
             if (!collection) throw new Error("Could not find collection");
 
-
-
-
-
-            /* await instance.update({
-                 is_used: 1
-             });*/
-
             await instance.update({
                 token_is_used: true,
-                status: 'Declined',
+                status: ACCEPTED_STATUS,
                 date_declined: new Date()
             })
             // update collection;
 
-
-
-
-
-            collection.status = DECLINED_STATUS;
-
-
-
-
-
+            collection.status = 'active';
 
             return collection.save();
         })
         .then((saved) => {
             if (!saved) throw new Error("Could not update collection");
 
-            d.resolve("Rejected the invitation")
+            d.resolve("Accepted the invitation")
         })
 
         .catch((error) => {
