@@ -26,4 +26,6 @@ vinfo.routeConfig.method = "put";
 vinfo.routeConfig.middlewares = [
     routemeta('accept_invitation', 'none')
 ];
+
+
 module.exports = vinfo;
