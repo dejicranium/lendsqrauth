@@ -27,8 +27,16 @@ function service(data) {
 				throw_error: true
 			});
 			const params = validParameters.params;
-			let getFunction = null
+			let getFunction = null;
+
 			if (params.collection_id) {
+				let query = {
+					where: {}
+				};
+				query.where.id = params.collection_id;
+				query.include = [{
+					model: models.product
+				}]
 				getFunction = models.collection.findOne({
 					where: {
 						id: params.collection_id
@@ -59,6 +67,11 @@ function service(data) {
 				} else if (data.profile.role == 'collaborator') {
 					query.where.lender_id = data.profile.parent_profile_id
 				}
+
+				query.include = [{
+					model: models.product,
+					attributes: ['interest', 'interest_period']
+				}]
 				query.order = [
 					['id', 'DESC']
 				]
