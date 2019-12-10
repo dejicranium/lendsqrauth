@@ -98,7 +98,9 @@ function service(data) {
             if (data.status) data.where.status = {
                 $like: '%' + data.status + '%'
             }
-
+            data.order = [
+                ['id', 'DESC']
+            ]
             return [
                 models.product.findAndCountAll(data),
                 data
