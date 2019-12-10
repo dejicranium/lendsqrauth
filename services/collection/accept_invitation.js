@@ -71,6 +71,7 @@ function service(data) {
             if (!saved) throw new Error("Could not update collection");
 
             d.resolve("Accepted the invitation")
+
         })
 
         .catch((error) => {
