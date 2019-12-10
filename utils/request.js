@@ -5,8 +5,7 @@ const q = require('q');
 module.exports = (url, method, payload, headers, caller = null) => {
     const d = q.defer();
     // append the access key
-    headers['LENDSQR_ACCESS_KEY'] = "7mvkUcJH4l45AJr9AWm1rcjJhLUFaspk";
-    headers['lendsqr_access_key'] = "7mvkUcJH4l45AJr9AWm1rcjJhLUFaspk";
+    headers['accesskey'] = "7mvkUcJH4l45AJr9AWm1rcjJhLUFaspk";
 
 
     q.fcall(() => {
