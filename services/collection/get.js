@@ -70,7 +70,7 @@ function service(data) {
 
 				query.include = [{
 					model: models.product,
-					attributes: ['interest', 'interest_period']
+					attributes: ['product_name', 'interest', 'interest_period']
 				}];
 				query.order = [
 					['id', 'DESC']
