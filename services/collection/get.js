@@ -71,10 +71,13 @@ function service(data) {
 				query.include = [{
 					model: models.product,
 					attributes: ['interest', 'interest_period']
-				}]
+				}];
 				query.order = [
 					['id', 'DESC']
-				]
+				];
+				query.where.deleted_flag = {
+					$ne: 1
+				};
 				getFunction = models.collection.findAndCountAll(query)
 			}
 
@@ -98,6 +101,7 @@ function service(data) {
 					throw new Error("You aren't a collaborator on the profile that created this collection")
 				}
 
+				if (collection.deleted_flag == 1) throw new Error('Collection has been deleted')
 				d.resolve(collections)
 			}
 

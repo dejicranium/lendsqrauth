@@ -129,7 +129,7 @@ function service(data) {
             if (!collection) throw new Error('No such product exists');
 
             // you can't change a loan's product id after it has been set
-            if (params.product_id && collection.product_id)
+            if (params.product_id && collection.status == 'active')
                 throw new Error('Cannot re-update product id of a created collection');
 
             //params.profile_id = data.profile.id

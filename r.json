@@ -32,5 +32,8 @@
 	"requests": "/utils/requests",
 	"resolvers": "/utils/resolvers",
 	"collection_utils": "/utils/collections",
-	"product_utils": "/utils/products"
+	"product_utils": "/utils/products",
+	"job_get_schedule": "/jobs/get_collections_due",
+	"mocks": "/mocks",
+	"queue": "/queue"
 }

@@ -3,7 +3,9 @@ const dotenv = require('dotenv')
 if (process.env.NODE_ENV != 'production') {
     //dotenv.load({ path: '.env' });
 
-    dotenv.config({path: 'env'});
+    dotenv.config({
+        path: 'env'
+    });
 }
 module.exports = {
     JWTsecret: process.env.JWTsecret || 'wd#o,9!fPJZ-> L<~%J-VEVGdnlr6(Gq2dq).XHOpQ^v[q4t1^-%Nq ff-jn_s=g',
@@ -12,5 +14,9 @@ module.exports = {
     notif_base_url: process.env.notif_base_url || 'https://v2-test.lendsqr.com/api/v1/notification/',
     utility_base_url: process.env.utility_base_url || 'https://v2-test.lendsqr.com/api/v1/util/',
     base_url: process.env.base_url || 'https://v2-test.lendsqr.com/',
-    admin_reg_token: process.env.admin_reg_token || 'saraytheiconoclast%32$6'
+    admin_reg_token: process.env.admin_reg_token || 'saraytheiconoclast%32$6',
+
+    aws_region: process.env.aws_region || 'us-east-2',
+    collection_schedules_queue_url: process.env.collection_schedules_queue_url || 'https://sqs.us-east-2.amazonaws.com/350152003452/CollectionSchedulesQueue'
+
 }
