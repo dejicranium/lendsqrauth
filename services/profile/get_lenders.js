@@ -91,6 +91,7 @@ function service(data) {
 					attributes: {
 						exclude: ['password']
 					},
+				}, {
 					model: models.role,
 					attributes: ['name']
 				}];
