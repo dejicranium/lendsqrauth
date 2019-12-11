@@ -17,6 +17,10 @@ module.exports = (sequelize, DataTypes) => {
     status: DataTypes.STRING,
     url_slug: DataTypes.STRING,
     deleted_flag: DataTypes.BOOLEAN,
+    created_on: {
+      type: DataTypes.DATE,
+      defaultValue: new Date()
+    },
     created_by: DataTypes.INTEGER,
     modified_on: DataTypes.DATE,
     modified_by: DataTypes.INTEGER,

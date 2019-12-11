@@ -75,9 +75,15 @@ function service(data) {
 				query.order = [
 					['id', 'DESC']
 				];
-				query.where.deleted_flag = {
+
+				query.where.$or = [{
+					deleted_flag: null
+				}, {
+					deleted_flag: false
+				}]
+				/*query.where.deleted_flag = {
 					$ne: 1
-				};
+				};*/
 				getFunction = models.collection.findAndCountAll(query)
 			}
 
