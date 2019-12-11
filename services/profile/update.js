@@ -7,7 +7,7 @@ const assert = require('mlar')('assertions');
 
 var spec = morx.spec({})
 	.build('role_id', 'required:false, eg:lender')
-	.build('profile_id', 'required:true, eg:lender')
+	.build('profile_id', 'required:false, eg:lender')
 	.build('url', 'required:false, eg:lender')
 	.build('bvn', 'required:false, eg:lender')
 	.build('business_logo', 'required:false, eg:lender')
@@ -40,7 +40,7 @@ function service(data) {
 			return [
 				models.profile.findOne({
 					where: {
-						id: params.profile_id
+						id: params.profile_id || data.profile.id
 					}
 				}),
 				params
@@ -61,7 +61,7 @@ function service(data) {
 						rc_number: params.rc_number
 					}
 				})
-				if (profile_with_rc_number && profile_with_rc_number.id) {
+				if ((profile_with_rc_number && profile_with_rc_number.id) && params.rc_number !== profile_with_rc_number.rc_number) {
 					throw new Error("Profile with RC Number already exists");
 				}
 			}

@@ -71,7 +71,6 @@ function service(data) {
 			}
 
 
-
 			// get all lenders
 			else {
 				let lender_roles = await models.role.findAll({
