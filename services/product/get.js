@@ -115,6 +115,9 @@ function service(data) {
                     $notIn: ['draft', 'inactive']
                 };
             }
+            if (data.profile.role == 'collaborator') {
+                data.where.profile_id = data.profile.parent_profile_id;
+            }
             if (data.status) data.where.status = {
                 $like: '%' + data.status + '%'
             }

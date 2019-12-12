@@ -72,7 +72,7 @@ function service(data) {
                 throw new Error('You need to provide a product id to proceed');
             }
 
-            if (!product || !product.id) throw new Error('Could not find product being attached to this collection');
+            if (!product || !product.id) throw new Error('Product does not exist');
             if (product.status !== 'active')
                 throw new Error("You cannot create a collection for a product that isn't active");
             if (product.profile_id !== data.profile.id)
@@ -195,6 +195,7 @@ function service(data) {
                     });
                 }
             }
+            collection.interest = product.interest
 
             d.resolve(collection);
         })

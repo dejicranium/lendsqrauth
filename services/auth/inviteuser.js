@@ -17,7 +17,6 @@ const requests = require('mlar')('requests');
 
 var spec = morx.spec({})
     .build('email', 'required:true, eg:1')
-    .build('phone', 'required:true, eg:1')
     .end();
 
 function service(data) {
@@ -45,10 +44,6 @@ function service(data) {
                 'Content-Type': 'application/json',
             }
 
-            // verify phone number
-            requests.validatePhone({
-                phone: params.phone
-            });
 
             // check to make sure that only a lender can do this;
             if (data.profile.role != 'individual_lender' && data.profile.role != 'business_lender') {
@@ -119,7 +114,6 @@ function service(data) {
                                    contact_first_name: params.first_name,
                                    contact_last_name: params.last_name,
                                    contact_email: params.email, */
-                    contact_phone: params.phone,
                     created_on: new Date(),
                 }
 
