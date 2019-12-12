@@ -46,6 +46,14 @@ function service(data) {
                         status: 'active'
                     },
                     required: false
+                }, {
+                    model: models.profile,
+                    attributes: {
+                        exclude: ['created_on', 'created_by']
+                    },
+                    include: [{
+                        model: models.user
+                    }]
                 }]
 
                 return [models.product.findOne(data), data]
