@@ -101,10 +101,9 @@ function service(data) {
                     attributes: ['id'],
                     include: [{
                         model: models.user,
-                        attributes: [
-                            'first_name',
-                            'last_name',
-                        ]
+                        attributes: {
+                            exclude: ['password']
+                        }
                     }]
                 }
             ] // do not show deleted products 

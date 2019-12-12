@@ -67,6 +67,8 @@ function service(data) {
 				}
 			}
 
+			//params = params.map(p. => p != "");
+
 			return [
 				profile.update({
 					...params
@@ -99,8 +101,7 @@ function service(data) {
 						let field = fields[i];
 						profile_contact.social_links[field] = params.social_links[field]
 					}
-					profile_contact.social_links = JSON.parse(JSON.stringify(profile_contact.social_links));
-					d.resolve(profile_contact)
+					profile_contact.social_links = JSON.stringify(profile_contact.social_links);
 					await profile_contact.save()
 				}
 
@@ -122,8 +123,8 @@ function service(data) {
 						...params
 					}
 				})
-				.spread((info, created) => {
-					if (!created) info.update({
+				.spread(async (info, created) => {
+					if (!created) await info.update({
 						...params
 					})
 				})
