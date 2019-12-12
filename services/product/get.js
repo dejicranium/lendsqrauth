@@ -79,14 +79,27 @@ function service(data) {
             if (data.tenor_type) data.where.tenor_type = data.tenor_type
             if (data.interest) data.where.interest = data.interest
             data.include = [{
-                model: models.collection,
-                attributes: ['id'],
-                where: {
-                    status: 'active'
-                },
-                required: false,
+                    model: models.collection,
+                    attributes: ['id'],
+                    where: {
+                        status: 'active'
+                    },
 
-            }] // do not show deleted products 
+                    required: false,
+
+                },
+                {
+                    model: models.profile,
+                    attributes: ['id'],
+                    include: [{
+                        model: models.user,
+                        attributes: [
+                            'first_name',
+                            'last_name',
+                        ]
+                    }]
+                }
+            ] // do not show deleted products 
             data.where.status = {
                 $ne: 'deleted'
             }

@@ -49,8 +49,6 @@ function service(data) {
 						exclude: ['password']
 					}
 				}]
-
-
 			}
 
 			// when you append profile type to the query string
@@ -127,12 +125,13 @@ function service(data) {
 				}
 				delete data.to
 			}
-
-			if (data.status) {
-				if (data.status.toLowerCase() == 'active') data.include[0].where.active = 1;
-				if (data.status.toLowerCase() == 'disabled') data.include[0].where.disabled = 1;
-				if (data.status.toLowerCase() == 'deleted') data.include[0].where.deleted = 1;
-			}
+			/*
+						if (data.status) {
+							if (data.status.toLowerCase() == 'active') data.include[0].where.active = 1;
+							if (data.status.toLowerCase() == 'disabled') data.include[0].where.disabled = 1;
+							if (data.status.toLowerCase() == 'deleted') data.include[0].where.deleted = 1;
+						}
+						*/
 
 			return models.profile.findAndCountAll(data);
 

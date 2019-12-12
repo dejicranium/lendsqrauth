@@ -134,6 +134,26 @@ module.exports = {
         return d.promise
     },
 
+    getBankDetails() {
+        const d = q.defer();
+
+        q.fcall(() => {
+
+                let url = config.utility_base_url + 'codes/fetch/bank';
+                let payload = {}
+
+                return makeRequest(url, 'GET', payload, constants.requestHeaders, 'verify bank account');
+            })
+            .then(response => {
+                d.resolve(response)
+            })
+            .catch(err => {
+                d.reject(err);
+            })
+
+        return d.promise
+    },
+
 
     calculateCollectionSchedule(data) {
         let tenor = data.tenor;
