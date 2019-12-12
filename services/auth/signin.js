@@ -65,7 +65,7 @@ function service(data) {
 
         })
         .spread(async (user, token, user_profiles) => {
-            if (user.status != 'active') throw new Error('User is ' + user.status)
+            if (user.status != 'active') throw new Error('User is inactive')
 
             // ids of the user's profiles 
             user_profiles = user_profiles.map(profile => profile.id)
