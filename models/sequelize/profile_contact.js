@@ -7,6 +7,7 @@ module.exports = (sequelize, DataTypes) => {
     contact_phone: DataTypes.STRING,
     contact_email: DataTypes.STRING,
     support_email: DataTypes.STRING,
+    social_links: DataTypes.TEXT,
     contact_role: DataTypes.STRING,
     created_on: DataTypes.DATE,
     created_by: DataTypes.INTEGER,
@@ -17,9 +18,12 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     timestamps: false,
   });
-  profile_contact.associate = function(models) {
+  profile_contact.associate = function (models) {
     // associations can be defined here
-    profile_contact.belongsTo(models.profile, {foreignKey: 'profile_id'})
+    profile_contact.belongsTo(models.profile, {
+      foreignKey: 'profile_id'
+    })
   };
   return profile_contact;
-};'use strict';
+};
+'use strict';

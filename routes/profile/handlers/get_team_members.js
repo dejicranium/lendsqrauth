@@ -31,7 +31,7 @@ vinfo.routeConfig.method = "get";
 vinfo.routeConfig.middlewares = [
     auth_middleware,
     profile_middleware,
-    has_role(['business_lender', 'invidivual_lender']),
+    has_role(['business_lender', 'individual_lender']),
     routemeta('get_team_members', 'none')
 ];
 module.exports = vinfo;

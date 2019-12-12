@@ -18,7 +18,6 @@ function vinfo(req, res, next) {
     };
 
     data.user_id = req.user.id // default user_id to the user making the request;
-    data.id = req.body.id
     service(data)
         .then(response => {
             utils.jsonS(res, response, "Deletion successful");
@@ -29,7 +28,7 @@ function vinfo(req, res, next) {
 }
 
 vinfo.routeConfig = {};
-vinfo.routeConfig.path = "/users/bank";
+vinfo.routeConfig.path = "/users/bank/:id";
 vinfo.routeConfig.method = "delete";
 vinfo.routeConfig.middlewares = [
     auth_middleware,

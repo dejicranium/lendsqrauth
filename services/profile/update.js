@@ -23,6 +23,7 @@ var spec = morx.spec({})
 	.build('contact_phone', 'required:false, eg:lender')
 	.build('contact_email', 'required:false, eg:lender')
 	.build('support_email', 'required:false, eg:lender')
+	.build('social_links', 'required:false, eg:lender')
 
 	.end();
 
@@ -66,8 +67,6 @@ function service(data) {
 				}
 			}
 
-
-
 			return [
 				profile.update({
 					...params
@@ -87,10 +86,33 @@ function service(data) {
 				})
 
 			if (profile_contact && profile_contact.id) {
+
+
+				if (params.social_links) {
+					// get social links from profile_contact 
+					//let existing_social_links = JSON.parse(JSON.stringify(profile_contact.social_links));
+
+					// when nothing exists ;
+					let fields = Object.keys(params.social_links);
+					if (!profile_contact.social_links) profile_contact.social_links = {};
+					for (let i = 0; i < fields.length; i++) {
+						let field = fields[i];
+						profile_contact.social_links[field] = params.social_links[field]
+					}
+					profile_contact.social_links = JSON.parse(JSON.stringify(profile_contact.social_links));
+					d.resolve(profile_contact)
+					await profile_contact.save()
+				}
+
+
 				await profile_contact.update({
 					...params
 				});
 
+			} else {
+				await models.profile_contact.create({
+					...params
+				})
 			}
 			await models.business_info.findOrCreate({
 					where: {

@@ -58,7 +58,7 @@ function service(data) {
 
         })
         .spread(async (record, bvnRecord, params) => {
-            if (record) throw new Error("Account number already exits");
+            if (record) throw new Error("Account number already exists");
 
             // if bvn exists for a user other than the one making the request;
 
@@ -106,8 +106,12 @@ function service(data) {
 
 
                 // verify bank details 
-                requests.verifyBank({
+                await requests.verifyBank({
                     ...params
+                }).then(resp => {
+                    if (!resp) throw new Error("Bank account is not valid")
+                }).catch(err => {
+                    throw new Error("Bank account is invalid")
                 })
 
                 //if all successful ---

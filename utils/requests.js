@@ -116,7 +116,7 @@ module.exports = {
 
         q.fcall(() => {
 
-                let url = config.notif_base_url + 'verify/bank';
+                let url = config.utility_base_url + 'verify/bank';
                 let payload = {
                     account_number: data.account_number,
                     bank_code: data.bank_code
@@ -143,6 +143,26 @@ module.exports = {
                 let payload = {}
 
                 return makeRequest(url, 'GET', payload, constants.requestHeaders, 'verify bank account');
+            })
+            .then(response => {
+                d.resolve(response)
+            })
+            .catch(err => {
+                d.reject(err);
+            })
+
+        return d.promise
+    },
+
+    verifyBankAccount(data) {
+        const d = q.defer();
+
+        q.fcall(() => {
+
+                let url = config.utility_base_url + 'verify/bank';
+
+
+                return makeRequest(url, 'GET', data, constants.requestHeaders, 'verify account');
             })
             .then(response => {
                 d.resolve(response)
