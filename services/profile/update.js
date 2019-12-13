@@ -97,14 +97,26 @@ function service(data) {
 					// when nothing exists ;
 					let fields = Object.keys(params.social_links);
 					if (!profile_contact.social_links) profile_contact.social_links = {};
+					else {
+						profile_contact.social_links = JSON.parse(JSON.stringify(profile_contact.social_links))
+					}
+
+					let social_contact_array = [];
 					for (let i = 0; i < fields.length; i++) {
 						let field = fields[i];
-						profile_contact.social_links[field] = params.social_links[field]
-					}
-					profile_contact.social_links = JSON.stringify(profile_contact.social_links);
-					await profile_contact.save()
-				}
+						let new_object = {};
 
+						new_object[field] = params.social_links[field];
+						social_contact_array.push(new_object);
+					}
+
+					params.social_links = JSON.stringify(social_contact_array)
+
+
+
+				} else {
+					delete params.social_links
+				}
 
 				await profile_contact.update({
 					...params

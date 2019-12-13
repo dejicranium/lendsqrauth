@@ -48,10 +48,9 @@ function service(data) {
 					}
 				});
 				let user_profiles_ids = user_profiles.map(prof => prof.id);
-
 				// check if profile of the requester is not admin 
 				// and the profile being searched for is one of the profiles of the requester
-				if (data.profile.role !== 'admin' && !user_profiles_ids.includes(params.profile_id) && !profile_is_a_subprofile) {
+				if (data.profile.role != 'admin' && !user_profiles_ids.includes(parseInt(params.profile_id)) && !profile_is_a_subprofile) {
 					throw new Error("You need to be an admin, own this profile or be it's parent to view it");
 				}
 

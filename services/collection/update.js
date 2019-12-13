@@ -10,6 +10,7 @@ const config = require('../../config');
 const resolvers = require('mlar')('resolvers');
 const collection_utils = require('mlar')('collection_utils');
 const moment = require('moment')
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
 var spec = morx
     .spec({})
@@ -195,6 +196,7 @@ function service(data) {
 
                     if (new_status == 'inactive') {
                         let params = {
+                            amount: collection.amount,
                             tenor: collection.tenor,
                             tenor_type: product.tenor_type,
                             num_of_collections: collection.num_of_collections,
@@ -204,31 +206,42 @@ function service(data) {
 
                         let result = await requests.createCollectionShedule(params)
 
-                        /*
-                        .then(resp => {
-                                                                 resp.periods.forEach(async resp => {
-                                                                     await models.collection_schedules.create({
-                                                                         period_id: resp.period,
-                                                                         from_date: resp.fromDate.join('-'),
-                                                                         due_date: resp.dueDate.join('-'),
-                                                                         days_in_period: resp.daysInPeriod,
-                                                                         principal_due: resp.principalDue,
-                                                                         interest_due: resp.interestDue,
-                                                                         total_amount: resp.totalDueForPeriod,
-                                                                         loan_id: product.id,
-                                                                         collection_id: collection.id,
-                                                                         borrower_id: collection.borrower_id,
-                                                                         lender_id: collection.lender_id,
-                                                                         status: 'Pending',
-                                                                     })
-                                                                 })
-                                 console.log(resp)
-                             })
-                             .catch(err => {
-                                 //silent failure
-                                 console.log(err)
-                             })
-                             */
+
+                            .then(async resp => {
+                                let bulkdata = []
+                                resp.periods.forEach(async r => {
+
+
+                                    if (resp.periods.indexOf(r) !== 0) {
+
+                                        let period = {
+                                            period_id: r.period,
+                                            from_date: r.fromDate.join('-'),
+                                            due_date: r.dueDate.join('-'),
+                                            days_in_period: r.daysInPeriod,
+                                            principal_due: r.principalDue,
+                                            interest_due: r.interestDue,
+                                            total_amount: r.totalDueForPeriod,
+                                            loan_id: product.id,
+                                            balance_outstanding: r.principalLoanBalanceOutstanding,
+                                            interest_outstanding: r.interestOutstanding,
+                                            collection_id: collection.id,
+                                            borrower_id: collection.borrower_id,
+                                            lender_id: collection.lender_id,
+                                            status: 'Pending',
+                                        }
+                                        bulkdata.push(period);
+
+                                    }
+                                })
+                                await models.collection_schedules.bulkCreate(bulkdata)
+                                console.log(resp)
+                            })
+                            .catch(err => {
+                                //silent failure
+                                console.log(err)
+                            })
+
                         console.log(result)
                     }
 

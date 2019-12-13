@@ -65,6 +65,12 @@ function service(data) {
 						exclude: DEFAULT_EXCLUDES
 					},
 					required: false,
+				}, {
+					model: models.profile_contact,
+					attributes: {
+						exclude: DEFAULT_EXCLUDES
+					},
+					required: false,
 				}
 			]
 

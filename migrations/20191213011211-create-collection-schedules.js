@@ -35,6 +35,12 @@ module.exports = {
       lender_id: {
         type: Sequelize.INTEGER
       },
+      balance_outstanding: {
+        type: Sequelize.DOUBLE
+      },
+      interest_outstanding: {
+        type: Sequelize.DOUBLE
+      },
       status: {
         type: Sequelize.STRING
       },

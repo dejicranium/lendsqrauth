@@ -3,7 +3,6 @@ let config = require('../config')
 const makeRequest = require('mlar')('makerequest');
 const q = require('q')
 const moment = require('moment')
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
 
 module.exports = {
@@ -96,8 +95,12 @@ module.exports = {
         let collection_frequency = data.collection_frequency;
         let start_date = data.start_date;
         */
+
         let tenor_type_value = null;
         switch (data.tenor_type) {
+            case 'days':
+                tenor_type_value = 0;
+                break;
             case 'weeks':
                 tenor_type_value = 1;
                 break;
@@ -109,11 +112,14 @@ module.exports = {
                 break;
             default:
                 tenor_type_value = 1;
-                break;
 
         }
+        console.log('tenor type is ' + data.tenor_type)
+        console.log('tenor type value is ' + tenor_type_value)
+
 
         const d = q.defer()
+        /*
         let params = {
             "dateFormat": "dd MMMM yyyy",
             "locale": "en_GB",
@@ -135,13 +141,13 @@ module.exports = {
             "loanType": "individual",
         }
 
-        /*
+        */
         let params = {
             "dateFormat": "dd MMMM yyyy",
             "locale": "en_GB",
             "productId": 1,
             "clientId": 1,
-            "principal": "200000.00",
+            "principal": data.amount,
             "loanTermFrequency": data.tenor, // 12
             "loanTermFrequencyType": tenor_type_value,
             "numberOfRepayments": data.num_of_collections,
@@ -151,24 +157,27 @@ module.exports = {
             "amortizationType": 1,
             "interestType": 0,
             "interestCalculationPeriodType": 1,
-            "expectedDisbursementDate": "20 September 2011", //moment(data.disbursement_date).format('DD MMMM YYYY'), //"20 September 2011"
+            "expectedDisbursementDate": moment(data.disbursement_date).format('DD MMMM YYYY'), //"20 September 2011"
             "transactionProcessingStrategyId": 2,
-            "submittedOnDate": "20 September 2011", // moment().format('DD MMMM YYYY'), //"20 September 2011",
+            "submittedOnDate": moment().format('DD MMMM YYYY'), //"20 September 2011",
             "loanType": "individual",
-        }*/
+        }
+
         const url = config.mifos_base_url + `loans?command=calculateLoanSchedule`
 
-        q.fcall(() => {
+        q.fcall(async () => {
                 return makeRequest(url, 'POST', params, constants.mifos_headers, null, false);
             })
             .then(response => {
+
                 //d.resolve(moment(data.disbursement_date).format('DD MMMM YYYY'))
+                console.log('response is ' + response)
                 console.log(response)
                 d.resolve(response)
 
             })
             .catch(error => {
-                console.log(error)
+                console.log(" error" + error)
                 d.reject(error)
             })
 

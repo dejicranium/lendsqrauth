@@ -81,6 +81,7 @@ function service(data) {
             if (data.max_loan_amount) data.where.max_loan_amount = data.max_loan_amount
             if (data.tenor_type) data.where.tenor_type = data.tenor_type
             if (data.interest) data.where.interest = data.interest
+
             data.include = [{
                     model: models.collection,
                     attributes: ['id'],
@@ -129,17 +130,91 @@ function service(data) {
             if (data.fetch_one !== undefined) {
                 products = JSON.parse(JSON.stringify(products));
                 products.num_of_borrowers = products.collections.length;
-                delete products.collections
+
+
+
+                /// get borrowers
+                let borrower_images = []
+                let borrowers = products.collections.map(c => c.borrower_id);
+
+                borrowers = await models.profile.findAll({
+                    where: {
+                        id: {
+                            $in: borrowers
+                        }
+                    },
+                    include: [{
+                        model: model.users
+                    }]
+                })
+                if (borrowers) {
+                    let images = borrowers.users.filter(u => u.image !== null);
+                    let not_null_images = images.filter(image => image != null);
+
+                    borrower_images = not_null_images;
+
+                    if (not_null_images.lengths < 6 && images.length > 5) {
+                        images.forEach(image => {
+                            if (!not_null_images.include(image)) {
+                                borrower_images.push(image)
+                            }
+                        })
+                    }
+
+                }
+                delete products.collections;
+
+
+
+
+                products.borrower_images = borrower_images;
+
+
                 d.resolve(products);
             }
 
             products.rows = JSON.parse(JSON.stringify(products.rows))
             products.rows.map(p => {
-
                 p.num_of_borrowers = p.collections.length;
                 delete p.collections;
-                return p
+                return p;
             })
+
+            /// get borrowers
+            let borrower_images = []
+            let borrowers = products.rows.collections.map(c => c.borrower_id);
+            borrowers = await models.profile.findAll({
+                where: {
+                    id: {
+                        $in: borrowers
+                    }
+                },
+                include: [{
+                    model: model.users
+                }]
+            })
+            if (borrowers) {
+                let images = borrowers.users.filter(u => u.image !== null);
+                let not_null_images = images.filter(image => image != null);
+
+                borrower_images = not_null_images;
+
+                if (not_null_images.lengths < 6 && images.length > 5) {
+                    images.forEach(image => {
+                        if (!not_null_images.include(image)) {
+                            borrower_images.push(image)
+                        }
+                    })
+                }
+
+            }
+            delete products.collections;
+
+
+
+
+            products.borrower_images = borrower_images;
+
             d.resolve(paginate(products.rows, 'products', products.count, data.limit, data.page));
         })
         .catch((err) => {

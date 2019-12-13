@@ -86,6 +86,10 @@ function service(data) {
             if (data.max_loan_amount) data.where.max_loan_amount = data.max_loan_amount
             if (data.tenor_type) data.where.tenor_type = data.tenor_type
             if (data.interest) data.where.interest = data.interest
+
+
+
+
             data.include = [{
                     model: models.collection,
                     attributes: ['id'],
@@ -107,30 +111,47 @@ function service(data) {
                     }]
                 }
             ] // do not show deleted products 
+
+
+
+
+
             data.where.status = {
                 $ne: 'deleted'
             }
+
+
+
             if (['borrower'].includes(data.profile.role)) {
                 data.where.status = {
                     $notIn: ['draft', 'inactive']
                 };
             }
+
+
+
             if (data.profile.role == 'collaborator') {
                 data.where.profile_id = data.profile.parent_profile_id;
             }
+
+
             if (data.status) data.where.status = {
                 $like: '%' + data.status + '%'
             }
+
+
             data.order = [
                 ['id', 'DESC']
             ]
+
+
             return [
                 models.product.findAndCountAll(data),
                 data
             ]
 
         })
-        .spread((products, data) => {
+        .spread(async (products, data) => {
             if (!products) throw new Error("No products to show");
 
             if (data.fetch_one !== undefined) {

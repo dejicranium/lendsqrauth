@@ -20,7 +20,13 @@ module.exports = (url, method, payload, headers, caller = null, defaultheaders =
             headers: headers,
         })
     }).then(response => {
-        response = response.data.data
+        console.log("called " + url)
+        if (defaultheaders) {
+
+            response = response.data.data
+        } else {
+            response = response.data
+        }
         console.log(response)
         d.resolve(response)
     }).catch(err => {
