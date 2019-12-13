@@ -9,6 +9,7 @@ const makeRequest = require('mlar')('makerequest');
 const config = require('../../config');
 const resolvers = require('mlar')('resolvers');
 const collection_utils = require('mlar')('collection_utils');
+const moment = require('moment')
 
 var spec = morx
     .spec({})
@@ -189,6 +190,47 @@ function service(data) {
                         'draft',
                         'inactive'
                     );
+
+
+
+                    if (new_status == 'inactive') {
+                        let params = {
+                            tenor: collection.tenor,
+                            tenor_type: product.tenor_type,
+                            num_of_collections: collection.num_of_collections,
+                            interest: product.interest,
+                            disbursement_date: collection.disbursement_date,
+                        }
+
+                        let result = await requests.createCollectionShedule(params)
+
+                        /*
+                        .then(resp => {
+                                                                 resp.periods.forEach(async resp => {
+                                                                     await models.collection_schedules.create({
+                                                                         period_id: resp.period,
+                                                                         from_date: resp.fromDate.join('-'),
+                                                                         due_date: resp.dueDate.join('-'),
+                                                                         days_in_period: resp.daysInPeriod,
+                                                                         principal_due: resp.principalDue,
+                                                                         interest_due: resp.interestDue,
+                                                                         total_amount: resp.totalDueForPeriod,
+                                                                         loan_id: product.id,
+                                                                         collection_id: collection.id,
+                                                                         borrower_id: collection.borrower_id,
+                                                                         lender_id: collection.lender_id,
+                                                                         status: 'Pending',
+                                                                     })
+                                                                 })
+                                 console.log(resp)
+                             })
+                             .catch(err => {
+                                 //silent failure
+                                 console.log(err)
+                             })
+                             */
+                        console.log(result)
+                    }
 
                     await collection.update({
                         status: new_status

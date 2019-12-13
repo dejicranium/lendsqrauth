@@ -2,6 +2,8 @@ let constants = require('mlar')('constants');
 let config = require('../config')
 const makeRequest = require('mlar')('makerequest');
 const q = require('q')
+const moment = require('moment')
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
 
 module.exports = {
@@ -86,6 +88,91 @@ module.exports = {
 
     createCollectionShedule(data) {
 
+        /*
+        let tenor = data.tenor;
+        let tenor_type = data.tenor_type;
+        let amount = data.amount;
+        let num_of_collections = data.num_of_collections;
+        let collection_frequency = data.collection_frequency;
+        let start_date = data.start_date;
+        */
+        let tenor_type_value = null;
+        switch (data.tenor_type) {
+            case 'weeks':
+                tenor_type_value = 1;
+                break;
+            case 'months':
+                tenor_type_value = 2;
+                break;
+            case 'years':
+                tenor_type_value = 3;
+                break;
+            default:
+                tenor_type_value = 1;
+                break;
+
+        }
+
+        const d = q.defer()
+        let params = {
+            "dateFormat": "dd MMMM yyyy",
+            "locale": "en_GB",
+            "productId": 1,
+            "clientId": 1,
+            "principal": "200000.00",
+            "loanTermFrequency": 12,
+            "loanTermFrequencyType": 2,
+            "numberOfRepayments": 10,
+            "repaymentEvery": 1,
+            "repaymentFrequencyType": 2,
+            "interestRatePerPeriod": 2,
+            "amortizationType": 1,
+            "interestType": 0,
+            "interestCalculationPeriodType": 1,
+            "expectedDisbursementDate": "20 September 2011",
+            "transactionProcessingStrategyId": 2,
+            "submittedOnDate": "20 September 2011",
+            "loanType": "individual",
+        }
+
+        /*
+        let params = {
+            "dateFormat": "dd MMMM yyyy",
+            "locale": "en_GB",
+            "productId": 1,
+            "clientId": 1,
+            "principal": "200000.00",
+            "loanTermFrequency": data.tenor, // 12
+            "loanTermFrequencyType": tenor_type_value,
+            "numberOfRepayments": data.num_of_collections,
+            "repaymentEvery": 1,
+            "repaymentFrequencyType": tenor_type_value,
+            "interestRatePerPeriod": data.interest,
+            "amortizationType": 1,
+            "interestType": 0,
+            "interestCalculationPeriodType": 1,
+            "expectedDisbursementDate": "20 September 2011", //moment(data.disbursement_date).format('DD MMMM YYYY'), //"20 September 2011"
+            "transactionProcessingStrategyId": 2,
+            "submittedOnDate": "20 September 2011", // moment().format('DD MMMM YYYY'), //"20 September 2011",
+            "loanType": "individual",
+        }*/
+        const url = config.mifos_base_url + `loans?command=calculateLoanSchedule`
+
+        q.fcall(() => {
+                return makeRequest(url, 'POST', params, constants.mifos_headers, null, false);
+            })
+            .then(response => {
+                //d.resolve(moment(data.disbursement_date).format('DD MMMM YYYY'))
+                console.log(response)
+                d.resolve(response)
+
+            })
+            .catch(error => {
+                console.log(error)
+                d.reject(error)
+            })
+
+        return d.promise
     },
 
     validatePhone(data) {

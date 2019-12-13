@@ -2,10 +2,14 @@ const axios = require('axios');
 const q = require('q');
 
 
-module.exports = (url, method, payload, headers, caller = null) => {
+
+module.exports = (url, method, payload, headers, caller = null, defaultheaders = true) => {
     const d = q.defer();
     // append the access key
-    headers['accesskey'] = "7mvkUcJH4l45AJr9AWm1rcjJhLUFaspk";
+    if (defaultheaders) {
+
+        headers['accesskey'] = "7mvkUcJH4l45AJr9AWm1rcjJhLUFaspk";
+    }
 
 
     q.fcall(() => {
@@ -17,6 +21,7 @@ module.exports = (url, method, payload, headers, caller = null) => {
         })
     }).then(response => {
         response = response.data.data
+        console.log(response)
         d.resolve(response)
     }).catch(err => {
         console.log(err)
