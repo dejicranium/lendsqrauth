@@ -62,7 +62,7 @@ function service(data) {
 						rc_number: params.rc_number
 					}
 				})
-				if ((profile_with_rc_number && profile_with_rc_number.id) && params.rc_number !== profile_with_rc_number.rc_number) {
+				if ((profile_with_rc_number && profile_with_rc_number.id) && profile_with_rc_number.profile_id !== data.profile.id) {
 					throw new Error("Profile with RC Number already exists");
 				}
 			}
@@ -87,42 +87,36 @@ function service(data) {
 					}
 				})
 
-			if (profile_contact && profile_contact.id) {
+			if (params.social_links) {
+				// get social links from profile_contact 
+				//let existing_social_links = JSON.parse(JSON.stringify(profile_contact.social_links));
 
+				// when nothing exists;
+				let fields = Object.keys(params.social_links);
 
-				if (params.social_links) {
-					// get social links from profile_contact 
-					//let existing_social_links = JSON.parse(JSON.stringify(profile_contact.social_links));
+				let social_contact_array = [];
+				for (let i = 0; i < fields.length; i++) {
+					let field = fields[i];
+					let new_object = {};
 
-					// when nothing exists ;
-					let fields = Object.keys(params.social_links);
-					if (!profile_contact.social_links) profile_contact.social_links = {};
-					else {
-						profile_contact.social_links = JSON.parse(JSON.stringify(profile_contact.social_links))
-					}
-
-					let social_contact_array = [];
-					for (let i = 0; i < fields.length; i++) {
-						let field = fields[i];
-						let new_object = {};
-
-						new_object[field] = params.social_links[field];
-						social_contact_array.push(new_object);
-					}
-
-					params.social_links = JSON.stringify(social_contact_array)
-
-
-
-				} else {
-					delete params.social_links
+					new_object[field] = params.social_links[field];
+					social_contact_array.push(new_object);
 				}
+
+				params.social_links = JSON.stringify(social_contact_array)
+
+
+			} else {
+				delete params.social_links
+			}
+			if (profile_contact && profile_contact.id) {
 
 				await profile_contact.update({
 					...params
 				});
 
 			} else {
+
 				await models.profile_contact.create({
 					...params
 				})
