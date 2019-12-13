@@ -60,6 +60,7 @@ function service(data) {
 						}
 					}
 				];
+
 			} else {
 				// get all lenders
 				let lender_roles = await models.role.findAll({
@@ -89,11 +90,14 @@ function service(data) {
 			}
 
 			if (data.search) {
-				// n
 				data.include[0].where = {
-
 					$or: [{
 							last_name: {
+								$like: '%' + data.search + '%'
+							}
+						},
+						{
+							business_name: {
 								$like: '%' + data.search + '%'
 							}
 						},
@@ -110,6 +114,11 @@ function service(data) {
 					]
 				};
 				delete data.search;
+				if (data.first_name) delete data.first_name;
+				if (data.last_name) delete data.last_name;
+				if (data.business_name) delete data.business_name;
+				if (data.uuid) delete data.uuid;
+
 			}
 			if (data.first_name) {
 				data.where.first_name = {
