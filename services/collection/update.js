@@ -206,7 +206,6 @@ function service(data) {
 
                         let result = await requests.createCollectionShedule(params)
 
-
                             .then(async resp => {
                                 let bulkdata = []
                                 resp.periods.forEach(async r => {
@@ -221,6 +220,7 @@ function service(data) {
                                             days_in_period: r.daysInPeriod,
                                             principal_due: r.principalDue,
                                             interest_due: r.interestDue,
+                                            fee: r.feeChargesDue,
                                             total_amount: r.totalDueForPeriod,
                                             loan_id: product.id,
                                             balance_outstanding: r.principalLoanBalanceOutstanding,

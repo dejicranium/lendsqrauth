@@ -30,7 +30,7 @@ module.exports = (url, method, payload, headers, caller = null, defaultheaders =
         console.log(response)
         d.resolve(response)
     }).catch(err => {
-        console.log(err)
+        console.log(err.response.data.errors)
         if (caller) {
             d.reject(new Error(`Could not ${caller}`))
         }

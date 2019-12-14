@@ -25,6 +25,7 @@ module.exports = (sequelize, DataTypes) => {
     lender_id: DataTypes.INTEGER,
 
     status: DataTypes.STRING,
+    fee: DataTypes.DOUBLE,
 
     lender_acknowledged_payment: {
       type: DataTypes.BOOLEAN,
@@ -50,6 +51,8 @@ module.exports = (sequelize, DataTypes) => {
   });
   collection_schedules.associate = function (models) {
     // associations can be defined here
+
+
   };
   return collection_schedules;
 };
