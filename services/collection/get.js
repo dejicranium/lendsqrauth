@@ -112,15 +112,30 @@ function service(data) {
 			}
 
 			collections.rows = JSON.parse(JSON.stringify(collections.rows));
-			let lender = await models.profile.findOne({
-				where: {
-					id: collection.lender_id
-				},
-				include: [{
-					model: models.user
-				}]
-			})
 
+			let lender_ids =
+				collections.rows.map(c => c.lender_id)
+			let lenders = [];
+			if (lender_ids) {
+				lenders = await models.profile.findAll({
+					where: {
+						id: {
+							$in: lender_ids
+						}
+					},
+					attributes: ['id'],
+					include: [{
+						model: models.user,
+						attributes: ['uuid', 'first_name', 'last_name', 'email', 'business_name', 'phone']
+					}]
+				})
+			}
+			collections.rows.forEach(c => {
+				if (lender_ids.includes(c.lender_id)) {
+					c.lender = lenders.find(l => l.id == c.lender_id)
+
+				}
+			})
 
 
 			d.resolve(paginate(collections.rows, 'collections', collections.count, limit, page))
