@@ -41,12 +41,18 @@ function service(data) {
             let lender = await models.profile.findOne({
                 where: {
                     id: schedule.lender_id
-                }
+                },
+                include: [{
+                    model: models.user
+                }]
             })
             let borrower = await models.profile.findOne({
                 where: {
                     id: schedule.borrower_id
-                }
+                },
+                include: [{
+                    model: models.user
+                }]
             })
 
             if (lender && lender.id) {
