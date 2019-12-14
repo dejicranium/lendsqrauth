@@ -8,13 +8,13 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue: 'pending',
     },
     token: {
-      type:DataTypes.STRING,
+      type: DataTypes.STRING,
     },
     profile_created_id: {
-      type:DataTypes.INTEGER,
+      type: DataTypes.INTEGER,
     },
     user_created_id: {
-      type:DataTypes.INTEGER,
+      type: DataTypes.INTEGER,
     },
     created_on: {
       type: DataTypes.DATE,
@@ -23,8 +23,11 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     timestamps: false
   });
-  user_invites.associate = function(models) {
+  user_invites.associate = function (models) {
     // associations can be defined here
+    user_invites.belongsTo(models.profile, {
+      foreignKey: 'inviter',
+    })
   };
   return user_invites;
 };

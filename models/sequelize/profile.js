@@ -19,6 +19,10 @@ module.exports = (sequelize, DataTypes) => {
   });
   profile.associate = function (models) {
     // associations can be defined here
+
+    profile.hasMany(models.user_invites, {
+      foreignKey: 'inviter',
+    });
     profile.belongsTo(models.profile, {
       foreignKey: 'parent_profile_id',
       as: 'sub_profiles'
@@ -51,6 +55,7 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: 'lender_id',
 
     });
+
   };
   return profile;
 };
