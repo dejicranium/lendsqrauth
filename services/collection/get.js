@@ -90,7 +90,7 @@ function service(data) {
 			return [getFunction, params]
 
 		})
-		.spread((collections, params) => {
+		.spread(async (collections, params) => {
 			if (!collections) throw new Error("No such product");
 			// if one, check who is making the request
 			if (params.collection_id) {
@@ -110,6 +110,18 @@ function service(data) {
 				if (collection.deleted_flag == 1) throw new Error('Collection has been deleted')
 				d.resolve(collections)
 			}
+
+			collections.rows = JSON.parse(JSON.stringify(collections.rows));
+			let lender = await models.profile.findOne({
+				where: {
+					id: collection.lender_id
+				},
+				include: [{
+					model: models.user
+				}]
+			})
+
+
 
 			d.resolve(paginate(collections.rows, 'collections', collections.count, limit, page))
 

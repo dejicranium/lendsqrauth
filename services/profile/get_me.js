@@ -51,6 +51,24 @@ function service(data) {
         })
         .then((profile) => {
             if (!profile) throw new Error("Profile not found")
+            profile = JSON.parse(JSON.stringify(profile));
+
+            if (!profile.profile_contact) {
+                profile.profile_contact = {
+                    contact_first_name: "",
+                    contact_last_name: "",
+                    contact_phone: "",
+                    contact_email: "",
+                    support_email: "",
+                    social_links: {
+                        facebook_link: "",
+                        twitter_link: "",
+                        instagram_link: "",
+                        linkedin_link: "",
+                        youtube_link: "",
+                    },
+                }
+            }
             d.resolve(profile)
         })
         .catch((err) => {
