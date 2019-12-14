@@ -51,6 +51,18 @@ module.exports = (sequelize, DataTypes) => {
   });
   collection_schedules.associate = function (models) {
     // associations can be defined here
+    collection_schedules.belongsTo(models.profile, {
+      foreignKey: 'lender_id',
+    })
+    collection_schedules.belongsTo(models.profile, {
+      foreignKey: 'borrower_id',
+    })
+    collection_schedules.belongsTo(models.product, {
+      foreignKey: 'loan_id'
+    })
+    collection_schedules.belongsTo(models.collection, {
+      foreignKey: 'collection_id'
+    })
 
 
   };

@@ -47,7 +47,10 @@ module.exports = (sequelize, DataTypes) => {
     profile.hasMany(models.product, {
       foreignKey: 'profile_id'
     });
+    profile.hasMany(models.collection_schedules, {
+      foreignKey: 'lender_id',
 
+    });
   };
   return profile;
 };

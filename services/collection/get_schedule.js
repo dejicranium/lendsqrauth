@@ -18,14 +18,42 @@ function service(data) {
             return models.collection_schedules.findOne({
                 where: {
                     id: data.id
-                }
+                },
+                include: [{
+                        model: models.collection
+                    },
+                    {
+                        model: models.product
+                    },
+
+                ]
             })
 
         })
-        .then((schedule) => {
+        .then(async (schedule) => {
             if (!schedule) throw new Error("No schedule found");
+
             if (data.profile.role !== 'admin' && ![schedule.lender_id, schedule.borrower_id].includes(data.profile.id)) {
                 throw new Error("Unauthorized access")
+            }
+
+            schedule = JSON.parse(JSON.stringify(schedule));
+            let lender = await models.profile.findOne({
+                where: {
+                    id: schedule.lender_id
+                }
+            })
+            let borrower = await models.profile.findOne({
+                where: {
+                    id: schedule.borrower_id
+                }
+            })
+
+            if (lender && lender.id) {
+                schedule.lender = lender;
+            }
+            if (borrower && borrower.id) {
+                schedule.borrower = borrower
             }
 
             d.resolve(schedule);
