@@ -19,6 +19,7 @@ var spec = morx.spec({})
 	.build('interest_period', 'required:false, eg:lender')
 	.build('interest', 'required:false, eg:lender')
 	.build('urL_slug', 'required:false, eg:lender')
+	.build('status', 'required:false, eg:lender')
 	.end();
 
 function service(data) {

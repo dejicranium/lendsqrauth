@@ -12,6 +12,10 @@ module.exports = (sequelize, DataTypes) => {
     created_by: DataTypes.INTEGER,
     modified_on: DataTypes.DATE,
     modified_by: DataTypes.DATE,
+    status: {
+      type: DataTypes.STRING,
+      defaultValue: 'active',
+    },
     deleted_on: DataTypes.DATE,
     deleted_by: DataTypes.INTEGER,
   }, {
