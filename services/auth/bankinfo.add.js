@@ -41,7 +41,8 @@ function service(data) {
                 models.user_bank.findOne({
                     where: {
                         account_number: params.account_number,
-                        bvn: params.bvn
+                        user_id: data.user.id
+                        //bvn: params.bvn
                     }
                 }),
                 models.user_bank.findOne({
@@ -55,7 +56,7 @@ function service(data) {
 
         })
         .spread(async (record, bvnRecord, params) => {
-            if (record) throw new Error("Account number already exists");
+            if (record) throw new Error("Account number already exists for this user");
 
             // if bvn exists for a user other than the one making the request;
 
