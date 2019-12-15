@@ -24,6 +24,7 @@ var spec = morx.spec({})
 	.build('contact_email', 'required:false, eg:lender')
 	.build('support_email', 'required:false, eg:lender')
 	.build('social_links', 'required:false, eg:lender')
+	.build('status', 'required:false, eg:lender')
 
 	.end();
 
@@ -37,7 +38,8 @@ function service(data) {
 			});
 			const params = validParameters.params;
 			if (params.role_id) throw new Error("Cannot update role");
-
+			if (params.status && !['active', 'inactive'].includes(params.status))
+				throw new Error("Status can be only active or inactive");
 			return [
 				models.profile.findOne({
 					where: {
