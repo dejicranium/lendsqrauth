@@ -22,12 +22,14 @@ function service(data) {
 
 
 
-            return models.collection_schedules.findOne({
-                where: {
-                    id: params.schedule_id
-                }
-            })
-
+            return [
+                models.collection_schedules.findOne({
+                    where: {
+                        id: params.schedule_id
+                    }
+                }),
+                params
+            ]
 
 
 
