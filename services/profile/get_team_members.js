@@ -35,62 +35,25 @@ function service(data) {
 				inviter: data.profile.id
 
 			};
-
-			return models.user_invites.findAndCountAll(data);
-
-
-		})
-		.then((invites) => {
-			if (!invites) throw new Error("No profile found")
-			g_Invites = invites;
-
-			d.resolve(g_Invites)
-			invites.rows = JSON.parse(JSON.stringify(invites.rows))
-			let emails = invites.rows.map(p => p.invitee)
-
-
-			let get_users = models.user.findAll({
-				where: {
-					email: {
-						$in: emails
-					}
-				},
-
-				attributes: {
-					exclude: DEFAULT_EXCLUDES
-				},
-
-			})
-
-			return get_users
-		}).then(async users => {
-			let users_id = users.map(u => u.id)
-			let get_profiles = models.profile.findAll({
-				where: {
-					user_id: {
-						$in: users_id
-					}
-				},
-				attributes: {
-					exclude: DEFAULT_EXCLUDES
-				},
+			data.include = [{
+				model: models.profile,
 				include: [{
 					model: models.role,
+					exclude: DEFAULT_EXCLUDES
+				}],
+				include: [{
+					model: models.user,
 					attributes: {
 						exclude: DEFAULT_EXCLUDES
 					}
 				}]
-			})
-			let profiles = await get_profiles;
+			}]
 
-			profiles = JSON.parse(JSON.stringify(profiles))
-
-			profiles.forEach(profile => {
-				user = users.find(u => u.id == profile.user_id);
-				profile.user = user;
-			})
-
-			d.resolve(paginate(profiles, 'profiles', g_Invites.count, limit, page))
+			return models.user_invites.findAndCountAll(data);
+		})
+		.then((invites) => {
+			if (!invites) throw new Error("No profile found")
+			d.resolve(paginate(invites.rows, 'profiles', invites.count, limit, page))
 		})
 
 		.catch((err) => {

@@ -120,7 +120,7 @@ function service(data) {
 						profile_id: profile.id
 					}
 				})
-
+			params.profile_id = profile.id
 			if (params.social_links) {
 				// get social links from profile_contact 
 				//let existing_social_links = JSON.parse(JSON.stringify(profile_contact.social_links));
@@ -143,31 +143,31 @@ function service(data) {
 			} else {
 				delete params.social_links
 			}
-			if (profile_contact && profile_contact.id) {
 
-				await profile_contact.update({
-					...params
-				});
+
+
+			if (profile_contact && profile_contact.id) {
+				await profile_contact.update(params);
 
 			} else {
-
-				await models.profile_contact.create({
-					...params
-				})
+				await models.profile_contact.create(params)
 			}
-			await models.business_info.findOrCreate({
-					where: {
-						profile_id: profile.id
-					},
-					defaults: {
-						...params
-					}
-				})
-				.spread(async (info, created) => {
-					if (!created) await info.update({
-						...params
+
+			if (profile.role == 'business_lender') {
+				params.profile_id = profile.id
+				await models.business_info.findOrCreate({
+						where: {
+							profile_id: profile.id
+						},
+						defaults: params
 					})
-				})
+					.spread(async (info, created) => {
+						if (!created) await info.update({
+							...params
+						})
+					})
+			}
+
 
 			d.resolve("Successfully updated user's profile");
 		})

@@ -25,7 +25,7 @@ module.exports = (sequelize, DataTypes) => {
     // associations can be defined here
 
     profile.hasMany(models.user_invites, {
-      foreignKey: 'inviter',
+      foreignKey: 'profile_created_id',
     });
     profile.belongsTo(models.profile, {
       foreignKey: 'parent_profile_id',
