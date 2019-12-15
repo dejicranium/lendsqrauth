@@ -26,8 +26,6 @@ vinfo.routeConfig = {};
 vinfo.routeConfig.path = "/schedules/:schedule_id(\\d+)";
 vinfo.routeConfig.method = "put";
 vinfo.routeConfig.middlewares = [
-    auth_middleware,
-    profile_middleware,
     routemeta('get_collection_schedules', 'none')
 ];
 module.exports = vinfo;

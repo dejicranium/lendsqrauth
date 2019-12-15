@@ -7,8 +7,8 @@ const assert = require('mlar')('assertions');
 
 var spec = morx.spec({})
     .build('schedule_id', 'required:true, eg:1')
-    .build('status', 'required:true, eg:1')
-    .build('retries', 'required:true, eg:1')
+    .build('status', 'required:false, eg:1')
+    .build('retries', 'required:false, eg:1')
     .end();
 
 function service(data) {
