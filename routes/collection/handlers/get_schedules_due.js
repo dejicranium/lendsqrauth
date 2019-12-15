@@ -1,7 +1,7 @@
 var utils = require('mlar')('mt1l');
 const routemeta = require('mlar')('routemeta');
 const auth_middleware = require('mlar')('authmiddleware');
-const service = require('mlar').mreq('services', 'collection/get_schedule');
+const service = require('mlar').mreq('services', 'collection/get_schedules_due');
 const profile_middleware = require('mlar')('profileVerifyMiddleware');
 
 function vinfo(req, res, next) {
@@ -15,7 +15,7 @@ function vinfo(req, res, next) {
     data.profile = req.profile
     service(data)
         .then(response => {
-            utils.jsonS(res, response, "Schedule");
+            utils.jsonS(res, response, "Schedules");
         })
         .catch(error => {
             utils.jsonF(res, null, error.message);
@@ -23,11 +23,10 @@ function vinfo(req, res, next) {
 }
 
 vinfo.routeConfig = {};
-vinfo.routeConfig.path = "/schedules/:id(\\d+)";
+vinfo.routeConfig.path = "/schedules/due";
 vinfo.routeConfig.method = "get";
 vinfo.routeConfig.middlewares = [
-    auth_middleware,
-    profile_middleware,
-    routemeta('get_collection_schedule', 'none')
+
+    routemeta('get_collection_schedule_due', 'none')
 ];
 module.exports = vinfo;
