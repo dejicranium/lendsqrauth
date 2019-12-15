@@ -9,27 +9,30 @@ const has_role = require('mlar')('hasRoleMiddleware');
  * @param {*} res 
  * @param {*} next 
  */
-function vinfo(req, res, next){ 
-        const data = {...req.body, ...req.query, ...req.headers, ...req.params};
-        
-        data.user_id = req.user.id // default user_id to the user making the request;
-        
-        service(data)
+function vinfo(req, res, next) {
+    const data = {
+        ...req.body,
+        ...req.query,
+        ...req.headers,
+        ...req.params
+    };
+
+    data.user = req.user // default user_id to the user making the request;
+
+    service(data)
         .then(response => {
-            utils.jsonS(res, response, "Update successful"); 
+            utils.jsonS(res, response, "Update successful");
         })
         .catch(error => {
-            utils.jsonF(res, null, error.message); 
+            utils.jsonF(res, null, error.message);
         })
 }
 
 vinfo.routeConfig = {};
-vinfo.routeConfig.path = "/users/:user_id/bank"; 
-vinfo.routeConfig.method = "put"; 
+vinfo.routeConfig.path = "/users/bank";
+vinfo.routeConfig.method = "put";
 vinfo.routeConfig.middlewares = [
-    auth_middleware,
     auth_middleware,
     routemeta('update_user_bank_info', 'none')
 ];
 module.exports = vinfo;
-
