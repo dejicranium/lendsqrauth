@@ -19,7 +19,7 @@ function service(data) {
             const validParameters = morx.validate(data, spec, {
                 throw_error: true
             });
-
+            const params = validParameters.params;
 
 
             return [
@@ -41,7 +41,7 @@ function service(data) {
             return schedule.update(params)
         }).then(response => {
             if (!response) throw new Error("There was an error updating the schedule");
-            d.reject(response)
+            d.resolve(response)
         })
         .catch((err) => {
 
