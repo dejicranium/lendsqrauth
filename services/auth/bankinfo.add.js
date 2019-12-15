@@ -53,9 +53,6 @@ function service(data) {
                 params,
             ]
 
-
-
-
         })
         .spread(async (record, bvnRecord, params) => {
             if (record) throw new Error("Account number already exists");

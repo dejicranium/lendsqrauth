@@ -40,6 +40,7 @@ function service(data) {
                 delete_flag: 1,
                 is_active: 0,
                 is_default: 0,
+                deleted_flag: 1,
                 deleted_on: new Date(),
                 deleted_by: params.user_id
             });
