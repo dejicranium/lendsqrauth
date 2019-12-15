@@ -37,7 +37,7 @@ function service(data) {
         .then(async (profile) => {
             if (!profile) throw new Error("User doesn't own this profile");
             // get permissions
-            if (profile.status !== 'active' || profile.status !== null) {
+            if (profile.status !== 'active' && profile.status !== null) {
                 throw new Error("Profile has been set to inactive");
             }
             let permissions = await models.sequelize.query(`

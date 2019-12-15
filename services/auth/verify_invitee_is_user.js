@@ -18,7 +18,7 @@ var spec = morx.spec({})
     .end();
 
 function service(data) {
-    const DECLINED_STATUS = 'borrower_declined';
+    const DECLINED_STATUS = 'declined';
     var d = q.defer();
     const globalUserId = data.USER_ID || 1;
     q.fcall(async () => {

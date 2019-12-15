@@ -169,7 +169,7 @@ function service(data) {
                     await requests.inviteBorrower(collection.borrower_email, payload);
                 }
 
-                if (!['borrower_declined', 'active'].includes(collection.status)) {
+                if (!['declined', 'active'].includes(collection.status)) {
                     let required_fields = [
                         'product_id',
                         'tenor',

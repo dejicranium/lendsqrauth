@@ -20,7 +20,7 @@ function service(data){
         let totalCollections = models.collection.findAndCountAll({limit:1})
         let inactiveCollections = models.collection.findAndCountAll({limit:1, where: {status: "inactive"}})
         let activeCollections = models.collection.findAndCountAll({limit:1, where: {status: "active"}})
-        let declinedCollections = models.collection.findAndCountAll({limit:1, where: {status: "borrower_declined"}})
+        let declinedCollections = models.collection.findAndCountAll({limit:1, where: {status: "declined"}})
 
         return [draftCollections, totalCollections, inactiveCollections, activeCollections, declinedCollections];
         
