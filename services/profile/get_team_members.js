@@ -34,62 +34,51 @@ function service(data) {
 				status: 'accepted',
 				inviter: data.profile.id
 
-			}
-			//data.distinct = true;
-			data.include = [{
-				model: models.profile,
-				required: true,
-				include: [{
-					model: models.user,
-					required: true,
-					attributes: {
-						exclude: DEFAULT_EXCLUDES
-					}
-				}, {
-					model: models.role,
-					attributes: {
-						exclude: DEFAULT_EXCLUDES
-					}
-				}]
-
-
-			}]
-			/*
-			data.attributes = {
-				exclude: [
-					'role_id'
-				]
-			}*/
-
-			/*
-
-			data.include = [{
-					model: models.role,
-					attributes: {
-						exclude: DEFAULT_EXCLUDES
-					}
-				},
-
-				{
-					model: models.user,
-					attributes: {
-						exclude: DEFAULT_EXCLUDES
-					}
-				},
-				
-			]*/
+			};
 
 			return models.user_invites.findAndCountAll(data);
 
 
 		})
-		.then((profiles) => {
-			if (!profiles) throw new Error("No profile found")
-			profiles.rows = profiles.rows;
-			profiles.rows = profiles.rows.map(p => p.profile)
-			d.resolve(paginate(profiles.rows, 'profiles', profiles.count, limit, page));
-			//d.resolve(profiles)
+		.then((invites) => {
+			if (!invites) throw new Error("No profile found")
+			invites.rows = JSON.parse(JSON.stringify(invites.rows))
+			let emails = invites.rows.map(p => p.invitee)
+
+
+			let get_users = models.user.findAll({
+				where: {
+					email: {
+						$in: emails
+					}
+				},
+
+				attributes: {
+					exclude: DEFAULT_EXCLUDES
+				}
+			})
+
+			return get_users
+		}).then(async users => {
+			let users_id = users.map(u => u.id)
+			let get_profiles = models.profile.findAll({
+				where: {
+					user_id: {
+						$in: users_id
+					}
+				},
+				attributes: {
+					exclude: DEFAULT_EXCLUDES
+				}
+			})
+			let profiles = await get_profiles;
+			users = JSON.parse(JSON.stringify(users))
+			users.forEach(u => {
+				u.profile = profiles.find(profile => profile.user_id)
+			});
+			d.resolve(users)
 		})
+
 		.catch((err) => {
 
 			d.reject(err);
