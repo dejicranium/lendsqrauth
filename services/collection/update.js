@@ -203,8 +203,15 @@ function service(data) {
                             interest: product.interest,
                             disbursement_date: collection.disbursement_date,
                         }
+                        let borrower = await models.profile.findOne({
+                            where: {
+                                id: collection.borrower_id
+                            }
+                        })
+                        let borrower_userId = borrower.user_id;
 
                         let result = await requests.createCollectionShedule(params)
+                     
 
                             .then(async resp => {
                                 let bulkdata = []
@@ -212,11 +219,13 @@ function service(data) {
 
 
                                     if (resp.periods.indexOf(r) !== 0) {
+                                        /*
                                         let borrower_userId = await models.profile.findOne({
                                             where: {
                                                 id: collection.borrower_id
                                             }
-                                        });
+                                        });*/
+                                        
                                         let period = {
                                             period_id: r.period,
                                             from_date: r.fromDate.join('-'),
@@ -231,7 +240,7 @@ function service(data) {
                                             interest_outstanding: r.interestOutstanding,
                                             collection_id: collection.id,
                                             lender_userId: data.user.id,
-                                            borrower_userId: borrower_userId.user_id,
+                                            borrower_userId: borrower_userId,
                                             borrower_id: collection.borrower_id,
                                             lender_id: collection.lender_id,
                                             status: 'Pending',
