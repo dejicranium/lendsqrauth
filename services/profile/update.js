@@ -38,12 +38,16 @@ function service(data) {
 			});
 			const params = validParameters.params;
 			if (params.role_id) throw new Error("Cannot update role");
-			if (params.status && !['active', 'inactive'].includes(params.status))
-				throw new Error("Status can be only active or inactive");
+			if (params.status) {
+				if (!['active', 'inactive'].includes(params.status))
+					throw new Error("Status can be only active or inactive");
+
+				// make sure that it is only the parent of the user that can do this stuff;
+			}
 			return [
 				models.profile.findOne({
 					where: {
-						id: params.profile_id || data.profile.id
+						id: params.profile_id
 					}
 				}),
 				params
@@ -54,8 +58,36 @@ function service(data) {
 		.spread(async (profile, params) => {
 			if (!profile) throw new Error("Profile does not exist");
 
+			if (params.status) {
+				// make sure that only the parent of the profile can update the profile
+				if (profile.parent_profile_id != data.profile.id && data.profile.role !== 'admin') {
+					throw new Error("Only a parent profile or admin can update a user's status");
+
+				}
+			}
+
+			// if the person updating is the parent of the profile,
+			// make sure that the only thing they can update is the status
+			if (profile.id !== data.profile.id && data.profile.role !== 'admin' && profile.parent_profile_id == data.profile.id) {
+				if (!params.status) throw new Error("You can only update a team member's status");
+				else {
+					// invalidate other fields that he is trying to update by changing the content of params
+					params = {
+						status: params.status
+					}
+				}
+			}
+			if (profile.user_id !== data.user.id && profile.id !== data.profile.id && data.profile.role !== 'admin' && profile.parent_profile_id !== data.profile.id) {
+				throw new Error("You cannot update a profile that isn't yours")
+			} else if (profile.user_id == data.user.id && profile.id !== data.profile.id && data.profile.role !== 'admin' && profile.parent_profile_id !== data.profile.id) {
+				throw new Error("You can't update another profile of yours unless you're logged in with it")
+			}
+
+
+
+			/*
 			if ((profile.user_id != data.user.id) && data.profile.role != 'admin')
-				throw new Error("Only admins can update someone else's profile");
+				throw new Error("Only admins can update someone else's profile");*/
 
 			if (params.rc_number) {
 				// check for rc_number - which must be unique;
