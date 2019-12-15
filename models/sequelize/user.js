@@ -12,10 +12,8 @@ module.exports = (sequelize, DataTypes) => {
     image: DataTypes.STRING,
     business_name: DataTypes.STRING,
     status_reason: DataTypes.TEXT,
-    active: DataTypes.BOOLEAN,
-    disabled: DataTypes.BOOLEAN,
+
     deleted: DataTypes.BOOLEAN,
-    password: DataTypes.STRING,
     password: DataTypes.STRING,
     created_on: {
       type: DataTypes.DATE,

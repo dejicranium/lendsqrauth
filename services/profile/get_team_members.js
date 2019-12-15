@@ -43,6 +43,8 @@ function service(data) {
 		.then((invites) => {
 			if (!invites) throw new Error("No profile found")
 			g_Invites = invites;
+
+			d.resolve(g_Invites)
 			invites.rows = JSON.parse(JSON.stringify(invites.rows))
 			let emails = invites.rows.map(p => p.invitee)
 
@@ -87,10 +89,6 @@ function service(data) {
 				user = users.find(u => u.id == profile.user_id);
 				profile.user = user;
 			})
-
-
-
-
 
 			d.resolve(paginate(profiles, 'profiles', g_Invites.count, limit, page))
 		})
