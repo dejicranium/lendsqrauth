@@ -1,7 +1,7 @@
 var utils = require('mlar')('mt1l');
 const routemeta = require('mlar')('routemeta');
 const auth_middleware = require('mlar')('authmiddleware');
-const service = require('mlar').mreq('services', 'collection/get_schedules');
+const service = require('mlar').mreq('services', 'collection/update_collection_schedule');
 const profile_middleware = require('mlar')('profileVerifyMiddleware');
 
 function vinfo(req, res, next) {
@@ -23,8 +23,8 @@ function vinfo(req, res, next) {
 }
 
 vinfo.routeConfig = {};
-vinfo.routeConfig.path = "/schedules/:id(\\d+)";
-vinfo.routeConfig.method = "get";
+vinfo.routeConfig.path = "/schedules/:schedule_id(\\d+)";
+vinfo.routeConfig.method = "put";
 vinfo.routeConfig.middlewares = [
     auth_middleware,
     profile_middleware,
