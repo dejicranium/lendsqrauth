@@ -32,7 +32,11 @@ function service(data) {
         })
         .spread((schedules, data) => {
             if (!schedules) throw new Error("No schedules available");
+            schedules = JSON.parse(JSON.stringify(schedules))
+
+
             d.resolve(schedules);
+
             //d.resolve(paginate(schedules.rows, 'schedules', schedules.count, Number(data.limit), data.page));
         })
         .catch((err) => {

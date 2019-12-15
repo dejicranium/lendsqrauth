@@ -21,7 +21,7 @@ function service(data) {
 
 	data.limit = limit;
 	data.offset = offset;
-
+	let g_Invites = null;
 
 	q.fcall(async () => {
 			const validParameters = morx.validate(data, spec, {
@@ -42,6 +42,7 @@ function service(data) {
 		})
 		.then((invites) => {
 			if (!invites) throw new Error("No profile found")
+			g_Invites = invites;
 			invites.rows = JSON.parse(JSON.stringify(invites.rows))
 			let emails = invites.rows.map(p => p.invitee)
 
@@ -55,7 +56,8 @@ function service(data) {
 
 				attributes: {
 					exclude: DEFAULT_EXCLUDES
-				}
+				},
+
 			})
 
 			return get_users
@@ -69,14 +71,28 @@ function service(data) {
 				},
 				attributes: {
 					exclude: DEFAULT_EXCLUDES
-				}
+				},
+				include: [{
+					model: models.role,
+					attributes: {
+						exclude: DEFAULT_EXCLUDES
+					}
+				}]
 			})
 			let profiles = await get_profiles;
-			users = JSON.parse(JSON.stringify(users))
-			users.forEach(u => {
-				u.profile = profiles.find(profile => profile.user_id)
-			});
-			d.resolve(users)
+
+			profiles = JSON.parse(JSON.stringify(profiles))
+
+			profiles.forEach(profile => {
+				user = users.find(u => u.id == profile.user_id);
+				profile.user = user;
+			})
+
+
+
+
+
+			d.resolve(paginate(profiles, 'profiles', g_Invites.count, limit, page))
 		})
 
 		.catch((err) => {

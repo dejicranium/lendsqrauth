@@ -212,7 +212,11 @@ function service(data) {
 
 
                                     if (resp.periods.indexOf(r) !== 0) {
-
+                                        let borrower_userId = await models.profile.findOne({
+                                            where: {
+                                                id: collection.borrower_id
+                                            }
+                                        });
                                         let period = {
                                             period_id: r.period,
                                             from_date: r.fromDate.join('-'),
@@ -226,6 +230,8 @@ function service(data) {
                                             balance_outstanding: r.principalLoanBalanceOutstanding,
                                             interest_outstanding: r.interestOutstanding,
                                             collection_id: collection.id,
+                                            lender_userId: data.user.id,
+                                            borrower_userId: borrower_userId.user_id,
                                             borrower_id: collection.borrower_id,
                                             lender_id: collection.lender_id,
                                             status: 'Pending',

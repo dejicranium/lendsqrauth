@@ -32,6 +32,15 @@ module.exports = {
       borrower_id: {
         type: Sequelize.INTEGER
       },
+      borrower_userId: {
+        type: Sequelize.INTEGER
+      },
+      lender_userId: {
+        type: Sequelize.INTEGER
+      },
+      borrower_id: {
+        type: Sequelize.INTEGER
+      },
       lender_id: {
         type: Sequelize.INTEGER
       },
