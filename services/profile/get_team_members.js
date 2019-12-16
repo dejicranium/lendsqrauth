@@ -38,22 +38,35 @@ function service(data) {
 			data.include = [{
 				model: models.profile,
 				include: [{
-					model: models.role,
-					exclude: DEFAULT_EXCLUDES
-				}],
-				include: [{
-					model: models.user,
-					attributes: {
+						model: models.role,
 						exclude: DEFAULT_EXCLUDES
+					},
+					{
+						model: models.user,
+						attributes: {
+							exclude: DEFAULT_EXCLUDES
+						}
 					}
-				}]
+				]
 			}]
 
 			return models.user_invites.findAndCountAll(data);
 		})
 		.then((invites) => {
 			if (!invites) throw new Error("No profile found")
-			d.resolve(paginate(invites.rows, 'profiles', invites.count, limit, page))
+
+			invites.rows = JSON.parse(JSON.stringify(invites.rows));
+			let final_invites = [];
+
+
+			invites.rows.map(row => {
+				let object = {};
+				object = row.profile;
+				final_invites.push(object);
+
+			})
+
+			d.resolve(paginate(final_invites, 'profiles', invites.count, limit, page))
 		})
 
 		.catch((err) => {
