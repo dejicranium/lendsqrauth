@@ -36,7 +36,7 @@ function service(data) {
 				throw_error: true
 			});
 			const params = validParameters.params;
-			if (params.role_id) throw new Error("Cannot update role");
+			//if (params.role_id) throw new Error("Cannot update role");
 			if (params.status) {
 				if (!['active', 'inactive'].includes(params.status))
 					throw new Error("Status can be only active or inactive");
