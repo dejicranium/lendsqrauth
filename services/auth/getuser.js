@@ -1,25 +1,30 @@
 const models = require('mlar')('models');
-const ErrorLogger = require('mlar')('errorlogger'); 
-const morx = require('morx'); 
-const q = require('q'); 
-const bcrypt = require('bcrypt'); 
-const validators = require('mlar')('validators'); 
-const obval = require('mlar')('obval'); 
-const assert = require('mlar')('assertions'); 
-const jwt = require('jsonwebtoken'); 
+const ErrorLogger = require('mlar')('errorlogger');
+const morx = require('morx');
+const q = require('q');
+const bcrypt = require('bcrypt');
+const validators = require('mlar')('validators');
+const obval = require('mlar')('obval');
+const assert = require('mlar')('assertions');
+const jwt = require('jsonwebtoken');
 const DEFAULT_EXCLUDES = require('mlar')('appvalues').DEFAULT_EXCLUDES;
 const config = require('../../config');
 const paginate = require('mlar')('paginate');
 const spec = morx.spec({})
-                .build('user_id', 'required:true')               
-                         
-			    .end();
+    .build('user_id', 'required:true')
 
-function service(data){
+    .end();
+
+function service(data) {
     const d = q.defer();
-    const result = morx.validate(data, spec, {throw_error: true});
+    const result = morx.validate(data, spec, {
+        throw_error: true
+    });
     data = result.params;
 
+    if (data.profile.role !== 'admin' && params.user_id !== data.user.id) {
+        throw new Error("Unauthorized access attempted")
+    }
     const selection = {
         where: {
             id: data.user_id
@@ -29,18 +34,18 @@ function service(data){
         }
     }
 
-    q.fcall( async () => {
-        return models.user.findOne(selection)
-	}) 
-	.then((user) => { 
-        if (!user) throw new Error("Couldn't fetch user");
-        d.resolve(user)
-    })
-	.catch( (err) => {
-		d.reject(err);
-	});
+    q.fcall(async () => {
+            return models.user.findOne(selection)
+        })
+        .then((user) => {
+            if (!user) throw new Error("Couldn't fetch user");
+            d.resolve(user)
+        })
+        .catch((err) => {
+            d.reject(err);
+        });
 
-	return d.promise;
+    return d.promise;
 
 }
 service.morxspc = spec;
