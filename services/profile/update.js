@@ -153,7 +153,7 @@ function service(data) {
 				await models.profile_contact.create(params)
 			}
 
-			if (profile.role == 'business_lender') {
+			if (data.profile.role == 'business_lender') {
 				params.profile_id = profile.id
 				await models.business_info.findOrCreate({
 						where: {
