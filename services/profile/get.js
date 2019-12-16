@@ -69,6 +69,14 @@ function service(data) {
 				}), data];
 			}
 
+
+			// for external services
+			/*
+			if (params.profile_ids) {
+				let profile_ids = params.profile_ids.split(',');
+				return models.profile.findAll()
+			}*/
+
 			if (data.profile.role !== 'admin') throw new Error("Unauthorized");
 
 			if (filter) {
