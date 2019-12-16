@@ -2,8 +2,7 @@
 module.exports = (sequelize, DataTypes) => {
   const profile_contact = sequelize.define('profile_contact', {
     profile_id: DataTypes.INTEGER,
-    contact_first_name: DataTypes.STRING,
-    contact_last_name: DataTypes.STRING,
+    contact_name: DataTypes.STRING,
     contact_phone: DataTypes.STRING,
     contact_email: DataTypes.STRING,
     support_email: DataTypes.STRING,

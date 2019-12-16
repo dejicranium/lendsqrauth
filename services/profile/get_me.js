@@ -74,8 +74,7 @@ function service(data) {
             }
             if (!profile.profile_contact) {
                 profile.profile_contact = {
-                    contact_first_name: "",
-                    contact_last_name: "",
+                    contact_name: "",
                     contact_phone: "",
                     contact_email: "",
                     support_email: "",
