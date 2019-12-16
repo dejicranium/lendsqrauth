@@ -8,7 +8,7 @@ const assert = require('mlar')('assertions');
 var spec = morx.spec({})
 	.build('role_id', 'required:false, eg:lender')
 	.build('profile_id', 'required:false, eg:lender')
-	.build('url', 'required:false, eg:lender')
+	.build('website_link', 'required:false, eg:lender')
 	.build('bvn', 'required:false, eg:lender')
 	.build('business_logo', 'required:false, eg:lender')
 	.build('business_name', 'required:false, eg:lender')

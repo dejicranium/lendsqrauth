@@ -2,7 +2,7 @@
 module.exports = (sequelize, DataTypes) => {
   const business_info = sequelize.define('business_info', {
     profile_id: DataTypes.INTEGER,
-    url: DataTypes.STRING,
+    website_link: DataTypes.STRING,
     business_logo: DataTypes.STRING,
     business_name: DataTypes.STRING,
     business_phone: DataTypes.STRING,
