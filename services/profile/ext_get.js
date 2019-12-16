@@ -19,6 +19,7 @@ function service(data) {
                 throw_error: true
             });
             const params = validParameters.params;
+            
 
             let profile_ids = params.profile_ids.split(',');
 
