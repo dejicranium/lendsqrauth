@@ -13,6 +13,7 @@ function vinfo(req, res, next) {
         ...req.params
     };
     data.user = req.user;
+    data.profile = req.profile;
     service(data)
         .then(response => {
             utils.jsonS(res, response, "User");

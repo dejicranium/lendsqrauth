@@ -20,14 +20,12 @@ function service(data) {
     const result = morx.validate(data, spec, {
         throw_error: true
     });
-    data = result.params;
+    params = result.params;
 
-    if (data.profile.role !== 'admin' && params.user_id !== data.user.id) {
-        throw new Error("Unauthorized access attempted")
-    }
+
     const selection = {
         where: {
-            id: data.user_id
+            id: params.user_id
         },
         attributes: {
             exclude: ['password', ...DEFAULT_EXCLUDES, 'business_name', 'active', 'deleted', 'disabled']
@@ -35,6 +33,10 @@ function service(data) {
     }
 
     q.fcall(async () => {
+
+            if (data.profile.role !== 'admin' && parseInt(params.user_id) != parseInt(data.user.id)) {
+                throw new Error("Unauthorized access attempted")
+            }
             return models.user.findOne(selection)
         })
         .then((user) => {

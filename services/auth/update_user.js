@@ -28,8 +28,13 @@ function service(data) {
 				throw_error: true
 			});
 			let params = validParameters.params;
+			if (!Object.keys(params).length) {
+				throw new Error("Please enter a value to update");
+			}
 
-			return models.users.findOne({
+
+
+			return models.user.findOne({
 				where: {
 					id: data.user.id
 				}
