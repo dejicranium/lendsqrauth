@@ -36,7 +36,6 @@ function service(data) {
 				throw_error: true
 			});
 			const params = validParameters.params;
-			//if (params.role_id) throw new Error("Cannot update role");
 			if (params.status) {
 				if (!['active', 'inactive'].includes(params.status))
 					throw new Error("Status can be only active or inactive");
@@ -56,6 +55,9 @@ function service(data) {
 		})
 		.spread(async (profile, params) => {
 			if (!profile) throw new Error("Profile does not exist");
+
+			if (params.role_id && parseInt(data.profile.id) != parseInt(profile.parent_profile_id))
+				throw new Error("Only team owners can update role");
 
 			if (params.status) {
 				// make sure that only the parent of the profile can update the profile
