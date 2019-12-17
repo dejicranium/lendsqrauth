@@ -25,6 +25,7 @@ function service(data) {
 		'Content-Type': 'application/json'
 	};
 
+	let GLOBAL_USER_EXISTS = false;
 	q
 		.fcall(async () => {
 			var validParameters = morx.validate(data, spec, {
@@ -44,11 +45,14 @@ function service(data) {
 			if (data.profile.role != 'individual_lender' && data.profile.role != 'business_lender') {
 				throw new Error('Only lenders can add team members');
 			}
-			let role = await models.role.findOne({ where: { id: params.role_id } });
+			let role = await models.role.findOne({
+				where: {
+					id: params.role_id
+				}
+			});
 			if (
 				role &&
-				role.id &&
-				[ 'individual_lender', 'admin', 'borrower', 'business_lender' ].includes(role.name)
+				role.id && ['individual_lender', 'admin', 'borrower', 'business_lender'].includes(role.name)
 			) {
 				throw new Error('Cannot add ' + role.name + ' as a team member');
 			}
@@ -75,6 +79,9 @@ function service(data) {
 			}
 
 			if (user) {
+
+				GLOBAL_USER_EXISTS = true;
+
 				// prepare to copy the details of the user's profile into a new and change only the role_id  (should be collaborator) and parent_profile_id
 				let userProfile = await models.profile.findOne({
 					where: {
@@ -112,7 +119,7 @@ function service(data) {
                 };
                 */
 
-				return [ params, models.profile.create(params), 'none' ];
+				return [params, models.profile.create(params), 'none'];
 			} else {
 				// create an incomplete user
 				let uuid = Math.random().toString(36).substr(2, 9);
@@ -135,7 +142,10 @@ function service(data) {
 
 			let new_profile_id = created1.id; // created1 is profile.id if no new user was created;
 
+
+
 			if (created2 == 'user-created') {
+
 				// if a new user was created.
 				// create profile
 				let new_profile = await models.profile.create({
@@ -145,12 +155,19 @@ function service(data) {
 					uuid: Math.random().toString(36).substr(2, 9)
 				});
 				new_profile_id = new_profile.id;
+
+
 			}
+
+
+
 			// invitation token
 			let invite_token = await crypto.randomBytes(32).toString('hex');
 
-			// create a user invite record
 
+
+
+			// create a user invite record
 			let invitation = await models.user_invites.findOrCreate({
 				where: {
 					invitee: params.email,
@@ -165,11 +182,27 @@ function service(data) {
 				}
 			});
 
+
 			if (!invitation[1]) {
 				invitation[0].update({
 					status: 'pending'
 				});
 			}
+
+
+
+
+			/*
+
+						let reject_link = config.base_url + '/signup/reject?token=' + invite_token;
+						let accept_link = config.base_url;
+
+						if (GLOBAL_USER_EXISTS) {
+							accet
+						}
+			*/
+
+
 
 			// send email
 			let payload = {

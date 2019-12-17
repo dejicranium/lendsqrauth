@@ -70,7 +70,7 @@ function service(data) {
 			// if the person updating is the parent of the profile,
 			// make sure that the only thing they can update is the status
 			if (profile.id !== data.profile.id && data.profile.role !== 'admin' && profile.parent_profile_id == data.profile.id) {
-				if (!params.status) throw new Error("You can only update a team member's status");
+				if (!params.status && !params.role_id) throw new Error("You can only update a team member's status or role");
 				else {
 					// invalidate other fields that he is trying to update by changing the content of params
 					params = {
