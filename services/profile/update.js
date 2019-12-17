@@ -6,7 +6,6 @@ const validators = require('mlar')('validators');
 const assert = require('mlar')('assertions');
 
 var spec = morx.spec({})
-	.build('role_id', 'required:false, eg:lender')
 	.build('profile_id', 'required:false, eg:lender')
 	.build('website_link', 'required:false, eg:lender')
 	.build('bvn', 'required:false, eg:lender')
@@ -23,8 +22,6 @@ var spec = morx.spec({})
 	.build('contact_email', 'required:false, eg:lender')
 	.build('support_email', 'required:false, eg:lender')
 	.build('social_links', 'required:false, eg:lender')
-	.build('status', 'required:false, eg:lender')
-
 	.end();
 
 function service(data) {
@@ -36,12 +33,7 @@ function service(data) {
 				throw_error: true
 			});
 			const params = validParameters.params;
-			if (params.status) {
-				if (!['active', 'inactive'].includes(params.status))
-					throw new Error("Status can be only active or inactive");
 
-				// make sure that it is only the parent of the user that can do this stuff;
-			}
 			return [
 				models.profile.findOne({
 					where: {
@@ -56,9 +48,6 @@ function service(data) {
 		.spread(async (profile, params) => {
 			if (!profile) throw new Error("Profile does not exist");
 
-			if (params.role_id && parseInt(data.profile.id) != parseInt(profile.parent_profile_id))
-				throw new Error("Only team owners can update role");
-
 			if (params.status) {
 				// make sure that only the parent of the profile can update the profile
 				if (profile.parent_profile_id != data.profile.id && data.profile.role !== 'admin') {
@@ -67,17 +56,6 @@ function service(data) {
 				}
 			}
 
-			// if the person updating is the parent of the profile,
-			// make sure that the only thing they can update is the status
-			if (profile.id !== data.profile.id && data.profile.role !== 'admin' && profile.parent_profile_id == data.profile.id) {
-				if (!params.status && !params.role_id) throw new Error("You can only update a team member's status or role");
-				else {
-					// invalidate other fields that he is trying to update by changing the content of params
-					params = {
-						status: params.status
-					}
-				}
-			}
 			if (profile.user_id !== data.user.id && profile.id !== data.profile.id && data.profile.role !== 'admin' && profile.parent_profile_id !== data.profile.id) {
 				throw new Error("You cannot update a profile that isn't yours")
 			} else if (profile.user_id == data.user.id && profile.id !== data.profile.id && data.profile.role !== 'admin' && profile.parent_profile_id !== data.profile.id) {
