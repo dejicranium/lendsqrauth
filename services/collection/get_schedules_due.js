@@ -25,7 +25,9 @@ function service(data) {
                     $lte: stop
 
                 },
-                status: "Pending"
+                status: {
+                    $ne: "Successful"
+                }
             }
             return [models.collection_schedules.findAll(data), data];
 
