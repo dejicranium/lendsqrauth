@@ -16,20 +16,16 @@ function service(data) {
                 throw_error: true
             });
             const params = validParameters.params;
-            /*
-            let query = await models.sequelize.query(`SELECT \
-                COUNT(status='Successful') as successful_volume,
-                COUNT(status='Pending') as pending_volume, \
-                COUNT(status='Failed') as failed_volume, \
-                COUNT(*) as total_volume,
-                SUM(total_amount) as total_value
-                SUM(total_amount where status='Failed') as failed_value,
-                FROM collection_schedules`)*/
-            return models.sequelize.query(
-                `select count(status='Successful') as successful_volume, \
-                count(status='Pending') as pending_volume, \
-                count(status='Failed') as failed_volume  \ from collection_schedules group by DATE_FORMAT(due_date, "%Y-%m-01")`)
-            //return query;
+
+            let query = await models.sequelize.query(`SELECT COUNT(status='Successful') as successful_volume, COUNT(status='Pending') as pending_volume, COUNT(status='Failed') as failed_volume, \
+                COUNT(*) as total_volume,\
+                SUM(CASE WHEN status = 'Successful' THEN total_amount END) successful_value,\
+                SUM(CASE WHEN status = 'Failed' THEN total_amount END) failed_value,\
+                SUM(CASE WHEN status = 'Pending' THEN total_amount END) pending_value,\
+                SUM(total_amount) as total_value 
+                FROM collection_schedules`)
+            //return models.sequelize.query(`SELECT COUNT(id), due_date FROM collection_schedules GROUP BY MONTH(due_date)`)
+            return query;
         })
         .then((query) => {
 
