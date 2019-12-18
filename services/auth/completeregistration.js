@@ -40,7 +40,6 @@ function service(data) {
             });
             const params = validParameters.params;
 
-
             if (validators.areMutuallyExclusive([params.password, params.password_confirmation]))
                 throw new Error("Passwords do not match");
 
