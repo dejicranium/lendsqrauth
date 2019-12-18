@@ -216,8 +216,12 @@ function service(data) {
                                 id: collection.borrower_id
                             }
                         })
-                        let borrower_userId = borrower.user_id;
+                        let borrower_userId = null;
+                        if (borrower && borrower.user_id) {
+                            borrower_userId = borrower.user_id;
 
+                        }
+                        /*
                         let result = await requests.createCollectionShedule(params)
 
 
@@ -232,7 +236,7 @@ function service(data) {
                                             where: {
                                                 id: collection.borrower_id
                                             }
-                                        });*/
+                                        });
 
                                         let period = {
                                             period_id: r.period,
@@ -264,7 +268,7 @@ function service(data) {
                                 //silent failure
                                 console.log(err)
                             })
-
+                        */
                         console.log(result)
                     }
 
