@@ -118,6 +118,14 @@ function service(data) {
             if (params.borrower_email) assert.emailFormatOnly(params.borrower_email, null, 'Email');
 
             if (params.disbursement_date) assert.dateFormatOnly(params.disbursement_date, null, 'Disbursement Date');
+            if (params.disbursement_mode) {
+                if (!['cash', 'transfer'].includes(params.disbursement_mode.toLowerCase()))
+                    throw new Error("Disbursement mode should be either cash or transfer")
+            }
+            if (params.loan_status) {
+                if (!['disbursed', 'active', 'past due'].includes(params.loan_status.toLowerCase()))
+                    throw new Error("Loan status should be one of disbursed, active or past due")
+            }
 
             if (params.start_date) assert.dateFormatOnly(params.start_date, null, 'Start Date');
 
@@ -211,7 +219,7 @@ function service(data) {
                         let borrower_userId = borrower.user_id;
 
                         let result = await requests.createCollectionShedule(params)
-                     
+
 
                             .then(async resp => {
                                 let bulkdata = []
@@ -225,7 +233,7 @@ function service(data) {
                                                 id: collection.borrower_id
                                             }
                                         });*/
-                                        
+
                                         let period = {
                                             period_id: r.period,
                                             from_date: r.fromDate.join('-'),
