@@ -175,6 +175,8 @@ function service(data) {
 
             try {
                 await makeRequest(url, 'POST', payload, requestHeaders);
+            } catch (e) {
+
             }
 
             d.resolve(user);
