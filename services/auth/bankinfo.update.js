@@ -90,9 +90,11 @@ function service(data) {
                         is_default: 1
                     }
                 });
-                await defaultBankAccount.update({
-                    is_default: 0
-                })
+                if (defaultBankAccount && defaultBankAccount.id) {
+                    await defaultBankAccount.update({
+                        is_default: 0
+                    })
+                }
 
                 params.is_default = 1;
             }
