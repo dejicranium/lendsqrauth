@@ -38,7 +38,8 @@ function service(data) {
                     'is_default',
                     'is_active',
                     'user_id',
-                    'created_on'
+                    'created_on',
+                    'deleted_flag'
                 ]
             }
 
@@ -51,7 +52,10 @@ function service(data) {
         })
         .then((bankdetails) => {
             if (!bankdetails) throw new Error(`User has no accounts`);
-            bankdetails = bankdetails.filter(detail => detail.deleted_flag !== 1);
+            bankdetails = JSON.parse(JSON.stringify(bankdetails));
+
+
+            bankdetails = bankdetails.filter(detail => !detail.deleted_flag);
             d.resolve(bankdetails);
         })
         .catch((err) => {
