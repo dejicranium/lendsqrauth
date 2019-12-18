@@ -17,7 +17,10 @@ function service(data) {
             });
             const params = validParameters.params;
 
-            let query = await models.sequelize.query(`SELECT COUNT(status='Successful') as successful_volume, COUNT(status='Pending') as pending_volume, COUNT(status='Failed') as failed_volume, \
+            let query = await models.sequelize.query(`SELECT 
+                COUNT(CASE status WHEN 'Successful' THEN 1 ELSE null END) as successful_volume, 
+                COUNT(CASE status WHEN 'Pending' THEN 1 ELSE null END) as pending_volume, 
+                COUNT(CASE status WHEN 'Failed' THEN 1 ELSE null END) as failed_volume, \
                 COUNT(*) as total_volume,\
                 SUM(CASE WHEN status = 'Successful' THEN total_amount END) successful_value,\
                 SUM(CASE WHEN status = 'Failed' THEN total_amount END) failed_value,\
