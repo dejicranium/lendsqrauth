@@ -1,102 +1,125 @@
 const models = require('mlar')('models');
-const ErrorLogger = require('mlar')('errorlogger'); 
-const morx = require('morx'); 
-const q = require('q'); 
-const bcrypt = require('bcrypt'); 
-const validators = require('mlar')('validators'); 
-const obval = require('mlar')('obval'); 
-const assert = require('mlar')('assertions'); 
+const ErrorLogger = require('mlar')('errorlogger');
+const morx = require('morx');
+const q = require('q');
+const bcrypt = require('bcrypt');
+const validators = require('mlar')('validators');
+const obval = require('mlar')('obval');
+const assert = require('mlar')('assertions');
 const crypto = require('crypto');
 const DEFAULT_EXCLUDES = require('mlar')('appvalues').DEFAULT_EXCLUDES;
 const moment = require('moment')
 const config = require('../../config');
 const makeRequest = require('mlar')('makerequest');
 
-var spec = morx.spec({}) 
-			   .build('email', 'required:true, eg:itisdeji@gmail.com')   
-               
-			   .end();
+var spec = morx.spec({})
+    .build('email', 'required:true, eg:itisdeji@gmail.com')
 
-function service(data){
-	var d = q.defer();
-	
-	q.fcall( async () => {
-		var validParameters = morx.validate(data, spec, {throw_error:true});
-		let params = validParameters.params;
-        
-        
-        assert.emailFormatOnly(params.email);  // validate email, throw error if it's some weird stuff
-        
-        return [ models.user.findOne({
-            where: {
-                email: params.email
-            },
-            
-        }), params]
-	}) 
-	.spread((user, params) => { 
-        if (!user) throw new Error(`User with email ${params.email} was not found`);
+    .end();
 
-        //if (globalUserId !== user.id) throw new Error("You don't have access to this account");
-        
-        return [crypto.randomBytes(32).toString('hex'), user];
-        
-    }).spread((randomBytes, user)=>{
-        if (!randomBytes) throw new Error("An error occured while carrying out this operation");
-        
-        // for password reset, user_id will be the user email;
-        return [
-            models.auth_token.findOne({where: { type: 'password_reset', user_id: user.id }}),
-            randomBytes, 
-            user
-        ];
+function service(data) {
+    var d = q.defer();
 
-    }).spread((usertoken, token, user) => {
-        
-        // store as auth token and set expiry to 20 minutes from now
-        let expiry = moment(new Date()).add(20, 'minutes');
+    q.fcall(async () => {
+            var validParameters = morx.validate(data, spec, {
+                throw_error: true
+            });
+            let params = validParameters.params;
 
-        if (!usertoken) 
+
+            assert.emailFormatOnly(params.email); // validate email, throw error if it's some weird stuff
+
+            return [models.user.findOne({
+                where: {
+                    email: params.email
+                },
+
+            }), params]
+        })
+        .spread((user, params) => {
+            if (!user) throw new Error(`User with email ${params.email} was not found`);
+
+            //if (globalUserId !== user.id) throw new Error("You don't have access to this account");
+
+            return [crypto.randomBytes(32).toString('hex'), user];
+
+        }).spread((randomBytes, user) => {
+            if (!randomBytes) throw new Error("An error occured while carrying out this operation");
+
+            // for password reset, user_id will be the user email;
             return [
-                models.auth_token.create({type: 'password_reset', user_id: user.id, token: token, expiry: expiry}), 
+                models.auth_token.findOne({
+                    where: {
+                        type: 'password_reset',
+                        user_id: user.id
+                    }
+                }),
+                randomBytes,
                 user
             ];
 
-        return [
-            usertoken.update({ token: token, expiry: expiry, is_used: 0}), 
-            user
-        ];
-    
-    }).spread(async (tokencreated, user)=> {
-        if (!tokencreated) throw new Error("An error occured please try again");
-        
-        let fullname =  user.business_name  || user.first_name + ' ' + user.last_name;
+        }).spread((usertoken, token, user) => {
 
-        const payload= {
-            context_id: 80,
-            sender: config.sender_email,
-            recipient: user.email,
-            sender_id: 1,
-            data:{
-                email: user.email,
-                name: fullname,
-                url: config.base_url + 'reset-password?token=' + tokencreated.token,
-                token: tokencreated.token
+            // store as auth token and set expiry to 20 minutes from now
+            let expiry = moment(new Date()).add(20, 'minutes');
+
+            if (!usertoken)
+                return [
+                    models.auth_token.create({
+                        type: 'password_reset',
+                        user_id: user.id,
+                        token: token,
+                        expiry: expiry
+                    }),
+                    user
+                ];
+
+            return [
+                usertoken.update({
+                    token: token,
+                    expiry: expiry,
+                    is_used: 0
+                }),
+                user
+            ];
+
+        }).spread(async (tokencreated, user) => {
+            if (!tokencreated) throw new Error("An error occured please try again");
+
+            let fullname = user.business_name || user.first_name + ' ' + user.last_name;
+
+            const payload = {
+                context_id: 80,
+                sender: config.sender_email,
+                recipient: user.email,
+                sender_id: 1,
+                data: {
+                    email: user.email,
+                    name: fullname,
+                    url: config.base_url + 'reset-password?token=' + tokencreated.token,
+                    token: tokencreated.token
+                }
             }
-        }
-        const url = config.notif_base_url + "email/send";
-        const requestHeaders = {'Content-Type' : 'application/json'}
-        await makeRequest(url, 'POST', payload, requestHeaders);
+            const url = config.notif_base_url + "email/send";
+            const requestHeaders = {
+                'Content-Type': 'application/json'
+            }
+            try {
+                await makeRequest(url, 'POST', payload, requestHeaders);
 
-        d.resolve(tokencreated.token);
-    })
-	.catch( (err) => {
+            } catch (e) {
+                // silent treatements
+            }
 
-		d.reject(err);
+            d.resolve(tokencreated.token);
+        })
+        .catch((err) => {
 
-	});
+            d.reject(err);
 
-	return d.promise;
+        });
+
+    return d.promise;
 
 }
 service.morxspc = spec;

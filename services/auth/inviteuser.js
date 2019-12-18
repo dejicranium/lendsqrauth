@@ -215,7 +215,12 @@ function service(data) {
 				}
 			};
 			const url = config.notif_base_url + 'email/send';
-			await makeRequest(url, 'POST', payload, requestHeaders);
+			try {
+				await makeRequest(url, 'POST', payload, requestHeaders);
+			} catch (e) {
+				// silent treatment. To be logged;
+
+			}
 
 			d.resolve('Invited team member');
 		})

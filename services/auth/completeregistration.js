@@ -55,24 +55,29 @@ function service(data) {
                 throw new Error("Name cannot be less than 3 characters")
             }
 
+            try {
 
-            // make request to verify phone number
-            const verifiedPhone = await makeRequest(
-                config.utility_base_url + 'verify/phone/',
-                'POST', {
-                    phone: params.phone
-                },
-                requestHeaders,
-                'validate phone number'
-            )
+                // make request to verify phone number
+                const verifiedPhone = await makeRequest(
+                    config.utility_base_url + 'verify/phone/',
+                    'POST', {
+                        phone: params.phone
+                    },
+                    requestHeaders,
+                    'validate phone number'
+                )
 
 
-            if (verifiedPhone) {
-                if (verifiedPhone.phone == undefined && verifiedPhone.countryCode == undefined) throw new Error("Phone number not valid");
+                if (verifiedPhone) {
+                    if (verifiedPhone.phone == undefined && verifiedPhone.countryCode == undefined) throw new Error("Phone number not valid");
+                }
+                if (verifiedPhone.status == 'error') {
+                    throw new Error("Could not validate phone number");
+                }
+            } catch (e) {
+                throw new Error("Error while validating phone number")
             }
-            if (verifiedPhone.status == 'error') {
-                throw new Error("Could not validate phone number");
-            }
+
 
 
 
@@ -156,15 +161,21 @@ function service(data) {
 
             const url = config.notif_base_url + "email/send";
             // send the welcome email 
-            await makeRequest(url, 'POST', payload, requestHeaders);
+            try {
+                await makeRequest(url, 'POST', payload, requestHeaders);
+
+            } catch (e) {
+                // silent treatment. user can always request for the user activation link;
+            }
 
             // prepare to send email verification email
             payload.context_id = 81;
             payload.data.token = userToken;
             payload.data.url = config.base_url + 'activate?token=' + userToken;
-            await makeRequest(url, 'POST', payload, requestHeaders);
 
-
+            try {
+                await makeRequest(url, 'POST', payload, requestHeaders);
+            }
 
             d.resolve(user);
         })

@@ -29,9 +29,6 @@ function service(data) {
             let selection = {
                 where: {
                     user_id: params.user_id,
-                    deleted_flag: {
-                        $ne: 1
-                    }
                 },
                 attributes: [
                     'id',
@@ -47,13 +44,14 @@ function service(data) {
 
             if (params.active) selection.where.is_active = 1;
             if (params.disabled) selection.where.is_active = 0;
-            if (params.deleted) selection.where.is_active = 1;
+            if (params.deleted) selection.where.is_active = 0;
 
             return models.user_bank.findAll(selection)
 
         })
         .then((bankdetails) => {
             if (!bankdetails) throw new Error(`User has no accounts`);
+            bankdetails = bankdetails.filter(detail => detail.deleted_flag !== 1);
             d.resolve(bankdetails);
         })
         .catch((err) => {
