@@ -49,13 +49,7 @@ function service(data) {
 		.spread(async (profile, params) => {
 			if (!profile) throw new Error("Profile does not exist");
 
-			if (params.status) {
-				// make sure that only the parent of the profile can update the profile
-				if (profile.parent_profile_id != data.profile.id && data.profile.role !== 'admin') {
-					throw new Error("Only a parent profile or admin can update a user's status");
 
-				}
-			}
 
 			if (profile.user_id !== data.user.id && profile.id !== data.profile.id && data.profile.role !== 'admin' && profile.parent_profile_id !== data.profile.id) {
 				throw new Error("You cannot update a profile that isn't yours")
@@ -101,26 +95,15 @@ function service(data) {
 					}
 				})
 			params.profile_id = profile.id
+
+
+
+
 			if (params.social_links) {
-				// get social links from profile_contact 
-				//let existing_social_links = JSON.parse(JSON.stringify(profile_contact.social_links));
-
-				// when nothing exists;
 				let fields = Object.keys(params.social_links);
-
-				let social_contact_array = [];
-				for (let i = 0; i < fields.length; i++) {
-					let field = fields[i];
-					let new_object = {};
-
-					new_object[field] = params.social_links[field];
-					social_contact_array.push(new_object);
-				}
-
-				params.social_links = JSON.stringify(social_contact_array)
-
-
-			} else {
+				fields.forEach(field => {
+					params[field] = params.social_links[field];
+				});
 				delete params.social_links
 			}
 
@@ -128,7 +111,6 @@ function service(data) {
 
 			if (profile_contact && profile_contact.id) {
 				await profile_contact.update(params);
-
 			} else {
 				await models.profile_contact.create(params)
 			}

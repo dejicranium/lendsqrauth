@@ -54,36 +54,22 @@ function service(data) {
             profile = JSON.parse(JSON.stringify(profile));
 
             let default_social_links = {
-                facebook_link: "",
-                twitter_link: "",
-                instagram_link: "",
-                linkedin_link: "",
-                youtube_link: "",
+                facebook_link: profile.profile_contact.facebook_link,
+                twitter_link: profile.profile_contact.twitter_link,
+                instagram_link: profile.profile_contact.instagram_link,
+                linkedin_link: profile.profile_contact.linkedin_link,
+                youtube_link: profile.profile_contact.youtube_link
             }
-            if (profile.profile_contact.social_links) {
 
-                let soc = JSON.parse(profile.profile_contact.social_links);
-                if (!soc.facebook_link) soc.facebook_link = ""
-                if (soc.twitter_link) soc.twitter_link = ""
-                if (!soc.instagram_link) soc.instagram_link = ""
-                if (!soc.linkedin_link) soc.linkedin_link = ""
-                if (!soc.youtube_link) soc.youtube_link = ""
+            profile.profile_contact.social_links = default_social_links;
 
-                profile.profile_contact.social_links = JSON.parse(JSON.stringify(profile.profile_contact.social_links))
-                profile.profile_contact.social_links = soc;
-            }
-            if (!profile.profile_contact) {
-                profile.profile_contact = {
-                    contact_name: "",
-                    contact_phone: "",
-                    contact_email: "",
-                    support_email: "",
-                    social_links: default_social_links
-                }
+            delete profile.profile_contact.twitter_link
+            delete profile.profile_contact.facebook_link
+            delete profile.profile_contact.twitter_link
+            delete profile.profile_contact.instagram_link
+            delete profile.profile_contact.linkedin_link
 
-            } else if (!profile.profile_contact.social_links) {
-                profile.profile_contact.social_links = default_social_links
-            }
+
             d.resolve(profile)
         })
         .catch((err) => {

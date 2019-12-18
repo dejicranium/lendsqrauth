@@ -2,32 +2,51 @@
 module.exports = {
   up: (queryInterface, Sequelize) => {
     queryInterface.removeColumn(
-      'business_info',
+      'profile_contacts',
       'social_links',
       Sequelize.STRING
     );
     queryInterface.addColumn(
-      'business_info',
+      'profile_contacts',
       'facebook_link',
       Sequelize.STRING
     );
     queryInterface.addColumn(
-      'business_info',
+      'profile_contacts',
       'twitter_link',
       Sequelize.STRING
     );
     queryInterface.addColumn(
-      'business_info',
+      'profile_contacts',
       'instagram_link',
       Sequelize.STRING
     );
-    queryInterface.addColumn(
-      'business_info',
+    return queryInterface.addColumn(
+      'profile_contacts',
       'linkedin_link',
       Sequelize.STRING
     );
   },
   down: (queryInterface, Sequelize) => {
-    return queryInterface.dropTable('add_boolean_columns_to_users');
+    queryInterface.removeColumn(
+      'business_info',
+      'facebook_link',
+      Sequelize.STRING
+    );
+    queryInterface.removeColumn(
+      'business_info',
+      'twitter_link',
+      Sequelize.STRING
+    );
+    queryInterface.removeColumn(
+      'business_info',
+      'instagram_link',
+      Sequelize.STRING
+    );
+    return queryInterface.removeColumn(
+      'business_info',
+      'linkedin_link',
+      Sequelize.STRING
+    );
   }
 };
