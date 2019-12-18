@@ -25,14 +25,15 @@ function service(data) {
                 SUM(total_amount) as total_value
                 SUM(total_amount where status='Failed') as failed_value,
                 FROM collection_schedules`)*/
-            return models.collection_schedules.findAll({
-                group: [sequelize.fn('date_trunc', 'month', sequelize.col('due_date'))]
-            })
+            return models.sequelize.query(
+                `select count(status='Successful') as successful_volume, \
+                count(status='Pending') as pending_volume, \
+                count(status='Failed') as failed_volume  \ from collection_schedules group by DATE_FORMAT(due_date, "%Y-%m-01")`)
             //return query;
         })
         .then((query) => {
 
-            d.resolve(query);
+            d.resolve(query[0][0]);
         })
         .catch((err) => {
 
