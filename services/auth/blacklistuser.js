@@ -42,7 +42,7 @@ function service(data) {
             return user.update(updateData);
 
         }).then((user) => {
-            if (!user) throw new Error("An error occured while updating user's account");
+            if (!user) throw new Error("An error occurred while updating user's account");
 
             d.resolve("Successfully updated user's status");
         })

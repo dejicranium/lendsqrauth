@@ -25,13 +25,14 @@ function service(data) {
     const globalUserId = data.user_id;
     const requestHeaders = {
         'Content-Type': 'application/json',
-    }
+    };
 
 
     q.fcall(async () => {
             const validParameters = morx.validate(data, spec, {
                 throw_error: true
             });
+
             let params = validParameters.params;
             assert.bvnFormatOnly(params.bvn);
             assert.nubanFormatOnly(params.account_number);
@@ -42,7 +43,7 @@ function service(data) {
                     where: {
                         account_number: params.account_number,
                         user_id: data.user.id
-                        //bvn: params.bvn
+
                     }
                 }),
                 models.user_bank.findOne({
@@ -56,11 +57,11 @@ function service(data) {
 
         })
         .spread(async (record, bvnRecord, params) => {
-            if (record) throw new Error("Account number already exists for this user");
+            // throw error if record exists and it  is not deleted
+            if (record && !record.deleted_flag) throw new Error("Account number already exists for this user");
 
-            // if bvn exists for a user other than the one making the request;
-
-            if (bvnRecord && bvnRecord.user_id != globalUserId) {
+            // if bvn exists for a user other than the one making the request
+            if (bvnRecord && bvnRecord.user_id != parseInt(globalUserId)) {
                 throw new Error("A different account is already associated with this BVN");
             }
 
@@ -69,10 +70,13 @@ function service(data) {
             if (!params.otp) {
 
                 let url = config.utility_base_url + "verify/bvn";
+
                 let payload = {
                     bvn: params.bvn
-                }
+                };
+
                 let phoneNumberFromBVN = null;
+
                 let verifiedBVN = await makeRequest(url, 'POST', payload, requestHeaders, 'verify BVN');
 
                 if (verifiedBVN && verifiedBVN.mobile) {
@@ -89,6 +93,7 @@ function service(data) {
                     phone: verifiedBVN.mobile,
                     user_id: data.user.id
                 }
+
                 await models.bvn_verifications.findOrCreate({
                         where: {
                             user_id: data.user.id,
@@ -110,7 +115,7 @@ function service(data) {
                     if (!resp) throw new Error("Bank account is not valid")
                 }).catch(err => {
                     throw new Error("Bank account is invalid")
-                })
+                });
 
                 //if all successful ---
 
@@ -134,7 +139,7 @@ function service(data) {
                         is_used: false,
                         expiry: moment(new Date()).add(10, 'minutes')
                     }
-                })
+                });
 
                 if (!token_create[1]) { // if token was not created, it exists , so go ahead and update
                     token_create[0].update({
@@ -156,7 +161,7 @@ function service(data) {
                 return `Phone number is: ${phoneNumberFromBVN}`;
             }
 
-            // if we only intend to otp
+            // if we only intend to verify otp otp
             else {
                 let token = await models.auth_token.findOne({
                     where: {
@@ -164,21 +169,18 @@ function service(data) {
                         user_id: globalUserId,
                     }
                 })
-                if (!token) throw new Error("Invalid OTP");
-                else if (moment(new Date()).isAfter(token.expiry)) throw new Error();
+                if (!token && !token.id) throw new Error("Invalid OTP");
+                else if (moment(new Date()).isAfter(token.expiry)) throw new Error("The token has expired");
                 else if (token.is_used) throw new Error("Token is already used");
 
                 // create account number;
                 params.user_id = globalUserId;
-
                 await models.user_bank.create({
                     ...params
                 });
 
-                // else if token has no issues, show success and flag as used
+                // if token has no issues, show success and flag as used
                 token.is_used = true;
-
-
                 await token.save();
                 return "OTP verified";
             }
