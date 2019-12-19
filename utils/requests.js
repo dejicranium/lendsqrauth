@@ -206,6 +206,20 @@ module.exports = {
         return d.promise
     },
 
+    getBanks(data) {
+        const d = q.defer();
+        q.fcall(()=> {
+            let url = config.utility_base_url + 'util/fetch/bank';
+            return makeRequest(url, 'GET', payload, constant.requestHeaders, 'get banks');
+        })
+            .then(response=> {
+                d.resolve(response)
+            })
+            .catch(err=> {
+                d.reject(err)
+            })
+
+    },
 
     verifyBank(data) {
         const d = q.defer();

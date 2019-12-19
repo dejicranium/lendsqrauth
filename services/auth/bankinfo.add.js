@@ -168,7 +168,7 @@ function service(data) {
                         type: 'verify_bank_otp',
                         user_id: globalUserId,
                     }
-                })
+                });
                 if (!token && !token.id) throw new Error("Invalid OTP");
                 else if (moment(new Date()).isAfter(token.expiry)) throw new Error("The token has expired");
                 else if (token.is_used) throw new Error("Token is already used");
@@ -184,8 +184,6 @@ function service(data) {
                 await token.save();
                 return "OTP verified";
             }
-
-
         })
         .then(success => {
             if (!success) throw new Error("An error occurred while carrying out this operation")

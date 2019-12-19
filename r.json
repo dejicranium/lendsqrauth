@@ -33,6 +33,7 @@
 	"resolvers": "/utils/resolvers",
 	"collection_utils": "/utils/collections",
 	"product_utils": "/utils/products",
+	"getBanks": "/utils/getbanks",
 	"job_get_schedule": "/jobs/get_collections_due",
 	"mocks": "/mocks",
 	"queue": "/queue"

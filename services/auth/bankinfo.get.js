@@ -8,7 +8,8 @@ const obval = require('mlar')('obval');
 const assert = require('mlar')('assertions');
 const crypto = require('crypto');
 const DEFAULT_EXCLUDES = require('mlar')('appvalues').DEFAULT_EXCLUDES;
-const moment = require('moment')
+const moment = require('moment');
+const getBanks = require('mlar')('getBanks');
 
 var spec = morx.spec({})
     .build('user_id', 'required: true')
@@ -50,10 +51,21 @@ function service(data) {
             return models.user_bank.findAll(selection)
 
         })
-        .then((bankdetails) => {
+        .then(async (bankdetails) => {
             if (!bankdetails) throw new Error(`User has no accounts`);
             bankdetails = JSON.parse(JSON.stringify(bankdetails));
-
+            let banks =  await getBanks();
+            bankdetails.map(detail=> {
+                if (banks && banks.length) {
+                    banks.forEach(bank=>{
+                        if (bank.additional_code == detail.bank_code){
+                            detail.bank_logo = bank.url;
+                            detail.bank_name = bank.code_description;
+                            return detail;
+                        }
+                    })
+                }
+            })
 
             bankdetails = bankdetails.filter(detail => !detail.deleted_flag);
             d.resolve(bankdetails);
