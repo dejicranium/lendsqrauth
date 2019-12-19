@@ -5,6 +5,7 @@ const q = require('q');
 const validators = require('mlar')('validators');
 const assert = require('mlar')('assertions');
 const paginate = require('mlar')('paginate');
+const DEFAULT_EXCLUDES = require('mlar')('appvalues').DEFAULT_EXCLUDES;
 
 var spec = morx.spec({})
     .build('profile_ids', 'required:true, eg:1')
@@ -19,7 +20,7 @@ function service(data) {
                 throw_error: true
             });
             const params = validParameters.params;
-            
+
 
             let profile_ids = params.profile_ids.split(',');
 
@@ -30,7 +31,10 @@ function service(data) {
                     }
                 },
                 include: [{
-                    model: models.user
+                    model: models.user,
+                    attributes: {
+                        exclude: DEFAULT_EXCLUDES
+                    }
                 }]
             })
 
