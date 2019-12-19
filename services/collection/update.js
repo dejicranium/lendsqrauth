@@ -269,7 +269,6 @@ function service(data) {
                                 console.log(err)
                             })
                         */
-                        console.log(result)
                     }
 
                     await collection.update({
