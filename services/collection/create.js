@@ -58,19 +58,19 @@ function service(data) {
 					"bvn",
 					"email",
 				]
-			)
+			);
 
 
 			const requestHeaders = {
 				'Content-Type': 'application/json',
-			}
+			};
 
 			if (params.borrower_bvn) {
-				// first verifiy that there is a bvn
+				// first verify that there is a bvn
 				let url = config.utility_base_url + "verify/bvn";
 				let payload = {
 					bvn: params.borrower_bvn
-				}
+				};
 
 				let verifiedBVN = await makeRequest(url, 'POST', payload, requestHeaders, 'Verify BVN');
 
@@ -93,6 +93,7 @@ function service(data) {
 			let user_with_email_exists = false;
 
 			if (params.borrower_email) {
+
 				// find out whether person with the email already has a user account 
 				let user_account = await models.user.findOne({
 					where: {
@@ -114,6 +115,7 @@ function service(data) {
 					}
 				});
 
+				// inner function for creating a new borrower profile
 				let create_new_borrower_profile = function (user_id) {
 					return models.profile.create({
 						role_id: borrower_role.id,
@@ -121,7 +123,16 @@ function service(data) {
 						user_id: user_id,
 						uuid: Math.random().toString(36).substr(2, 9),
 					});
-				}
+				};
+
+				let create_new_user = function() {
+					return models.user.create({
+						first_name: params.borrower_first_name,
+						last_name: params.borrower_last_name,
+						phone: params.borrower_phone,
+						email: params.borrower_email
+					})
+				};
 
 				if (user_account && user_account.email) {
 					user_with_email_exists = true;
@@ -129,11 +140,10 @@ function service(data) {
 					if (user_account.profiles) {
 
 						let user_has_borrower_profile = false;
-
 						let profiles = user_account.profiles;
 
 						profiles.forEach(profile => {
-							if (profile.role_id == borrower_role.id) {
+							if (parseInt(profile.role_id) === parseInt(borrower_role.id)) {
 								user_has_borrower_profile = true;
 							}
 						});
@@ -147,7 +157,7 @@ function service(data) {
 								params,
 							]
 						} else { // when user already has a profile
-							let user_borrower_profile = profiles.find(profile => profile.role_id == borrower_role.id);
+							let user_borrower_profile = profiles.find(profile => profile.role_id === borrower_role.id);
 							return [
 								user_borrower_profile,
 								'OLD-PROFILE',
@@ -158,43 +168,38 @@ function service(data) {
 					} else {
 						return [
 							create_new_borrower_profile(user_account.id),
-							"new-profile",
+							"NEW-PROFILE",
 							params
 						]
 					}
 				} else {
+					let new_user = await create_new_user(); // create a new user
 					return [
-						'none',
-						'none',
+						create_new_borrower_profile(new_user.id),
+						'NEW-PROFILE',
 						params,
 					]
 				}
 			}
 		})
 
-		.spread(async (borrower_profile, profile_created, params) => {
-			if (borrower_profile && borrower_profile != 'none') {
-				params.borrower_id = borrower_profile.id;
+		.spread(async (borrower_cred, profile_created, params) => {
+			if (borrower_cred && borrower_cred.id) { // if there's borrower_cred.first_name, it means a new user was created instead of a new borrower
+				params.borrower_id = borrower_cred.id;
 			}
-			params.lender_id = data.profile.id; // set the lender profile to the person making this request
+
+			params.lender_id = data.profile.id; 	// set the lender profile to the person making this request
 			params.status = "draft";
-
-
-
 
 			invitation_data = {
 				inviter_id: data.profile.id,
 				date_invited: new Date(),
 				borrower_name: data.borrower_first_name + " " + data.borrower_last_name,
+			};
+
+			if (borrower_cred && borrower_cred.id) { // if there's borrower_cred.first_name, it means a new user was created instead of a new borrower
+				invitation_data.profile_created_id = borrower_cred.id
 			}
-
-
-
-
-			if (borrower_profile && borrower_profile.id) {
-				invitation_data.profile_created_id = borrower_profile.id
-			}
-
 
 			return models.collection.create(params);
 		})
@@ -206,38 +211,26 @@ function service(data) {
 			invitation_data.collection_id = collection.id;
 			invitation_data.token = crypto.randomBytes(32).toString('hex');
 
-
 			// create borrower invites
 			await models.borrower_invites.create(invitation_data);
-
-
-
-
-
-
-
-
-
 			let token = crypto.randomBytes(32).toString('hex');
-
 
 			let invitation_meta = {
 				collection_id: collection.id
-			}
-
-
+			};
+			
 			await models.auth_token.create({
 				type: 'borrower_invitation',
 				token: token,
 				meta: JSON.stringify(invitation_meta),
 				is_used: 0
-			})
+			});
 
 			d.resolve(collection)
 		})
 		.catch(err => {
 			d.reject(err);
-		})
+		});
 
 	return d.promise;
 

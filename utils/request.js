@@ -5,12 +5,10 @@ const q = require('q');
 
 module.exports = (url, method, payload, headers, caller = null, defaultheaders = true) => {
     const d = q.defer();
-    // append the access key
+    // append the access key if we are calling the lendsqr utility servicer
     if (defaultheaders) {
-
         headers['accesskey'] = "7mvkUcJH4l45AJr9AWm1rcjJhLUFaspk";
     }
-
 
     q.fcall(() => {
         return axios({
@@ -22,13 +20,12 @@ module.exports = (url, method, payload, headers, caller = null, defaultheaders =
     }).then(response => {
         console.log("called " + url)
         if (defaultheaders) {
-
             response = response.data.data
         } else {
             response = response.data
         }
-        console.log(response)
-        d.resolve(response)
+        console.log(response);
+        d.resolve(response);
     }).catch(err => {
         console.log(err.response.data.errors)
         if (caller) {

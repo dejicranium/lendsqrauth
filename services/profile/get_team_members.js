@@ -33,8 +33,9 @@ function service(data) {
 				//parent_profile_id: data.profile.id, // profile of the user making the request
 				status: 'accepted',
 				inviter: data.profile.id
-
 			};
+
+
 			data.include = [{
 				model: models.profile,
 				include: [{
@@ -45,11 +46,47 @@ function service(data) {
 						model: models.user,
 						attributes: {
 							exclude: DEFAULT_EXCLUDES
-						}
+						},
+						where: {}
 					}
 				]
 			}]
 
+		if (data.first_name) {
+			data.include[0].include[1].where.first_name = {$like: '%' + data.first_name + '%'};
+
+		}
+		if (data.last_name) {
+			data.include[0].include[1].where.last_name = {$like: '%' + data.last_name + '%'};
+
+		}
+		if (data.email) {
+			data.include[0].include[1].where.email = {$like: '%' + data.email + '%'}
+		}
+		delete  data.first_name;
+		delete data.last_name;
+		delete data.email;
+
+		// if we are searching by term
+		if (data.search) {
+			delete  data.where;
+			// search first name, last name ,email , business name and phone;
+			data.include[0].include[1].where.$or = [
+				{first_name: {$like: '%' + data.search + '%'}},
+				{last_name: {$like: '%' + data.search + '%'}},
+				{business_name: {$like: '%' + data.search + '%'}},
+				{phone: {$like: '%' + data.search + '%'}},
+			];
+			data.include[0].include[1].required = true;
+		}
+		data.order = [['id', 'DESC']];
+		// if (data.sort)
+		if (data.sort) {
+			data.order = [[
+				data.sort,
+				'DESC'
+			]]
+		}
 			return models.user_invites.findAndCountAll(data);
 		})
 		.then((invites) => {
@@ -64,7 +101,7 @@ function service(data) {
 				object = row.profile;
 				final_invites.push(object);
 
-			})
+			});
 
 			d.resolve(paginate(final_invites, 'profiles', invites.count, limit, page))
 		})

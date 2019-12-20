@@ -59,7 +59,7 @@ function service(data) {
             await instance.update({
                 token_is_used: true,
                 status: ACCEPTED_STATUS,
-                date_declined: new Date()
+                date_accepted: new Date()
             })
             // update collection;
 

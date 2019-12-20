@@ -18,7 +18,6 @@ var spec = morx.spec({})
 function service(data) {
     const DECLINED_STATUS = 'Declined';
     var d = q.defer();
-    const globalUserId = data.USER_ID || 1;
     q.fcall(async () => {
             const validParameters = morx.validate(data, spec, {
                 throw_error: true
@@ -34,23 +33,11 @@ function service(data) {
             })
 
 
-
-
-            /*return models.auth_token.findOne({
-                where: {
-                    token: params.token
-                }
-            })*/
         })
         .then(async (instance) => {
 
-            if (!instance) throw new Error("Invalid token")
+            if (!instance) throw new Error("Invalid token");
 
-            // if token exists, go ahead and grab the collection id
-            /*
-            let auth_meta = JSON.parse(instance.meta);
-            if (!auth_meta.collection_id) throw new Error("No collection is linked to this token")
-            */
             return [
                 models.collection.findOne({
                     where: {
@@ -65,32 +52,28 @@ function service(data) {
         .spread(async (collection, instance) => {
             if (!collection) throw new Error("Could not find collection");
 
+           // DELETE THE CREATED USER ACCOUNT AND PROFILE
+            let borrower_profile = await models.profile.findOne({
+                where: {
+                    id: instance.profile_created_id
+                }
+            });
 
-
-
-
-            /* await instance.update({
-                 is_used: 1
-             });*/
+            let user = await models.user.findOne({
+                where: {
+                    id: borrower_profile.user_id
+                }
+            });
+            await borrower_profile.update({deleted_flag:1})
+            await user.update({deleted_flag:1});
 
             await instance.update({
                 token_is_used: true,
                 status: 'Declined',
                 date_declined: new Date()
-            })
-            // update collection;
-
-
-
-
+            });
 
             collection.status = DECLINED_STATUS;
-
-
-
-
-
-
             return collection.save();
         })
         .then((saved) => {

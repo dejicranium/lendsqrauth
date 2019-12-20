@@ -159,25 +159,9 @@ function service(data) {
             if (product.id) {
                 // check whether the most essential parts of a collection are available before sending email
 
-                // if tenor is just being added
-                if (tenor_just_added) {
-                    // set email
-                    let lender_identity =
-                        data.profile.business_name || data.user.first_name + ' ' + data.user.last_name;
+                if (!['declined', 'active'].includes(collection.status)) { // make sure that you aren't detecting a collection
+                    //that is already considered active;
 
-                    let payload = {
-                        lender: lender_identity,
-                        accept_url: config.base_url + 'reject-borrower-invite',
-                        reject_url: config.base_url + 'accept-borrower-invite',
-                        borrower: collection.borrower_first_name + ' ' + collection.borrower_last_name,
-                        interest: product.interest,
-                        interest_period: product.interest_period,
-                        tenor: collection.tenor + ' ' + product.tenor_type
-                    };
-                    await requests.inviteBorrower(collection.borrower_email, payload);
-                }
-
-                if (!['declined', 'active'].includes(collection.status)) {
                     let required_fields = [
                         'product_id',
                         'tenor',
@@ -200,9 +184,50 @@ function service(data) {
                         'inactive'
                     );
 
+                    // if tenor is just being added
+                    if (new_status === 'inactive') {
+
+                        // prepare email
+                        let lender_identity =
+                            data.profile.business_name || data.user.first_name + ' ' + data.user.last_name;
 
 
-                    if (new_status == 'inactive') {
+                        let email_payload = {
+                            lenderFullName: lender_identity,
+                            loanAmount: collection.amount,
+                            interestRate: product.interest,
+                            interestPeriod: product.interest_period,
+                            tenor: collection.tenor + ' ' + product.tenor_type,
+                            borrowersFullName: collection.borrower_first_name + ' ' + collection.borrower_last_name,
+                            accept_url: config.base_url + 'accept-borrower-invite',
+                            reject_url: config.base_url + 'accept-borrower-invite',
+                        };
+
+                        // if there's no profile_created_id, user doesn't exist on system yet;
+
+                        // see if borrower is an already-existing user.
+                        // here's how we know that:
+                        // we get the borrower invites models
+                        // then check if there's a profile created id
+
+                        let invitation = await models.borrower_invites.findOne({
+                            where: {
+                                collection_id: collection.id,
+                                borrower_name: collection.borrower_first_name + collection.borrower_last_name
+                            }
+
+                        });
+
+                        if (invitation && invitation.id) {
+                            if (!invitation.profile_created_id) {
+                                email_payload.reject_url = config.base_url + 'reject-borrower-invite'
+                            }
+                        }
+
+                        await requests.inviteBorrower(collection.borrower_email, email_payload);
+                    }
+
+                    if (new_status === 'inactive') {
                         let params = {
                             amount: collection.amount,
                             tenor: collection.tenor,
@@ -210,12 +235,14 @@ function service(data) {
                             num_of_collections: collection.num_of_collections,
                             interest: product.interest,
                             disbursement_date: collection.disbursement_date,
-                        }
+                        };
+
                         let borrower = await models.profile.findOne({
                             where: {
                                 id: collection.borrower_id
                             }
-                        })
+                        });
+
                         let borrower_userId = null;
                         if (borrower && borrower.user_id) {
                             borrower_userId = borrower.user_id;
@@ -276,7 +303,7 @@ function service(data) {
                     });
                 }
             }
-            collection.interest = product.interest
+            collection.interest = product.interest;
 
             d.resolve(collection);
         })
