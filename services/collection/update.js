@@ -185,17 +185,17 @@ function service(data) {
                     );
 
                     // if tenor is just being added
-                    if (new_status === 'inactive') {
+                    if (new_status === 'inactive' && collection.status !== 'inactive') {
 
                         // prepare email
-                        let lender_identity =
+                        let lender_name =
                             data.profile.business_name || data.user.first_name + ' ' + data.user.last_name;
 
 
                         let email_payload = {
-                            lenderFullName: lender_identity,
-                            loanAmount: collection.amount,
-                            interestRate: product.interest,
+                            lenderFullName: lender_name,
+                            loanAmount: collection.amount + ` NGN`,
+                            interestRate: product.interest+  " %",
                             interestPeriod: product.interest_period,
                             tenor: collection.tenor + ' ' + product.tenor_type,
                             borrowersFullName: collection.borrower_first_name + ' ' + collection.borrower_last_name,

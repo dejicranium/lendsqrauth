@@ -9,18 +9,14 @@ module.exports = {
     inviteBorrower(email, payloadData) {
         const d = q.defer();
         q.fcall(() => {
-
                 let url = config.notif_base_url + 'email/send';
                 let payload = {
                     sender_id: 1,
-                    context_id: 89,
+                    context_id: 95,
                     recipient: email,
                     sender: config.sender_email,
-                    data: {
-                        ...payloadData
-                    }
-                }
-
+                    data: payloadData
+                };
                 return makeRequest(url, 'POST', payload, constants.requestHeaders, 'Invite borrower');
             })
             .then(response => {
@@ -28,7 +24,7 @@ module.exports = {
             })
             .catch(err => {
                 d.reject(err);
-            })
+            });
 
         return d.promise
     },

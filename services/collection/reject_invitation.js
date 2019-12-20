@@ -64,7 +64,7 @@ function service(data) {
                     id: borrower_profile.user_id
                 }
             });
-            await borrower_profile.update({deleted_flag:1})
+            await borrower_profile.update({deleted_flag:1});
             await user.update({deleted_flag:1});
 
             await instance.update({
