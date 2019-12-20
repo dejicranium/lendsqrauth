@@ -8,6 +8,7 @@ const assert = require('mlar')('assertions');
 const config = require('../../config');
 const makeRequest = require('mlar')('makerequest');
 const crypto = require('crypto');
+const requests = require('mlar')('requests');
 
 var spec = morx.spec({})
     .build('first_name', 'required:false, eg:Tina')
@@ -184,11 +185,23 @@ function service(data) {
                     name: fullname
                 }
             }
+            try {
+                // create wallet
+                let create_wallet_data = {
+                    firstname: user.first_name ? user.first_name : user.business_name,
+                    lastname: user.last_name ? user.last_name : user.business_name,
+                    user_id: user.id
+                };
 
+                await requests.createWallet(create_wallet_data);
+
+            }
+            catch(e){
+                // silent treatmentto be logged;
+            }
             const url = config.notif_base_url + "email/send";
             // send the welcome email 
             try {
-
                 await makeRequest(url, 'POST', payload, requestHeaders);
             } catch (e) {
                 // silent treatment to be logged;
@@ -200,7 +213,6 @@ function service(data) {
             payload.data.url = config.base_url + 'activate?token=' + userToken
 
             try {
-
                 await makeRequest(url, 'POST', payload, requestHeaders);
             }
             catch(e) {

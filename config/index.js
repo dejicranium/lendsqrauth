@@ -1,6 +1,6 @@
 const dotenv = require('dotenv')
 
-if (process.env.NODE_ENV != 'production') {
+if (process.env.NODE_ENV !== 'production') {
     //dotenv.load({ path: '.env' });
 
     dotenv.config({
@@ -21,5 +21,7 @@ module.exports = {
 
     mifos_base_url: process.env.mifos_base_url || 'https://ec2-54-169-251-192.ap-southeast-1.compute.amazonaws.com/fineract-provider/api/v1/',
     mifos_user: process.env.mifos_user || 'mifos',
-    mifos_password: process.env.mifos_password || 'password'
+    mifos_password: process.env.mifos_password || 'password',
+
+    wallet_service_base_url: process.env.wallet_service_base_url || 'https://wallet-service-lendsqr.herokuapp.com/api/v1/'
 }

@@ -9,7 +9,7 @@ const makeRequest = require('mlar')('makerequest');
 const config = require('../../config');
 const resolvers = require('mlar')('resolvers');
 const collection_utils = require('mlar')('collection_utils');
-const moment = require('moment')
+const moment = require('moment');
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
 var spec = morx
@@ -139,7 +139,7 @@ function service(data) {
             if (!collection) throw new Error('No such product exists');
 
             // you can't change a loan's product id after it has been set
-            if (params.product_id && collection.status == 'active')
+            if (params.product_id && collection.status === 'active')
                 throw new Error('Cannot re-update product id of a created collection');
 
             //params.profile_id = data.profile.id
@@ -157,11 +157,11 @@ function service(data) {
         })
         .spread(async (collection, product) => {
             if (product.id) {
+
                 // check whether the most essential parts of a collection are available before sending email
-
                 if (!['declined', 'active'].includes(collection.status)) { // make sure that you aren't detecting a collection
-                    //that is already considered active;
 
+                    //that is already considered active;
                     let required_fields = [
                         'product_id',
                         'tenor',
@@ -176,7 +176,6 @@ function service(data) {
                     ];
 
                     // see whether collection is in draft;
-
                     let new_status = resolvers.resolveCompletionStatus(
                         collection,
                         required_fields,

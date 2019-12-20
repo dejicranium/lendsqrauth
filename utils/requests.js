@@ -29,6 +29,29 @@ module.exports = {
         return d.promise
     },
 
+    createWallet(data) {
+        const d = q.defer();
+        let payload = {
+            firstname: data.firstname,
+            lastname: data.lastname,
+            user_id: data.user_id
+        }
+        q.fcall(() => {
+            let url = config.wallet_service_base_url + 'wallets';
+            return makeRequest(url, 'POST', payload, constants.requestHeaders, 'create wallet');
+        })
+            .then(response => {
+                console.log(response);
+                d.resolve(response)
+            })
+            .catch(err => {
+                console.log(err);
+                d.reject(err);
+            });
+
+        return d.promise
+    },
+
     notifyLoanCreated(email) {
         const d = q.defer();
         q.fcall(() => {
