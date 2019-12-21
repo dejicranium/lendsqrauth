@@ -23,7 +23,7 @@ module.exports = async function (req, res, next) {
 
             if (err) {
                 utils.jsonF(res, null, "Profile token expired or invalid");
-                return
+                return;
             }
             try {
                 console.log('attempting to start jwt decode')
@@ -38,7 +38,7 @@ module.exports = async function (req, res, next) {
 
 
                 if (decoded_dict) {
-                    req.profile = decoded_dict
+                    req.profile = decoded_dict;
 
                     console.log('profile id is ' + req.profile.id)
 
@@ -52,18 +52,16 @@ module.exports = async function (req, res, next) {
                     } else {
                         console.log('got req profile.id');
                         // else  go on
-                        next()
+                        next();
                         return;
                     }
                 }
             } catch (err) {
-                utils.jsonF(res, err, err);
+                utils.jsonF(res, null, err);
                 return;
             }
 
-        })
-        .catch(err => {
-            utils.jsonF(res, err, err);
-        })
+        });
+
     return d.promise
-}
+};
