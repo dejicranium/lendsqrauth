@@ -7,6 +7,7 @@ const validators = require('mlar')('validators');
 const obval = require('mlar')('obval');
 const assert = require('mlar')('assertions');
 const DEFAULT_EXCLUDES = require('mlar')('appvalues').DEFAULT_EXCLUDES;
+const AuditLog = require('mlar')('audit_log');
 
 var spec = morx.spec({})
     .build('user_id', 'required:true') // to be used by admin
@@ -47,7 +48,9 @@ function service(data) {
 
         }).then((user) => {
             if (!user) throw new Error("An error occured while updating user's account");
-
+            let action_type = data.status === "activate" ? 'activated' : 'deactivated';
+            let audit_log = new AuditLog(data.reqData, "UPDATE",  action_type +" account with user id " + user.id);
+            audit_log.create();
             d.resolve("Successfully updated user's status");
         })
         .catch((err) => {

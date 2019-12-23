@@ -6,7 +6,8 @@ const service = require('mlar').mreq('services', 'profile/choose');
 
 function vinfo(req, res, next){ 
         const data = {...req.body, ...req.query, ...req.headers, ...req.params};
-        data.user = req.user
+        data.user = req.user;
+        data.reqData = req;
         service(data)
         .then(response => {
             utils.jsonS(res, response, "Profile chosen successfully"); 

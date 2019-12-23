@@ -7,5 +7,7 @@ module.exports = (data) => {
         })
         .catch(err => {
             console.log(err);
+            // silent treatment
+
         })
 }

@@ -6,7 +6,7 @@ const has_perm_middleware = require('mlar')('hasPermMiddleware');
 
 function vinfo(req, res, next){ 
         const data = {...req.query, ...req.body, ...req.headers};
-        
+        data.reqData = req;
         service(data)
         .then(response => {
             utils.jsonS(res, response, "Process completed successfully"); 

@@ -9,6 +9,7 @@ const assert = require('mlar')('assertions');
 const crypto = require('crypto');
 const DEFAULT_EXCLUDES = require('mlar')('appvalues').DEFAULT_EXCLUDES;
 const moment = require('moment')
+const AuditLog = require('mlar')('audit_log');
 
 var spec = morx.spec({}) 
 			   .build('type', 'required:true')   
@@ -30,8 +31,14 @@ function service(data){
         		 
 		return role.update({type: params.type})
 
-	}).then(done=> {
-		if (!done) throw new Error("Could not update role")
+	}).then(async role=> {
+		if (!role) throw new Error("Could not update role")
+
+		//audit log
+
+		let audit_log = new AuditLog(data.reqData, 'UPDATE', 'updated role ' + role.id);
+		await audit_log.create();
+		// end of audit log
 		d.resolve("Successfully updated role ")
 	})
 	.catch( (err) => {

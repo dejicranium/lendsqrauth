@@ -12,6 +12,7 @@ const moment = require('moment');
 const config = require('../../config');
 const makeRequest = require('mlar')('makerequest');
 const generateRandom = require('mlar')('testutils').generateRandom;
+const AuditLog = require('mlar')('audit_log');
 
 var spec = morx.spec({})
     .build('token', 'required:true')
@@ -42,6 +43,10 @@ function service(data) {
                 status: 'accepted'
             });
 
+            //data.reqData.user = {id: invite.user_created_id}
+            let audit = new AuditLog(data.reqData, "CREATE", "accepted membership invitation from user " + inivite.inviter);
+            await audit.create();
+            
             d.resolve(`Invitation accepted`);
         })
         .catch((err) => {

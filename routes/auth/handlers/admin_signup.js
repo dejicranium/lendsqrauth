@@ -4,6 +4,7 @@ const routemeta = require('mlar')('routemeta');
 
 function vinfo(req, res, next){ 
         const data = {...req.body, ...req.query, ...req.headers, ...req.params};
+        data.reqData = req;
         data.create_profile = true;
         signupService(data)
         .then(response => {

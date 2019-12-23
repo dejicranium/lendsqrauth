@@ -5,6 +5,7 @@ const q = require('q');
 const validators = require('mlar')('validators');
 const assert = require('mlar')('assertions');
 const product_utils = require('mlar')('product_utils');
+const AuditLog = require('mlar')('audit_log');
 
 var spec = morx.spec({})
     .build('product_id', 'required:true, eg:lender')
@@ -22,7 +23,7 @@ function service(data) {
             const params = validParameters.params;
 
             // verify status parameter
-            if (!['active', 'deactivated', 'inactive'].includes(params.status)) throw new Error("Product must be one of active, deactivated or inactive")
+            if (!['active', 'deactivated', 'inactive'].includes(params.status)) throw new Error("Status must be one of active, deactivated or inactive")
 
             // get a product
             let getProduct = models.product.findOne({
@@ -80,8 +81,18 @@ function service(data) {
             return product.update({
                 ...params
             })
-        }).then((product) => {
+        }).then(async(product) => {
             if (!product) throw new Error("An error occured while updating product");
+            let action_type = null;
+            if (data.status === 'active') {
+                action_type = 'activated';
+            }
+            else if (data.status === 'inactive') {
+                action_type = 'inactivated';
+            }
+
+            let audit = new AuditLog(data.reqData, "UPDATE", action_type + " product " + product.id);
+            await audit.create();
 
             d.resolve(product);
         })

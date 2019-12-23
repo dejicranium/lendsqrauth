@@ -9,6 +9,7 @@ const makeRequest = require('mlar')('makerequest');
 const config = require('../../config');
 const resolvers = require('mlar')('resolvers');
 const collection_utils = require('mlar')('collection_utils');
+const AuditLog = require('mlar')('audit_log');
 const moment = require('moment');
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
@@ -198,9 +199,11 @@ function service(data) {
                             interestPeriod: product.interest_period,
                             tenor: collection.tenor + ' ' + product.tenor_type,
                             borrowersFullName: collection.borrower_first_name + ' ' + collection.borrower_last_name,
-                            accept_url: config.base_url + 'accept-borrower-invite',
-                            reject_url: config.base_url + 'accept-borrower-invite',
+                            rejectURL: config.base_url + 'signup/borrower/reject?token=',
+                            acceptURL: config.base_url + 'signup/borrower/accept?token='
                         };
+
+
 
                         // if there's no profile_created_id, user doesn't exist on system yet;
 
@@ -212,17 +215,25 @@ function service(data) {
                         let invitation = await models.borrower_invites.findOne({
                             where: {
                                 collection_id: collection.id,
-                                borrower_name: collection.borrower_first_name + collection.borrower_last_name
                             }
 
                         });
 
                         if (invitation && invitation.id) {
-                            if (!invitation.profile_created_id) {
-                                email_payload.reject_url = config.base_url + 'reject-borrower-invite'
-                            }
+                            email_payload.rejectURL += invitation.token;
+                            email_payload.acceptURL += invitation.token;
+
                         }
 
+                        /******
+                         *
+                         *
+                         *
+                         *
+                         *
+                         *
+                         * Send invitation email
+                         */
                         await requests.inviteBorrower(collection.borrower_email, email_payload);
                     }
 
@@ -304,6 +315,8 @@ function service(data) {
             }
             collection.interest = product.interest;
 
+            let audit = new AuditLog(data.reqData, 'UPDATE', 'updated collection ' + collection.id);
+            await audit.create()
             d.resolve(collection);
         })
         .catch((err) => {

@@ -12,6 +12,7 @@ const moment = require('moment');
 const config = require('../../config');
 const makeRequest = require('mlar')('makerequest');
 const generateRandom = require('mlar')('testutils').generateRandom;
+const AuditLog = require('mlar')('audit_log');
 
 var spec = morx.spec({}) 
 			 
@@ -72,6 +73,10 @@ function service(data){
 
         // send otp to phone;
         await makeRequest(url, 'POST', payload, requestHeaders);
+
+
+        let audit_log = new AuditLog(data.reqData, "CREATE", "requested bank verification OTP to be sent");
+        await audit_log.create();
 
         d.resolve("sent otp");
     })

@@ -8,6 +8,8 @@ const config = require('../../config');
 const makeRequest = require('mlar')('makerequest');
 const generateRandom = require('mlar')('testutils').generateRandom;
 const requests = require('mlar')('requests');
+const AuditLog = require('mlar')('audit_log');
+
 var spec = morx.spec({})
     .build('bvn', 'required:true')
     .build('account_number', 'required:true')
@@ -182,6 +184,10 @@ function service(data) {
                 // if token has no issues, show success and flag as used
                 token.is_used = true;
                 await token.save();
+
+                let audit_log = new AuditLog(data.reqData, "CREATE", "added a new bank account");
+                audit_log.create();
+
                 return "OTP verified";
             }
         })

@@ -9,6 +9,7 @@ const bcrypt = require('bcrypt');
 const config = require('../../config');
 const makeRequest = require('mlar')('makerequest');
 const crypto = require('crypto');
+const AuditLog = require('mlar')('audit_log');
 
 /**  this is to be used by a borrower to reject a collections invitation 
  *  sent to him by a lender.
@@ -178,6 +179,9 @@ function service(data) {
 
             }
 
+            data.reqData.user = JSON.parse(JSON.stringify(user));
+            let audit_log = new AuditLog(data.reqData, 'SIGN UP', 'completed registration as a team member');
+            audit_log.create();
             d.resolve(user);
         })
 

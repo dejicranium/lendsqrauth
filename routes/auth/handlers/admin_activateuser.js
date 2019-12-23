@@ -10,6 +10,7 @@ function vinfo(req, res, next){
         const data = {...req.body, ...req.query, ...req.headers, ...req.params};
         data.status = 'activate';
         data.profile = req.profile;
+        data.reqData = req;
         service(data)
         .then(response => {
             utils.jsonS(res, response, "User account has been updated successfully"); 

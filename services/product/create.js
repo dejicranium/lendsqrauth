@@ -1,9 +1,8 @@
 const models = require('mlar')('models');
-const ErrorLogger = require('mlar')('errorlogger');
 const morx = require('morx');
 const q = require('q');
-const validators = require('mlar')('validators');
 const assert = require('mlar')('assertions');
+const AuditLog = require('mlar')('audit_log');
 
 var spec = morx.spec({})
 	//.build('profile_id', 'required:true, eg:lender')   
@@ -138,6 +137,9 @@ function service(data) {
 			await product.update({
 				...updateData
 			});
+
+			let audit = new AuditLog(data.reqData, "CREATE", "created loan product " + product.id);
+			await audit.create();
 
 			d.resolve(product);
 		})

@@ -3,7 +3,8 @@ const ErrorLogger = require('mlar')('errorlogger');
 const morx = require('morx'); 
 const q = require('q'); 
 const validators = require('mlar')('validators'); 
-const assert = require('mlar')('assertions'); 
+const assert = require('mlar')('assertions');
+const AuditLog = require('mlar')('audit_log');
 
 var spec = morx.spec({}) 
 				.build('preference_id', 'required:true')
@@ -21,6 +22,8 @@ function service(data){
 	})
 	.then( async (preference) => {
 		if (!preference) throw new Error("Could not delete preference");
+		let audit = new AuditLog(data.reqData, 'DELETE', 'deleted preference');
+		await audit.create();
 		d.resolve("Deleted preference");
 	})
 	.catch(error=> {

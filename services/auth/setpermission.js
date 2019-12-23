@@ -9,6 +9,7 @@ const assert = require('mlar')('assertions');
 const crypto = require('crypto');
 const DEFAULT_EXCLUDES = require('mlar')('appvalues').DEFAULT_EXCLUDES;
 const moment = require('moment')
+const AuditLog = require('mlar')('audit_log');
 
 var spec = morx.spec({}) 
                 .build('entity', 'required:true,eg:role')
@@ -64,8 +65,17 @@ function service(data){
         params.created_on = new Date();
         return models.entity_permission.create(params);
 	
-	}).then(created=>  {
+	}).then(async created=>  {
         if (!created) throw new Error("Could not create permission");
+
+        //  audit log
+
+        let audit_log = new AuditLog(data.reqData, "UPDATE", 'set new entity permission');
+        await audit_log.create();
+
+        // end of audit log
+
+
         d.resolve(created);
     })
 	.catch( (err) => {

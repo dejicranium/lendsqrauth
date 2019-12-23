@@ -6,6 +6,7 @@ const validators = require('mlar')('validators');
 const assert = require('mlar')('assertions');
 const signup = require('mlar')('signupservice');
 const bcrypt = require('bcrypt');
+const AuditLog = require('mlar')('audit_log');
 
 
 /**  this is to be used by a borrower to reject a collections invitation 
@@ -110,6 +111,14 @@ function service(data) {
                     status: 'Accepted',
                     date_joined: new Date(),
                 })
+
+
+
+                // audit
+
+                data.reqData.user = JSON.parse(JSON.stringify(user));
+                let audit = new AuditLog(data.reqData, "SIGN UP", "signed up as through borrower invitation");
+                await audit.create();
 
                 d.resolve({
                     first_name: user.first_name,

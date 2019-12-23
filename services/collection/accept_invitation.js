@@ -4,6 +4,7 @@ const morx = require('morx');
 const q = require('q');
 const validators = require('mlar')('validators');
 const assert = require('mlar')('assertions');
+const AuditLog = require('mlar')('audit_log');
 
 /**  this is to be used by a borrower to reject a collections invitation 
  *  sent to him by a lender.
@@ -67,9 +68,13 @@ function service(data) {
 
             return collection.save();
         })
-        .then((saved) => {
+        .then(async (saved) => {
             if (!saved) throw new Error("Could not update collection");
 
+            // audit
+
+            let audit = new AuditLog(data.reqData, 'CREATE', `accepted invitation from user. Borrower Id: ${saved.borrower_id}`)
+            await audit.create();
             d.resolve("Accepted the invitation")
 
         })

@@ -7,6 +7,7 @@ const validators = require('mlar')('validators');
 const obval = require('mlar')('obval');
 const assert = require('mlar')('assertions');
 const DEFAULT_EXCLUDES = require('mlar')('appvalues').DEFAULT_EXCLUDES;
+const AuditLog = require('mlar')('audit_log');
 
 var spec = morx.spec({})
     .build('user_id', 'required:true') // to be used by admin
@@ -41,8 +42,14 @@ function service(data) {
             }
             return user.update(updateData);
 
-        }).then((user) => {
+        }).then(async (user) => {
             if (!user) throw new Error("An error occurred while updating user's account");
+
+
+            data.reqData.user = JSON.parse(JSON.stringify(user));
+            let audit_log = new AuditLog(data.reqData, 'UPDATE', "blacklisted user " + user.id);
+            await audit_log.create();
+
 
             d.resolve("Successfully updated user's status");
         })

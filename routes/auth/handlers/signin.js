@@ -4,7 +4,8 @@ const routemeta = require('mlar')('routemeta');
 
 function vinfo(req, res, next){ 
         const data = {...req.body, ...req.query, ...req.headers, ...req.params};
-        
+
+        data.reqData = req; // for audit trail 
         service(data)
         .then(response => {
             utils.jsonS(res, response, "User signed in successfully"); 

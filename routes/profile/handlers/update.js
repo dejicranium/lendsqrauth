@@ -14,6 +14,7 @@ function vinfo(req, res, next) {
 
     data.user = req.user;
     data.profile = req.profile;
+    data.reqData = req;
 
     service(data)
         .then(response => {

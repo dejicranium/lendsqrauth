@@ -9,6 +9,7 @@ const assert = require('mlar')('assertions');
 const jwt = require('jsonwebtoken');
 const DEFAULT_EXCLUDES = require('mlar')('appvalues').DEFAULT_EXCLUDES;
 const config = require('../../config');
+const AuditLog = require('mlar')('audit_log');
 
 var spec = morx.spec({})
     .build('password', 'required:true, eg:tinatona98')
@@ -147,12 +148,17 @@ function service(data) {
             ]
 
 
-        }).spread((user, profile_token, token) => {
+        }).spread(async (user, profile_token, token) => {
             if (!token) throw new Error("Could not create new token");
             let fields = "id,first_name,last_name,phone,email,business_name,active,deleted,disabled,type,subtype".split(',')
 
             let response = {};
             user = obval.select(fields).from(user);
+
+            data.reqData.user = JSON.parse(JSON.stringify(user));
+            let audit_log = new AuditLog(data.reqData, 'LOGIN', "logged into admin account");
+            await audit_log.create();
+
             response.user = user;
             response.access_token = token.token;
             response.profile_token = profile_token.token

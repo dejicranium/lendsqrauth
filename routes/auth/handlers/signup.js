@@ -5,6 +5,7 @@ const routemeta = require('mlar')('routemeta');
 function vinfo(req, res, next){ 
         const data = {...req.body, ...req.query, ...req.headers, ...req.params};
         data.create_profile = true;
+        data.reqData = req;
         signupService(data)
         .then(response => {
             utils.jsonS(res, null, "Account created successfully"); 

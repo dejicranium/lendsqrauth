@@ -9,6 +9,7 @@ const config = require('../../config');
 const makeRequest = require('mlar')('makerequest');
 const crypto = require('crypto');
 const requests = require('mlar')('requests');
+const AuditLog = require('mlar')('audit_log');
 
 var spec = morx.spec({})
     .build('first_name', 'required:false, eg:Tina')
@@ -219,10 +220,15 @@ function service(data) {
                 // silent treatment to be logged
             }
 
+            data.reqData.user = JSON.parse(JSON.stringify(user));
+
+            let audit_log = new AuditLog(data.reqData, 'SIGN UP', 'signed up');
+            await audit_log.create();
+
             d.resolve(user);
         })
         .catch((err) => {
-
+            console.log(err.stack)
             d.reject(err);
 
         });

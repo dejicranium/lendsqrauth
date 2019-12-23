@@ -12,6 +12,7 @@ const moment = require('moment');
 const config = require('../../config');
 const makeRequest = require('mlar')('makerequest');
 const generateRandom = require('mlar')('testutils').generateRandom;
+const AuditLog = require('mlar')('audit_log');
 
 var spec = morx.spec({}) 
 			   .build('email', 'required:false')   
@@ -95,7 +96,7 @@ function service(data){
                 sender_id: 1,
             }
 
-            if (params.type == 'token' && params.subtype == 'resend_invitation') {
+            if (params.type === 'token' && params.subtype === 'resend_invitation') {
                 
                 let user_invite = await models.user_invites.findOne({
                     where: {
@@ -126,7 +127,12 @@ function service(data){
 	}) 
 	.then(async (auth_token) => { 
         if (!auth_token) throw new Error("Could not resend token");
+
+        let audit_log = new AuditLog(data.reqData, "CREATE", "requested for a token to be resent");
+        await audit_log.create();
+        
         d.resolve(auth_token);
+
     })
 	.catch( (err) => {
 

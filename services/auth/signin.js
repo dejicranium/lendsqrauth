@@ -10,6 +10,8 @@ const jwt = require('jsonwebtoken');
 const DEFAULT_EXCLUDES = require('mlar')('appvalues').DEFAULT_EXCLUDES;
 const config = require('../../config');
 const jwt_decode = require('jwt-decode');
+const AuditLog = require('mlar')('audit_log');
+
 
 var spec = morx.spec({})
     .build('password', 'required:true, eg:tinatona98')
@@ -46,7 +48,7 @@ function service(data) {
                     name: 'admin'
                 }
             })
-            if (user_profiles.length == 1 && user_profiles[0].role_id == admin_role.id) {
+            if (user_profiles.length === 1 && parseInt(user_profiles[0].role_id) === parseInt(admin_role.id)) {
                 throw new Error("Cannot sign in user with only one profile which is an admin profile")
             }
 
@@ -65,7 +67,7 @@ function service(data) {
 
         })
         .spread(async (user, token, user_profiles) => {
-            if (user.status != 'active') throw new Error('User is inactive')
+            if (user.status !== 'active') throw new Error('User is inactive')
 
             // ids of the user's profiles 
             user_profiles = user_profiles.map(profile => profile.id)
@@ -99,18 +101,30 @@ function service(data) {
             ]
 
 
-        }).spread((user, token) => {
+        }).spread(async (user, token) => {
             if (!token) throw new Error(token) //throw new Error("Could not create new token");
-            let fields = "id,first_name,last_name,phone,email,image,type".split(',')
 
+
+            let fields = "id,first_name,last_name,phone,email,image,type".split(',')
             let response = {};
+
+
             user = obval.select(fields).from(user);
+
+
             response.user = user;
             response.token = token.token;
 
-            d.resolve(response)
+
+            data.reqData.user = user;
+            let audit_log = new AuditLog(data.reqData, 'LOGIN', 'logged into their account');
+            await audit_log.create();
+
+
+        d.resolve(response)
         })
         .catch((err) => {
+            console.log(err.stack)
             d.reject(err);
 
         });

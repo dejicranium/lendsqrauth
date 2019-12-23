@@ -4,6 +4,7 @@ const morx = require('morx');
 const q = require('q');
 const validators = require('mlar')('validators');
 const assert = require('mlar')('assertions');
+const AuditLog = require('mlar')('audit_log');
 
 var spec = morx.spec({})
 	.build('profile_id', 'required:false, eg:lender')
@@ -130,7 +131,8 @@ function service(data) {
 					})
 			}
 
-
+			let audit = new AuditLog(data.reqData, "UPDATE", "updated their profile");
+			await audit.create();
 			d.resolve("Successfully updated user's profile");
 		})
 		.catch((err) => {

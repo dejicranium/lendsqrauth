@@ -5,8 +5,9 @@ const service = require('mlar').mreq('services', 'collection/complete_registrati
 
 function vinfo(req, res, next){ 
         const data = {...req.body, ...req.query, ...req.headers, ...req.params};
-        
-        service(data)
+    data.reqData = req;
+
+    service(data)
         .then(response => {
             utils.jsonS(res, response, "Registration completed"); 
         })

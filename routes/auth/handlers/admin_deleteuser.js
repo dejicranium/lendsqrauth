@@ -12,7 +12,10 @@ function vinfo(req, res, next) {
         ...req.headers,
         ...req.params
     };
-
+    data.user = req.user;
+    data.profile = req.profile;
+    data.reqData = req;
+    
     service(data)
         .then(response => {
             utils.jsonS(res, response, "User has been deleted successfully");

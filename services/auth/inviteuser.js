@@ -12,6 +12,7 @@ const config = require('../../config');
 const makeRequest = require('mlar')('makerequest');
 const crypto = require('crypto');
 const requests = require('mlar')('requests');
+const AuditLog = require('mlar')('audit_log');
 
 var spec = morx.spec({}).build('email', 'required:true, eg:1').build('role_id', 'required:true, eg:1').end();
 
@@ -26,6 +27,7 @@ function service(data) {
 	};
 
 	let GLOBAL_USER_EXISTS = false;
+	let GLOBAL_USER = null;
 	q
 		.fcall(async () => {
 			var validParameters = morx.validate(data, spec, {
@@ -81,6 +83,7 @@ function service(data) {
 			if (user) {
 
 				GLOBAL_USER_EXISTS = true;
+				GLOBAL_USER = user;
 
 				// prepare to copy the details of the user's profile into a new and change only the role_id  (should be collaborator) and parent_profile_id
 				let userProfile = await models.profile.findOne({
@@ -189,21 +192,6 @@ function service(data) {
 				});
 			}
 
-
-
-
-			/*
-
-						let reject_link = config.base_url + '/signup/reject?token=' + invite_token;
-						let accept_link = config.base_url;
-
-						if (GLOBAL_USER_EXISTS) {
-							accet
-						}
-			*/
-
-
-
 			// send email
 			let payload = {
 				context_id: 87,
@@ -215,13 +203,18 @@ function service(data) {
 				}
 			};
 			const url = config.notif_base_url + 'email/send';
+
 			try {
 				await makeRequest(url, 'POST', payload, requestHeaders);
 			} catch (e) {
 				// silent treatment. To be logged;
-
 			}
 
+			// audit log
+			let audit_description = "sent invitation to a potential team member";
+			if (GLOBAL_USER_EXISTS) audit_description = " with user id " + GLOBAL_USER.id
+			let audit_log = new AuditLog(data.reqData, "CREATE", 'sent invitation to a potential team member')
+			await audit_log.create();
 			d.resolve('Invited team member');
 		})
 		.catch((err) => {

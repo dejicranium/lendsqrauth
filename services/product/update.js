@@ -4,6 +4,7 @@ const morx = require('morx');
 const q = require('q');
 const validators = require('mlar')('validators');
 const assert = require('mlar')('assertions');
+const AuditLog = require('mlar')('audit_log');
 
 var spec = morx.spec({})
 	.build('product_id', 'required:true, eg:1')
@@ -170,6 +171,8 @@ function service(data) {
 
 			// see whether loan is draft or not
 			//let loan_is_draft = true;
+			let audit = new AuditLog(data.reqData, "UPDATE", "updated product " + product.id);
+			await audit.create();
 
 			d.resolve(product);
 		})

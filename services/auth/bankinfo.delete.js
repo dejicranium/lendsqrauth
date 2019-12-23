@@ -8,7 +8,9 @@ const obval = require('mlar')('obval');
 const assert = require('mlar')('assertions');
 const crypto = require('crypto');
 const DEFAULT_EXCLUDES = require('mlar')('appvalues').DEFAULT_EXCLUDES;
-const moment = require('moment')
+const moment = require('moment');
+const AuditLog = require('mlar')('audit_log');
+
 
 var spec = morx.spec({})
     .build('user_id', 'required: true')
@@ -34,9 +36,9 @@ function service(data) {
                 params
             ]
         })
-        .spread((bankdetails, params) => {
+        .spread(async (bankdetails, params) => {
             if (!bankdetails) throw new Error(`No such account exists for the user`);
-            bankdetails.update({
+            await bankdetails.update({
                 delete_flag: 1,
                 is_active: 0,
                 is_default: 0,
@@ -44,6 +46,10 @@ function service(data) {
                 deleted_on: new Date(),
                 deleted_by: params.user_id
             });
+
+            let audit_log = new AuditLog(data.reqData, "DELETE", "deleted bank information");
+            await audit_log.create();
+
             d.resolve(bankdetails);
         })
         .catch((err) => {

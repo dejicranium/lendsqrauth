@@ -3,7 +3,8 @@ const ErrorLogger = require('mlar')('errorlogger');
 const morx = require('morx'); 
 const q = require('q'); 
 const validators = require('mlar')('validators'); 
-const assert = require('mlar')('assertions'); 
+const assert = require('mlar')('assertions');
+const AuditLog = require('mlar')('audit_log');
 
 var spec = morx.spec({}) 
 				.build('name', 'required:false')
@@ -62,6 +63,10 @@ function service(data){
 	})
 	.spread( async (preference, params) => {
 		if (!preference) throw new Error("Could not create preference");
+
+		let audit = new AuditLog(data.reqData, "CREATE", "created preference " + preference.id);
+		await audit.create();
+
 		d.resolve(preference[0]);
 	})
 	.catch(error=> {

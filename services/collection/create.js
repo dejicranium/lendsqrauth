@@ -8,6 +8,7 @@ const config = require('../../config');
 const makeRequest = require('mlar')('makerequest');
 const crypto = require('crypto');
 const requests = require('mlar')('requests');
+const AuditLog = require('mlar')('audit_log');
 
 var spec = morx.spec({})
 	.build('borrower_first_name', 'required:true, eg:lender')
@@ -119,7 +120,7 @@ function service(data) {
 				let create_new_borrower_profile = function (user_id) {
 					return models.profile.create({
 						role_id: borrower_role.id,
-						parent_profile_id: data.profile.id, // TODO: get real parent_profile_id
+						parent_profile_id: data.profile.id,
 						user_id: user_id,
 						uuid: Math.random().toString(36).substr(2, 9),
 					});
@@ -188,8 +189,13 @@ function service(data) {
 				params.borrower_id = borrower_cred.id;
 			}
 
+
+
 			params.lender_id = data.profile.id; 	// set the lender profile to the person making this request
 			params.status = "draft";
+
+
+
 
 			invitation_data = {
 				inviter_id: data.profile.id,
@@ -201,10 +207,18 @@ function service(data) {
 				invitation_data.profile_created_id = borrower_cred.id
 			}
 
+
+
 			return models.collection.create(params);
 		})
 		.then(async collection => {
 			if (!collection) throw new Error("Could not create collection");
+
+
+
+
+
+
 
 
 			// create new auth_token for this
@@ -213,18 +227,11 @@ function service(data) {
 
 			// create borrower invites
 			await models.borrower_invites.create(invitation_data);
-			let token = crypto.randomBytes(32).toString('hex');
 
-			let invitation_meta = {
-				collection_id: collection.id
-			};
-			
-			await models.auth_token.create({
-				type: 'borrower_invitation',
-				token: token,
-				meta: JSON.stringify(invitation_meta),
-				is_used: 0
-			});
+			let audit = new AuditLog(data.reqData, "CREATE", "created a new collection. Collection ID " + collection.id);
+			await audit.create();
+
+
 
 			d.resolve(collection)
 		})

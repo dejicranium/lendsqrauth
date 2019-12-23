@@ -8,6 +8,7 @@ const paginate = require('mlar')('paginate');
 const jwt = require('jsonwebtoken');
 const DEFAULT_EXCLUDES = require('mlar')('appvalues').DEFAULT_EXCLUDES;
 const config = require('../../config');
+const AuditLog = require('mlar')('audit_log');
 
 var spec = morx.spec({})
     .build('profile_id', 'required:true, eg:1')
@@ -17,7 +18,7 @@ function service(data) {
 
     let globalUser = data.user;
     let d = q.defer();
-
+    let g_profile = null;
     q.fcall(async () => {
             const validParameters = morx.validate(data, spec, {
                 throw_error: true
@@ -37,7 +38,8 @@ function service(data) {
         .then(async (profile) => {
             if (!profile) throw new Error("User doesn't own this profile");
             // get permissions
-            if (profile.status == 'inactive') {
+            g_profile = profile;
+            if (profile.status === 'inactive') {
                 throw new Error("Profile has been set to inactive");
             }
             let permissions = await models.sequelize.query(`
@@ -104,12 +106,15 @@ function service(data) {
 
         })
 
-        .then(tokenObject => {
+        .then(async tokenObject => {
 
             // token object is an object that shoudl contain `token` as a keuy
             if (tokenObject.token === null) {
                 throw new Error("Could not create profile token");
             }
+
+            let audit = new AuditLog(data.reqData, "LOGIN", "logged into profile " + g_profile.id)
+            await audit.create();
 
             d.resolve({
                 profile_token: tokenObject.token

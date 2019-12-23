@@ -7,6 +7,7 @@ const auth_middleware = require('mlar')('authmiddleware');
 
 function vinfo(req, res, next){ 
         const data = {...req.body, ...req.query, ...req.headers, ...req.params};
+        data.reqData = req;
         forgotpassword(data)
         .then(response => {
             utils.jsonS(res, response, "The process completed successfully"); 

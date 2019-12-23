@@ -10,7 +10,7 @@ function vinfo(req, res, next){
         
         service(data)
         .then(response => {
-            utils.jsonS(res, req.profile, "Roles");
+            utils.jsonS(res, response, "Roles");  //TODO :Rememeber to change the response here
         })
         .catch(error => {
             utils.jsonF(res, null, error.message); 

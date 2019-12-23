@@ -3,6 +3,9 @@ const service = require('mlar').mreq('services', 'auth/bankinfo.delete');
 const routemeta = require('mlar')('routemeta');
 const auth_middleware = require('mlar')('authmiddleware');
 const has_role = require('mlar')('hasRoleMiddleware');
+const profile_verify = require('mlar')('profileVerifyMiddleware');
+
+
 /**
  * Used by admin to get info of bank
  * @param {*} req 
@@ -16,6 +19,10 @@ function vinfo(req, res, next) {
         ...req.headers,
         ...req.params
     };
+    data.user = req.user;
+    data.profile = req.profile;
+    data.reqData = req;
+
 
     data.user_id = req.user.id // default user_id to the user making the request;
     service(data)
@@ -32,6 +39,7 @@ vinfo.routeConfig.path = "/users/bank/:id";
 vinfo.routeConfig.method = "delete";
 vinfo.routeConfig.middlewares = [
     auth_middleware,
+    profile_verify,
     routemeta('update_user_bank_info', 'none')
 ];
 module.exports = vinfo;

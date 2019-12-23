@@ -18,6 +18,7 @@ function vinfo(req, res, next) {
     };
 
     data.user = req.user // default user_id to the user making the request;
+    data.reqData = req;
 
     service(data)
         .then(response => {

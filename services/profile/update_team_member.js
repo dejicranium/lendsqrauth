@@ -2,8 +2,7 @@ const models = require('mlar')('models');
 const ErrorLogger = require('mlar')('errorlogger');
 const morx = require('morx');
 const q = require('q');
-const validators = require('mlar')('validators');
-const assert = require('mlar')('assertions');
+const AuditLog = require('mlar')('audit_log');
 
 var spec = morx.spec({})
     .build('profile_id', 'required:true, eg:lender')
@@ -20,7 +19,7 @@ function service(data) {
                 throw_error: true
             });
             const params = validParameters.params;
-            if (Object.keys(params).length == 1) throw new Error("Please pass a value to update") // profile_id will always be there
+            if (Object.keys(params).length === 1) throw new Error("Please pass a value to update") // profile_id will always be there
             if (params.status) {
                 if (!['active', 'inactive'].includes(params.status)) throw new Error("Pass either active or inactive as a status")
             }
@@ -55,6 +54,9 @@ function service(data) {
             return profile.update(params)
         }).then(async (profile) => {
             if (!profile) throw new Error("An error occured while updating user's profile");
+
+            let audit = new AuditLog(data.reqData, "UPDATE", "updated team member with profile id "+ profile.id);
+            await audit.create();
 
             d.resolve("Successfully updated user's profile");
         })

@@ -6,6 +6,7 @@ const validators = require('mlar')('validators');
 const assert = require('mlar')('assertions');
 const requests = require('mlar')('requests');
 const config = require('../../config');
+const AuditLog = require('mlar')('audit_log');
 
 /**  this is to be used by a borrower to reject a collections invitation
  *  sent to him by a lender.
@@ -63,6 +64,10 @@ function service(data) {
                 };
                 try {
                     await requests.inviteBorrower(collection.borrower_email, email_payload);
+
+                    let audit = new AuditLog(data.reqData,  "CREATE", "re-sent borrower invitation");
+                    await audit.create();
+
                     d.resolve("Successfully re-invited borrower");
                 }
                 catch(e){

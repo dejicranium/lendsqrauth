@@ -12,6 +12,7 @@ const moment = require('moment');
 const config = require('../../config');
 const makeRequest = require('mlar')('makerequest');
 const generateRandom = require('mlar')('testutils').generateRandom;
+const AuditLog = require('mlar')('audit_log');
 
 var spec = morx.spec({}) 
 			   .build('token', 'required:true') 
@@ -47,7 +48,11 @@ function service(data){
 		if (invite.user_created_id) {
 			await models.user.destroy({where : {id: invite.user_created_id}}, {force: true})
 		}
-		
+
+		// create audit_log
+		let audit_log = new AuditLog(data.reqData, 'UPDATE', 'rejected invitation to become a team member');
+		await audit_log.create();
+
         d.resolve(`Invitation declined`);
     })
 	.catch( (err) => {

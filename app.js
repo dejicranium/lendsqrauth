@@ -31,6 +31,8 @@ const apis_product = require('./routes/product');
 const apis_collection = require('./routes/collection');
 const apis_preferences = require('./routes/preference');
 const apis_dashboard = require('./routes/dashboard');
+const apis_audit = require('./routes/audit');
+
 var utils = require('mlar')('mt1l');
 
 var get_collection_schedules = require('mlar')('job_get_schedule');
@@ -118,6 +120,7 @@ app.use(`${base}`, apis_product(EndpointRouter));
 app.use(`${base}`, apis_collection(EndpointRouter));
 app.use(`${base}`, apis_preferences(EndpointRouter));
 app.use(`${base}`, apis_dashboard(EndpointRouter));
+app.use(`${base}`, apis_audit(EndpointRouter));
 
 
 

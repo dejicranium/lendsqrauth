@@ -11,6 +11,8 @@ function vinfo(req, res, next) {
         ...req.params
     };
 
+    data.reqData = req;
+
     service(data)
         .then(response => {
             utils.jsonS(res, response, "Collection invitation accepted");

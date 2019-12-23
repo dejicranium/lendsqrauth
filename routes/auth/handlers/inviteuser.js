@@ -10,6 +10,7 @@ function vinfo(req, res, next){
         const data = {...req.body, ...req.header, ...req.params, ...req.query};
         data.profile = req.profile;
         data.user = req.user;
+        data.reqData = req;
         service(data)
         .then(response => {
             utils.jsonS(res, response, "Created"); 

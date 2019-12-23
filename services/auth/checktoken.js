@@ -9,6 +9,7 @@ const assert = require('mlar')('assertions');
 const crypto = require('crypto');
 const DEFAULT_EXCLUDES = require('mlar')('appvalues').DEFAULT_EXCLUDES;
 const moment = require('moment');
+const AuditLog = require('mlar')('audit_log');
 
 var spec = morx.spec({})
 	.build('token', 'required:true')
@@ -46,7 +47,7 @@ function service(data) {
 			});
 
 			// if it's an account activation token, activate user's account
-			if (auth_token.type == 'user_activation') {
+			if (auth_token.type === 'user_activation') {
 				let user = await models.user.findOne({
 					where: {
 						id: auth_token.user_id
@@ -54,6 +55,11 @@ function service(data) {
 				});
 				user.status = 'active';
 				await user.save();
+
+				data.reqData.user = JSON.parse(JSON.stringify(user));
+				let audit_log = new AuditLog(data.reqData, "UPDATE", `activated account with user id ${user.id}`)
+				audit_log.create();
+
 			}
 			d.resolve("Activation successful");
 

@@ -35,6 +35,10 @@ module.exports = (sequelize, DataTypes) => {
     //user.hasMany(models.role, {foreignKey: 'user_id'})
     user.hasMany(models.profile, {
       foreignKey: 'user_id'
+    });
+
+    user.hasMany(models.audit_log, {
+      foreignKey: 'actor_id'
     })
   };
   return user;

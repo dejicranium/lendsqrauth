@@ -11,6 +11,7 @@ const DEFAULT_EXCLUDES = require('mlar')('appvalues').DEFAULT_EXCLUDES;
 const moment = require('moment')
 const config = require('../../config');
 const makeRequest = require('mlar')('makerequest');
+const AuditLog = require('mlar')('audit_log');
 
 var spec = morx.spec({})
     .build('email', 'required:true, eg:itisdeji@gmail.com')
@@ -110,6 +111,11 @@ function service(data) {
             } catch (e) {
                 // silent treatements
             }
+
+
+            // create audit log;
+            let audit_log = new AuditLog(data.reqData, "UPDATE", 'requested for a password reset');
+            await audit_log.create();
 
             d.resolve(tokencreated.token);
         })

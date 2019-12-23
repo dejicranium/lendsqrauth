@@ -3,7 +3,8 @@ const ErrorLogger = require('mlar')('errorlogger');
 const morx = require('morx'); 
 const q = require('q'); 
 const validators = require('mlar')('validators'); 
-const assert = require('mlar')('assertions'); 
+const assert = require('mlar')('assertions');
+const AuditLog = require('mlar')('audit_log');
 
 var spec = morx.spec({}) 
 			   .build('profile_id', 'required:true, eg:lender')       
@@ -33,8 +34,12 @@ function service(data){
             deleted_on: new Date(),
         })
     })
-    .then((updated)=> {
+    .then(async (updated)=> {
         if(!updated) throw new Error("Unable to delete profile");
+
+        let audit = new AuditLog(data.reqData, "DELETE", "deleted profile "+ update.id);
+        await audit.create();
+
         d.resolve("Successfully deleted profile");
         
     })

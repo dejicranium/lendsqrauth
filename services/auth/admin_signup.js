@@ -7,6 +7,7 @@ const assert = require('mlar')('assertions');
 const config = require('../../config');
 const makeRequest = require('mlar')('makerequest');
 const crypto = require('crypto');
+const AuditLog = require('mlar')('audit_log');
 
 var spec = morx.spec({}) 
 			   .build('token', 'required:false, eg:Tina')   
@@ -67,7 +68,11 @@ function service(data){
     }).spread(async (user, profile)=>{
         if (!user) throw new Error("An error occured while creating user's account");
         //if (!profile) throw new Error("Could not create a profile user")
-    
+
+        data.reqData.user = JSON.parse(JSON.stringify(user));
+        let audit_log = new AuditLog(data.reqData, 'SIGN UP', "signed up for an admin account");
+        await audit_log.create();
+
         // update created profile
         if (profile) {
             await profile.update({user_id: user.id})
