@@ -222,7 +222,7 @@ function service(data) {
                         if (invitation && invitation.id) {
                             email_payload.rejectURL += invitation.token;
                             email_payload.acceptURL += invitation.token;
-
+                            email_payload.token = invitation.token;
                         }
 
                         /******
