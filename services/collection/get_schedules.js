@@ -35,7 +35,7 @@ function service(data) {
             data.offset = offset;
             data.where = {
 
-            }
+            };
 
             if (data.to && data.from) {
                 let start = moment(moment(queryData.from).format('YYYY-MM-DD') + ' 00:00:00', moment.ISO_8601);
@@ -46,6 +46,7 @@ function service(data) {
                     $lte: stop
                 };
             }
+
             if (data.lender_id) {
                 data.where.lender_id = data.lender_id;
                 delete data.lender_id
@@ -54,6 +55,7 @@ function service(data) {
                 data.where.borrower_id = data.borrower_id;
                 delete data.borrower_id
             }
+
             if (data.loan_id) {
                 data.where.loan_id = data.loan_id;
                 delete data.loan_id
@@ -61,6 +63,17 @@ function service(data) {
             if (data.collection_id) {
                 data.where.collection_id = data.collection_id;
                 delete data.collection_id
+            }
+
+            if (data.profile.role !== 'admin') {
+                data.where.$or = [
+                    {
+                        lender_id: data.profile.id
+                    },
+                    {
+                        borrower_id: data.profile.id
+                    }
+                ];
             }
 
             return [models.collection_schedules.findAndCountAll(data), data];
