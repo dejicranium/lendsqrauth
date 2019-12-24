@@ -189,7 +189,7 @@ function service(data) {
 
                         // prepare email
                         let lender_name =
-                            data.profile.business_name || data.user.first_name + ' ' + data.user.last_name;
+                            data.user.business_name || data.user.first_name + ' ' + data.user.last_name;
 
 
                         let email_payload = {
