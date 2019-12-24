@@ -37,7 +37,7 @@ function service(data) {
         .then(async (instance) => {
 
             if (!instance) throw new Error("Invalid token");
-            if (!instance.token_is_used) throw new Error("Token is already used");
+            if (instance.token_is_used) throw new Error("Token is already used");
 
             // if token exists, go ahead and grab the collection id
             /*
