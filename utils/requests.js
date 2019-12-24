@@ -283,6 +283,8 @@ module.exports = {
         return d.promise
     },
 
+
+
     verifyBankAccount(data) {
         const d = q.defer();
 

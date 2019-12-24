@@ -56,6 +56,9 @@ function service(data) {
 				user.status = 'active';
 				await user.save();
 
+				// send an email;
+
+
 				data.reqData.user = JSON.parse(JSON.stringify(user));
 				let audit_log = new AuditLog(data.reqData, "UPDATE", `activated account with user id ${user.id}`)
 				audit_log.create();

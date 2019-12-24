@@ -215,12 +215,6 @@ function service(data) {
 			if (!collection) throw new Error("Could not create collection");
 
 
-
-
-
-
-
-
 			// create new auth_token for this
 			invitation_data.collection_id = collection.id;
 			invitation_data.token = crypto.randomBytes(32).toString('hex');

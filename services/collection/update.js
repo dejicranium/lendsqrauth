@@ -204,14 +204,6 @@ function service(data) {
                         };
 
 
-
-                        // if there's no profile_created_id, user doesn't exist on system yet;
-
-                        // see if borrower is an already-existing user.
-                        // here's how we know that:
-                        // we get the borrower invites models
-                        // then check if there's a profile created id
-
                         let invitation = await models.borrower_invites.findOne({
                             where: {
                                 collection_id: collection.id,
@@ -220,20 +212,21 @@ function service(data) {
                         });
 
                         if (invitation && invitation.id) {
+                            /// get the user record so that we can define whether or not we are inviting a new user or not
+                            let borrower = await models.profile.findOne({where: {id: collection.borrower_id},
+                                include: [{model:models.user}] });
+
+                            let borrower_is_new_user = !borrower.user || !borrower.user.password;
+
+                            if (borrower_is_new_user) {
+                                email_payload.acceptURL = config.base_url + 'signup/borrowers?token=' + invitation.token;
+                            }
+                            else {
+                                email_payload.acceptURL += invitation.token;
+                            }
                             email_payload.rejectURL += invitation.token;
-                            email_payload.acceptURL += invitation.token;
-                            email_payload.token = invitation.token;
                         }
 
-                        /******
-                         *
-                         *
-                         *
-                         *
-                         *
-                         *
-                         * Send invitation email
-                         */
                         await requests.inviteBorrower(collection.borrower_email, email_payload);
                     }
 

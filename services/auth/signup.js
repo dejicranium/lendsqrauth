@@ -66,13 +66,13 @@ function service(data) {
                 },
                 requestHeaders,
                 'validate phone number'
-            )
+            );
 
 
             if (verifiedPhone) {
-                if (verifiedPhone.phone == undefined && verifiedPhone.countryCode == undefined) throw new Error("Phone number not valid");
+                if (verifiedPhone.phone === undefined && verifiedPhone.countryCode === undefined) throw new Error("Phone number not valid");
             }
-            if (verifiedPhone.status == 'error') {
+            if (verifiedPhone.status === 'error') {
                 throw new Error("Could not validate phone number");
             }
             if (validators.areMutuallyExclusive([params.password, params.password_confirmation]))
@@ -81,13 +81,13 @@ function service(data) {
             if (params.password.length < 8)
                 throw new Error("Password cannot be less than 8 characters");
 
-            if (role.name == "business_lender" && params.business_name == undefined)
+            if (role.name === "business_lender" && params.business_name === undefined)
                 throw new Error("Business accounts must have a business name");
 
-            if (role.name == "individual_lender" && (!params.first_name || !params.last_name))
+            if (role.name === "individual_lender" && (!params.first_name || !params.last_name))
                 throw new Error("Individual accounts must have both first name and last name");
 
-            if (role.name == "borrower" && (!params.first_name || !params.last_name))
+            if (role.name === "borrower" && (!params.first_name || !params.last_name))
                 throw new Error("Individual must have both first name and last name");
 
             // hash password
@@ -107,7 +107,7 @@ function service(data) {
 
             params.created_on = new Date();
             params.uuid = Math.random().toString(36).substr(2, 9);
-            if (params.create_profile == true) {
+            if (params.create_profile === true) {
                 return models.sequelize.transaction((t1) => {
                     // create a user and his profile            
                     return q.all([
@@ -137,10 +137,10 @@ function service(data) {
                 await profile.update({
                     user_id: user.id,
                     uuid: uuid
-                })
+                });
 
                 // if the user is  business lender, then create a business info record
-                if (data.type == 'business_lender') {
+                if (data.type === 'business_lender') {
                     await models.business_info.create({
                         profile_id: profile.id,
                         business_name: data.business_name
