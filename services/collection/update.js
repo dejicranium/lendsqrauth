@@ -176,6 +176,7 @@ function service(data) {
                         'start_date'
                     ];
 
+
                     // see whether collection is in draft;
                     let new_status = resolvers.resolveCompletionStatus(
                         collection,
@@ -184,9 +185,8 @@ function service(data) {
                         'inactive'
                     );
 
-                    // if tenor is just being added
-                    if (new_status === 'inactive' && collection.status !== 'inactive') {
 
+                    if (new_status === 'inactive' && collection.status !== 'inactive') {
                         // prepare email
                         let lender_name =
                             data.user.business_name || data.user.first_name + ' ' + data.user.last_name;
@@ -208,7 +208,6 @@ function service(data) {
                             where: {
                                 collection_id: collection.id,
                             }
-
                         });
 
                         if (invitation && invitation.id) {
@@ -219,7 +218,7 @@ function service(data) {
                             let borrower_is_new_user = !borrower.user || !borrower.user.password;
 
                             if (borrower_is_new_user) {
-                                email_payload.acceptURL = config.base_url + 'signup/borrowers?token=' + invitation.token;
+                                email_payload.acceptURL = config.base_url + 'signup/borrower?token=' + invitation.token;
                             }
                             else {
                                 email_payload.acceptURL += invitation.token;
