@@ -67,6 +67,10 @@ function service(data) {
                 exclude: ['token', 'token_is_used', ]
             }
 
+            if (data.profile.role !== 'admin') {
+                //
+                data.where.inviter_id =  data.profile.id
+            }
 
             data.include = [{
                 model: models.collection,

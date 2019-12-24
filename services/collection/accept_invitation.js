@@ -61,7 +61,7 @@ function service(data) {
                 token_is_used: true,
                 status: ACCEPTED_STATUS,
                 date_accepted: new Date()
-            })
+            });
             // update collection;
 
             collection.status = 'active';
