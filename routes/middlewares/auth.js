@@ -19,8 +19,14 @@ module.exports = async function (req, res, next) {
     }
     jwt.verify(auth_token, config.JWTsecret, function (err, decoded) {
 
-            if (err) utils.json401(res, null, "Invalid access token");
-            if (decoded && decoded.expiry < new Date()) utils.json401(res, null, "Expired access token");
+            if (err) {
+                utils.json401(res, null, "Invalid access token");
+                return;
+            }
+            if (decoded && decoded.expiry < new Date()) {
+                utils.json401(res, null, "Expired access token");
+                return;
+            }
             models.auth_token.findOne({
                     where: {
                         type: 'session',
@@ -46,9 +52,7 @@ module.exports = async function (req, res, next) {
                     return;
                 })
 
-        })
-        .catch(err => {
-            utils.jsonF(res, err, err);
-        })
+        });
+
     return d.promise
 }

@@ -19,7 +19,10 @@ module.exports = async function (req, res, next) {
     }
 
     jwt.verify(prof_token, config.JWTsecret, function (err, decoded) {
-            if (decoded && decoded.expiry < new Date()) utils.jsonF(res, 'null', "Expired access token");
+            if (decoded && decoded.expiry < new Date()) {
+                utils.jsonF(res, 'null', "Expired access token");
+                return 0;
+            }
 
             if (err) {
                 utils.jsonF(res, null, "Profile token expired or invalid");
