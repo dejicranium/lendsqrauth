@@ -5,6 +5,8 @@ const q = require('q');
 const validators = require('mlar')('validators');
 const assert = require('mlar')('assertions');
 const AuditLog = require('mlar')('audit_log');
+const requests = require('mlar')('requests');
+
 
 /**  this is to be used by a borrower to reject a collections invitation 
  *  sent to him by a lender.
@@ -64,17 +66,84 @@ function service(data) {
                 date_accepted: new Date()
             });
             // update collection;
-
             collection.status = 'active';
-
             return collection.save();
         })
-        .then(async (saved) => {
-            if (!saved) throw new Error("Could not update collection");
+        .then(async (collection) => {
+            if (!collection) throw new Error("Could not update collection");
+
+
+            let borrower = await models.profile.findOne({
+                where: {
+                    id: collection.borrower_id
+                }
+            });
+
+            let borrower_userId = null;
+            if (borrower && borrower.user_id) {
+                borrower_userId = borrower.user_id;
+            }
+            let product = await models.product.findOne({where: {id: collection.product_id}});
+            let params = {
+                amount: collection.amount,
+                tenor: collection.tenor,
+                tenor_type: product.tenor_type,
+                num_of_collections: collection.num_of_collections,
+                interest: product.interest,
+                disbursement_date: collection.disbursement_date,
+            };
+
+            let result = await requests.createCollectionShedule(params)
+                .then(async resp => {
+                    let bulkdata = [];
+                    resp.periods.forEach(async r => {
+
+
+                        if (resp.periods.indexOf(r) !== 0) {
+                            /*
+                            let borrower_userId = await models.profile.findOne({
+                                where: {
+                                    id: collection.borrower_id
+                                }
+                            });*/
+
+                            let period = {
+                                period_id: r.period,
+                                from_date: r.fromDate.join('-'),
+                                due_date: r.dueDate.join('-'),
+                                days_in_period: r.daysInPeriod,
+                                principal_due: r.principalDue,
+                                interest_due: r.interestDue,
+                                fee: r.feeChargesDue,
+                                total_amount: r.totalDueForPeriod,
+                                loan_id: product.id,
+                                balance_outstanding: r.principalLoanBalanceOutstanding,
+                                interest_outstanding: r.interestOutstanding,
+                                collection_id: collection.id,
+                                lender_userId: data.user.id,
+                                borrower_userId: borrower_userId,
+                                borrower_id: collection.borrower_id,
+                                lender_id: collection.lender_id,
+                                status: 'Pending',
+                            };
+                            bulkdata.push(period);
+
+                        }
+                    });
+                    await models.collection_schedules.bulkCreate(bulkdata);
+                    console.log(resp);
+                })
+                .catch(err => {
+                    //silent failure
+                    console.log(err)
+                })
+
+
+
 
             // audit
 
-            let audit = new AuditLog(data.reqData, 'CREATE', `accepted invitation from user. Borrower Id: ${saved.borrower_id}`)
+            let audit = new AuditLog(data.reqData, 'CREATE', `accepted invitation from user. Borrower Id: ${collection.borrower_id}`)
             await audit.create();
             d.resolve("Accepted the invitation")
 
