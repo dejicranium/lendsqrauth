@@ -58,6 +58,12 @@ function service(data) {
             if (!collection || !collection.id) throw new Error('Could not find collection');
             if (collection.status === 'active') throw new Error('Cannot update an active collection');
 
+            if ((params.start_date || collection.start_date) &&  (params.disbursement_date || collection.disbursement_date)) {
+                let start_date = params.start_date || collection.start_date;
+                let disbursement_date = params.disbursement_date || collection.disbursement_date;
+
+                if (!moment(start_date).isAfter(disbursement_date)) throw new Error("Start date cannot be before disbursement date")
+            }
             // see whether there is a product id attached to the collection or if user is trying to input one
 
             if (collection.product_id) {
