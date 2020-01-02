@@ -38,6 +38,7 @@ function service(data) {
             let params = validParameters.params;
 
             assert.emailFormatOnly(params.email); // validate email, throw error if it's some weird stuff
+            if (params.email.indexOf('lendsqr.com') !== -1) throw new Error("Restricted email");
             assert.mustBeValidPassword(params.password);
 
 
