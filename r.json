@@ -36,6 +36,8 @@
 	"audit_log": "/utils/audit_log",
 
 	"getBanks": "/utils/getbanks",
+	"notifs": "/utils/notifs",
+
 	"job_get_schedule": "/jobs/get_collections_due",
 	"mocks": "/mocks",
 	"queue": "/queue"

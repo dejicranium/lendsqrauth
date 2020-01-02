@@ -10,6 +10,8 @@ const crypto = require('crypto');
 const DEFAULT_EXCLUDES = require('mlar')('appvalues').DEFAULT_EXCLUDES;
 const moment = require('moment');
 const AuditLog = require('mlar')('audit_log');
+const requests = require('mlar')('requests');
+
 
 var spec = morx.spec({})
 	.build('token', 'required:true')
@@ -63,6 +65,9 @@ function service(data) {
 				let audit_log = new AuditLog(data.reqData, "UPDATE", `activated account with user id ${user.id}`)
 				audit_log.create();
 
+				// send new user active email
+				let lenderFullName = user.first_name ? `${user.first_name} ${user.last_name}` : user.business_name;
+				requests.sendNewActiveUserEmail({email: user.email, lenderFullName: lenderFullName});
 			}
 			d.resolve("Activation successful");
 

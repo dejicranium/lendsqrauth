@@ -56,6 +56,7 @@ function service(data) {
             });
 
             if (!collection || !collection.id) throw new Error('Could not find collection');
+            if (collection.status === 'active') throw new Error('Cannot update an active collection');
 
             // see whether there is a product id attached to the collection or if user is trying to input one
 

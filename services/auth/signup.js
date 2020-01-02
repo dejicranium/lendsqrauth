@@ -10,6 +10,8 @@ const makeRequest = require('mlar')('makerequest');
 const crypto = require('crypto');
 const requests = require('mlar')('requests');
 const AuditLog = require('mlar')('audit_log');
+const createWalletJob = require('mlar').mreq('queue', 'jobs/create_wallet');
+const sendEmailJob = require('mlar').mreq('queue', 'jobs/send_email');
 
 var spec = morx.spec({})
     .build('first_name', 'required:false, eg:Tina')
@@ -185,40 +187,39 @@ function service(data) {
                     email: user.email,
                     name: fullname
                 }
-            }
+            };
             try {
-                // create wallet
-                let create_wallet_data = {
-                    firstname: user.first_name ? user.first_name : user.business_name,
-                    lastname: user.last_name ? user.last_name : user.business_name,
-                    user_id: user.id
-                };
+                let first_name = user.first_name ? user.first_name : user.business_name;
+                let last_name = user.first_name ? user.last_name : user.business_name;
 
-                await requests.createWallet(create_wallet_data);
+                await createWalletJob(first_name, last_name, user.id);
+                //await sendEmailJob(81, user.email, payload.data);  // welcome email
+
 
             }
             catch(e){
                 // silent treatmentto be logged;
+                throw new Error(e);
             }
+
             const url = config.notif_base_url + "email/send";
-            // send the welcome email 
+
+            // send the welcome email
             try {
                 await makeRequest(url, 'POST', payload, requestHeaders);
-            } catch (e) {
+
+                // prepare to send email verification email
+                payload.context_id = 81;
+                payload.data.token = userToken;
+                payload.data.url = config.base_url + 'activate?token=' + userToken;
+
+                await makeRequest(url, 'POST', payload, requestHeaders);
+
+            }
+            catch (e) {
                 // silent treatment to be logged;
             }
 
-            // prepare to send email verification email
-            payload.context_id = 81;
-            payload.data.token = userToken;
-            payload.data.url = config.base_url + 'activate?token=' + userToken
-
-            try {
-                await makeRequest(url, 'POST', payload, requestHeaders);
-            }
-            catch(e) {
-                // silent treatment to be logged
-            }
 
             data.reqData.user = JSON.parse(JSON.stringify(user));
 
@@ -228,7 +229,7 @@ function service(data) {
             d.resolve(user);
         })
         .catch((err) => {
-            console.log(err.stack)
+            console.log(err.stack);
             d.reject(err);
 
         });

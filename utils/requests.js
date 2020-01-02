@@ -2,7 +2,7 @@ let constants = require('mlar')('constants');
 let config = require('../config')
 const makeRequest = require('mlar')('makerequest');
 const q = require('q')
-const moment = require('moment')
+const moment = require('moment');
 
 
 module.exports = {
@@ -223,6 +223,32 @@ module.exports = {
             })
 
         return d.promise
+    },
+
+    sendNewActiveUserEmail(data) {
+        const d = q.defer();
+        q.fcall(() => {
+            let url = config.notif_base_url + 'email/send';
+            let payload = {
+                sender_id: 1,
+                context_id: 98,
+                recipient: data.email,
+                sender: config.sender_email,
+                data: {
+                    lenderFullName: data.lenderFullName
+                }
+            };
+            return makeRequest(url, "POST", payload, constants.requestHeaders, "send email to new active user");
+        }).then(sent=> {
+            if (!sent) throw new Error("Could not send email to new active user");
+            else {
+                d.resolve(sent);
+            }
+        }).catch(error=> {
+            d.reject(error);
+        });
+
+        return d.promise;
     },
 
     getBanks(data) {

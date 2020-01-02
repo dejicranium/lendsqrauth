@@ -10,6 +10,8 @@
     "product-test": "mocha test/services/product --recursive",
     "coll-test": "mocha test/services/collection --recursive",
     "pref-test": "mocha test/services/preference --recursive",
+    "notif-test": "mocha test/notifs --recursive",
+
     "start": "node_modules/.bin/sequelize db:migrate && node app.js"
   },
   "keywords": [],

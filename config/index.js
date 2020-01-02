@@ -23,5 +23,7 @@ module.exports = {
     mifos_user: process.env.mifos_user || 'mifos',
     mifos_password: process.env.mifos_password || 'password',
 
-    wallet_service_base_url: process.env.wallet_service_base_url || 'https://wallet-service-lendsqr.herokuapp.com/api/v1/'
+    wallet_service_base_url: process.env.wallet_service_base_url || 'https://wallet-service-lendsqr.herokuapp.com/api/v1/',
+    sqs_jobs_queue_url: process.env.sqs_jobs_queue_url || 'https://sqs.us-east-2.amazonaws.com/350152003452/LendsqrAsyncJobs'
+
 }

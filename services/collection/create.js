@@ -9,6 +9,7 @@ const makeRequest = require('mlar')('makerequest');
 const crypto = require('crypto');
 const requests = require('mlar')('requests');
 const AuditLog = require('mlar')('audit_log');
+const sendCollectionCreatedEmail = require('../../utils/notifs/collection_created');
 
 var spec = morx.spec({})
 	.build('borrower_first_name', 'required:true, eg:lender')
@@ -27,8 +28,8 @@ function service(data) {
 	var d = q.defer();
 	const globalUserId = data.USER_ID || 1;
 	let invitation_data = {
+	};
 
-	}
 	q.fcall(async () => {
 			const validParameters = morx.validate(data, spec, {
 				throw_error: true
@@ -131,7 +132,8 @@ function service(data) {
 						first_name: params.borrower_first_name,
 						last_name: params.borrower_last_name,
 						phone: params.borrower_phone,
-						email: params.borrower_email
+						email: params.borrower_email,
+						status: 'active'
 					})
 				};
 
@@ -189,12 +191,8 @@ function service(data) {
 				params.borrower_id = borrower_cred.id;
 			}
 
-
-
 			params.lender_id = data.profile.id; 	// set the lender profile to the person making this request
 			params.status = "draft";
-
-
 
 
 			invitation_data = {
@@ -206,8 +204,6 @@ function service(data) {
 			if (borrower_cred && borrower_cred.id) { // if there's borrower_cred.first_name, it means a new user was created instead of a new borrower
 				invitation_data.profile_created_id = borrower_cred.id
 			}
-
-
 
 			return models.collection.create(params);
 		})
@@ -224,8 +220,6 @@ function service(data) {
 
 			let audit = new AuditLog(data.reqData, "CREATE", "created a new collection. Collection ID " + collection.id);
 			await audit.create();
-
-
 
 			d.resolve(collection)
 		})
