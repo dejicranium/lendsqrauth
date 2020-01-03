@@ -7,6 +7,7 @@ const assert = require('mlar')('assertions');
 const signup = require('mlar')('signupservice');
 const bcrypt = require('bcrypt');
 const AuditLog = require('mlar')('audit_log');
+const send_email = require('mlar').mreq('notifs', 'send');
 
 
 /**  this is to be used by a borrower to reject a collections invitation 
@@ -53,7 +54,10 @@ function service(data) {
             return [models.collection.findOne({
                 where: {
                     id: instance.collection_id
-                }
+                },
+                include: [{
+                    model: models.product
+                }]
             }), instance, params];
         })
         .spread(async (collection, instance, params) => {
@@ -86,6 +90,11 @@ function service(data) {
         })
         .spread(async (user, collection, instance) => {
             if (!user) throw new Error("There was an error with the sign up");
+            let lender = await models.profile.findOne({
+                where: {
+                    id: collection.lender_id
+                }
+            });
             // if (signup_info.id) {
             //     // create a borrower profile for the user
             //     let borrower_role = await models.role.findOne({
@@ -112,9 +121,28 @@ function service(data) {
                     date_joined: new Date(),
                 })
 
+                // prepare to send emails
+
+            // first, send email notification to the lender;
+            const LENDER_COLLECTION_CONFIRMATION_EMAIL_CONTEXT_ID = 104;
+            const BORROWER_COLLECTION_CONFIRMATION_EMAIL_CONTEXT_ID = 103;
+
+            let confirmation_email_payload = {
+                lenderFullName: lender.user.first_name ? lender.user.first_name + ' ' + lender.user.last_name : lender.user.business_name,
+                loanAmount: collection.amount,
+                borrowerName: collection.borrower_first_name + ' ' + collection.borrower_last_name,
+                interestRate: collection.product.interest + '%',
+                interestPeriod: collection.product.interest_period,
+                tenor: collection.tenor + ' ' + collection.product.tenor_type,
+                link: config.base_url + 'collections',
+                loanRepaymentURL: '',  //TODO: makee sure that this links to reapyment schedule url
+            };
+            // SEND!
+            send_email(LENDER_COLLECTION_CONFIRMATION_EMAIL_CONTEXT_ID, confirmation_email_payload);
+            send_email(BORROWER_COLLECTION_CONFIRMATION_EMAIL_CONTEXT_ID, confirmation_email_payload);
 
 
-                // audit
+            // audit
 
                 data.reqData.user = JSON.parse(JSON.stringify(user));
                 let audit = new AuditLog(data.reqData, "SIGN UP", "signed up as through borrower invitation");

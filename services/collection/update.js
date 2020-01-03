@@ -11,6 +11,8 @@ const resolvers = require('mlar')('resolvers');
 const collection_utils = require('mlar')('collection_utils');
 const AuditLog = require('mlar')('audit_log');
 const moment = require('moment');
+const send_email = require('mlar').mreq('notifs', 'send');
+
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
 var spec = morx
@@ -62,8 +64,40 @@ function service(data) {
                 let start_date = params.start_date || collection.start_date;
                 let disbursement_date = params.disbursement_date || collection.disbursement_date;
 
-                if (!moment(start_date).isAfter(disbursement_date)) throw new Error("Start date cannot be before disbursement date")
+                if (!moment(start_date).isAfter(disbursement_date) && !moment(start_date).isSame(disbursement_date, 'day')) throw new Error("Start date cannot be before disbursement date")
             }
+
+            if (params.borrower_first_name && params.borrower_first_name.length < 3)
+                throw new Error('Names must be more than 2 characters');
+
+            if (params.borrower_last_name && params.borrower_last_name.length < 3)
+                throw new Error('Names must be more than 2 characters');
+
+            if (params.borrower_bvn) {
+                assert.digitsOnly(params.borrower_bvn, null, 'BVN');
+                // first verify that there is a bvn
+                let url = config.utility_base_url + "verify/bvn";
+                let payload = {
+                    bvn: params.borrower_bvn
+                };
+
+                let verifiedBVN = await makeRequest(url, 'POST', payload, requestHeaders, 'Verify BVN');
+
+                if (verifiedBVN && verifiedBVN.mobile) {} else {
+                    throw new Error("Could not verify BVN");
+                }
+
+                // make request to verify phone number
+                const verifiedPhone = await makeRequest(
+                    config.utility_base_url + 'verify/phone/',
+                    'POST', {
+                        phone: collection.borrower_phone
+                    },
+                    requestHeaders,
+                    'validate phone number'
+                );
+            }
+
             // see whether there is a product id attached to the collection or if user is trying to input one
 
             if (collection.product_id) {
@@ -79,7 +113,17 @@ function service(data) {
                     }
                 });
             } else {
-                throw new Error('You need to provide a product id to proceed');
+                //throw new Error('You need to provide a product id to proceed');
+
+                // if there's no product id, we are updating the stuff at the first stage
+                 let result = await collect.update({
+                    borrower_first_name: params.borrower_first_name,
+                    borrower_last_name: params.borrower_last_name,
+                    borrower_bvn: params.borrower_bvn,
+                    borrower_phone: params.borrower_phone
+                });
+                d.resolve(result);
+                 return  d.promise;
             }
 
             if (!product || !product.id) throw new Error('Product does not exist');
@@ -88,13 +132,6 @@ function service(data) {
             if (product.profile_id !== data.profile.id)
                 throw new Error("You can't use a product that isn't attached to this profile");
 
-            if (params.borrower_first_name && params.borrower_first_name.length < 3)
-                throw new Error('Names must be more than 2 characters');
-
-            if (params.borrower_last_name && params.borrower_last_name.length < 3)
-                throw new Error('Names must be more than 2 characters');
-
-            if (params.borrower_bvn) assert.digitsOnly(params.borrower_bvn, null, 'BVN');
 
             if (params.amount) {
                 assert.digitsOrDecimalOnly(params.amount, null, 'Amount');
@@ -207,9 +244,13 @@ function service(data) {
                             tenor: collection.tenor + ' ' + product.tenor_type,
                             borrowersFullName: collection.borrower_first_name + ' ' + collection.borrower_last_name,
                             rejectURL: config.base_url + 'signup/borrower/reject?token=',
-                            acceptURL: config.base_url + 'signup/borrower/accept?token='
+                            acceptURL: config.base_url + 'signup/borrower/accept?token=',
+                            link: config.base_url + 'collections'
                         };
 
+                        /// send collection set up email;
+                        let COLLECTION_SETUP_EMAIL_CONTEXT_ID = 105;
+                        send_email(COLLECTION_SETUP_EMAIL_CONTEXT_ID, data.user.email, email_payload);
 
                         let invitation = await models.borrower_invites.findOne({
                             where: {

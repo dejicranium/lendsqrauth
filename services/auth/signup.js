@@ -9,6 +9,9 @@ const config = require('../../config');
 const makeRequest = require('mlar')('makerequest');
 const crypto = require('crypto');
 const requests = require('mlar')('requests');
+
+const send_email = require('mlar').mreq('notifs', 'send');
+
 const AuditLog = require('mlar')('audit_log');
 const createWalletJob = require('mlar').mreq('queue', 'jobs/create_wallet');
 const sendEmailJob = require('mlar').mreq('queue', 'jobs/send_email');
@@ -177,36 +180,40 @@ function service(data) {
                 });
             }
 
-            let fullname = data.business_name || data.first_name + ' ' + data.last_name;
-            // send email 
-            let payload = {
-                context_id: 69,
-                sender: config.sender_email,
-                recipient: user.email,
-                sender_id: 1,
-                data: {
-                    email: user.email,
-                    name: fullname
-                }
-            };
             try {
                 let first_name = user.first_name ? user.first_name : user.business_name;
                 let last_name = user.first_name ? user.last_name : user.business_name;
 
                 await createWalletJob(first_name, last_name, user.id);
+
+                let verification_email_context_id = 109;
+                let welcome_email_context_id = 108;
+
+                let fullname = data.business_name || data.first_name + ' ' + data.last_name;
+
+                send_email(welcome_email_context_id, user.email, {
+                    lenderFullName: fullname,
+                    loginURL: config.base_url + '/login'
+                });
+                send_email(verification_email_context_id, user.email, {
+                    lenderFullName: fullname,
+                    verifyAccountURL: config.base_url + 'activate?token=' + userToken
+                })
+
                 //await sendEmailJob(81, user.email, payload.data);  // welcome email
-
-
-            }
-            catch(e){
-                // silent treatmentto be logged;
-                throw new Error(e);
-            }
-
-            const url = config.notif_base_url + "email/send";
-
-            // send the welcome email
-            try {
+                /*
+                // send email
+                let payload = {
+                    context_id: 108,
+                    sender: config.sender_email,
+                    recipient: user.email,
+                    sender_id: 1,
+                    data: {
+                        email: user.email,
+                        name: fullname
+                    }
+                };
+                const url = config.notif_base_url + "email/send";
                 await makeRequest(url, 'POST', payload, requestHeaders);
 
                 // prepare to send email verification email
@@ -216,9 +223,13 @@ function service(data) {
 
                 await makeRequest(url, 'POST', payload, requestHeaders);
 
+                */
+
+
             }
-            catch (e) {
-                // silent treatment to be logged;
+            catch(e){
+                // silent treatmentto be logged;
+                throw new Error(e);
             }
 
 

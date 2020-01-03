@@ -12,6 +12,7 @@ const moment = require('moment')
 const config = require('../../config');
 const makeRequest = require('mlar')('makerequest');
 const AuditLog = require('mlar')('audit_log');
+const send_email = require('mlar').mreq('notifs', 'send');
 
 var spec = morx.spec({})
     .build('email', 'required:true, eg:itisdeji@gmail.com')
@@ -87,9 +88,14 @@ function service(data) {
         }).spread(async (tokencreated, user) => {
             if (!tokencreated) throw new Error("An error occured please try again");
 
-            let fullname = user.business_name || user.first_name + ' ' + user.last_name;
+            const fullname = user.business_name || user.first_name + ' ' + user.last_name;
+            const link =  config.base_url + 'reset-password?token=' + tokencreated.token;
+            const FORGOT_PASSWORD_EMAIL_CONTEXT_ID = 107;
 
-            const payload = {
+            send_email(FORGOT_PASSWORD_EMAIL_CONTEXT_ID, user.email, {fullname, link});
+
+            //send_email()
+            /*const payload = {
                 context_id: 80,
                 sender: config.sender_email,
                 recipient: user.email,
@@ -110,7 +116,7 @@ function service(data) {
 
             } catch (e) {
                 // silent treatements
-            }
+            }(*/
 
 
             // create audit log;

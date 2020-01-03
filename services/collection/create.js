@@ -39,9 +39,9 @@ function service(data) {
 			if (params.borrower_first_name.length < 3) throw new Error("Names must be more than 2 characters")
 			if (params.borrower_last_name.length < 3) throw new Error("Names must be more than 2 characters")
 
-			assert.digitsOnly(params.borrower_bvn, null, 'BVN')
-			assert.digitsOnly(params.borrower_phone, null, 'Phone')
-			assert.emailFormatOnly(params.borrower_email, null, 'Email')
+			assert.digitsOnly(params.borrower_bvn, null, 'BVN');
+			assert.digitsOnly(params.borrower_phone, null, 'Phone');
+			assert.emailFormatOnly(params.borrower_email, null, 'Email');
 
 			//all or none
 			assert.mustBeAllOrNone(

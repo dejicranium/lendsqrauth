@@ -11,6 +11,7 @@ const DEFAULT_EXCLUDES = require('mlar')('appvalues').DEFAULT_EXCLUDES;
 const moment = require('moment');
 const AuditLog = require('mlar')('audit_log');
 const requests = require('mlar')('requests');
+const send_email = require('mlar').mreq('notifs', 'send');
 
 
 var spec = morx.spec({})
@@ -66,8 +67,14 @@ function service(data) {
 				audit_log.create();
 
 				// send new user active email
+
+				let NEED_HELP_EMAIL_CONTEXT_ID = 98;
 				let lenderFullName = user.first_name ? `${user.first_name} ${user.last_name}` : user.business_name;
-				requests.sendNewActiveUserEmail({email: user.email, lenderFullName: lenderFullName});
+				send_email(NEED_HELP_EMAIL_CONTEXT_ID, user.email, {lenderFullName});
+
+				//requests.sendNewActiveUserEmail({email: user.email, lenderFullName: lenderFullName});
+
+
 			}
 			d.resolve("Activation successful");
 

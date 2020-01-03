@@ -43,14 +43,14 @@ function service(data) {
             if (!product) throw new Error("No product found");
             // check if the profile who created this is the same as the person trying to accepti it.
             if (data.profile.id !== product.profile_id) throw new Error("You cannot update another profile's product")
-            if (product.status == 'draft' || product.status == 'deleted') throw new Error("Cannot operate on a draft/deleted product");
+            if (product.status === 'draft' || product.status === 'deleted') throw new Error("Cannot operate on a draft/deleted product");
 
             if (product_utils.productHasActiveCollection(product)) {
                 throw new Error("Cannot update a product with at least one active collection")
             }
-            let p = product
-            if (params.status.toLowerCase() == 'active' && product.status !== 'active') {
-                if (p.max_tenor == null || p.product_name == null || p.product_description == null || p.repayment_method == null ||
+            let p = product;
+            if (params.status.toLowerCase() === 'active' && product.status !== 'active') {
+                if (p.max_tenor === null || p.product_name == null || p.product_description == null || p.repayment_method == null ||
                     p.repayment_model == null || p.min_loan_amount == null || p.max_loan_amount == null || p.tenor_type == null ||
                     p.min_tenor == null || p.max_tenor == null || p.interest_period == null || p.interest == null) {
 
@@ -72,7 +72,7 @@ function service(data) {
                 }
             }
             //if (product.status === 'active') throw new Error("Cannot update active product");
-            if (product.deleted_flag == 0) throw new Error("Product has been deleted");
+            if (product.deleted_flag === 0) throw new Error("Product has been deleted");
 
             // set modification details
             params.modified_on = new Date();

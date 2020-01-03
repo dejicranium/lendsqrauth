@@ -6,6 +6,7 @@ const assert = require('mlar')('assertions');
 const config = require('../../config');
 const makeRequest = require('mlar')('makerequest');
 const AuditLog = require('mlar')('audit_log');
+const send_email = require('mlar').mreq('notifs', 'send');
 
 var spec = morx.spec({}) 
 			   .build('current_password', 'required:true, eg:somethingsweet')   
@@ -66,6 +67,13 @@ function service(data){
         */
         // send the change password email 
         //await makeRequest(url, 'POST', payload, requestHeaders, 'send notification');
+
+        const CHANGE_PASSWORD_EMAIL_CONTEXT_ID = 106;
+
+        send_email(CHANGE_PASSWORD_EMAIL_CONTEXT_ID, user.email, {
+            profileURL: config.base_url + '/'
+        });
+
         let audit_log = new AuditLog(data.reqData, "UPDATE", 'changed their password');
         await audit_log.create();
 
