@@ -80,7 +80,9 @@ function service(data) {
                 let payload = {
                     bvn: params.borrower_bvn
                 };
-
+                const requestHeaders = {
+                    'Content-Type': 'application/json',
+                };
                 let verifiedBVN = await makeRequest(url, 'POST', payload, requestHeaders, 'Verify BVN');
 
                 if (verifiedBVN && verifiedBVN.mobile) {} else {
