@@ -39,7 +39,9 @@ function json_send(res, data, message, status, status_code, meta, is_error){
 			data: scrubber(response_json.data, SCRUBVALS),
 			meta: scrubber(response_json.meta, SCRUBVALS)
 		}
-	})
+	});
+
+	logger
 	res.status(status_code).json(response_json);
 }
 

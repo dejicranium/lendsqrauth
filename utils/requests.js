@@ -104,7 +104,7 @@ module.exports = {
         return d.promise
     },
 
-    createCollectionShedule(data) {
+    createCollectionSchedule(data) {
 
         /*
         let tenor = data.tenor;

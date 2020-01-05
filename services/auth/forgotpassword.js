@@ -28,10 +28,37 @@ function service(data) {
             });
             let params = validParameters.params;
 
-
             assert.emailFormatOnly(params.email); // validate email, throw error if it's some weird stuff
 
-            return [models.user.findOne({
+        // first, check how many times the user has attempted to reset password
+        let password_reset_attempts = await models.password_reset_attempts.findAll({
+            limit: 5,
+            order: [['time', 'DESC']],
+            where: {
+                email: params.email,
+            }
+        });
+
+
+
+        if (password_reset_attempts.length === 5) {
+            // check the time difference between the first and the last
+            let latest_time  = moment(password_reset_attempts[0].time);
+            let oldest_time = moment(password_reset_attempts[4].time);
+
+            let time_difference_in_minutes = latest_time.diff(oldest_time, 'minutes');
+
+            if (time_difference_in_minutes < 60)  {
+                // check to see whether the time now is greater than 1 hour of the last time the user tried to reset
+                let now = moment();
+
+                if (now.diff(latest_time, 'minutes') < 60) {
+                    throw new Error("Too much password reset attempts occurred in the most recent hour. Please try again in the next");
+                }
+            }
+        }
+
+        return [models.user.findOne({
                 where: {
                     email: params.email
                 },
@@ -118,6 +145,12 @@ function service(data) {
                 // silent treatements
             }(*/
 
+
+            // create a log in the password reset attempts table
+
+            let new_attempt = await models.password_reset_attempts.create({
+                email: data.email
+            });
 
             // create audit log;
             let audit_log = new AuditLog(data.reqData, "UPDATE", 'requested for a password reset');

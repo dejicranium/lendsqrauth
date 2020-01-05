@@ -103,6 +103,7 @@ function service(data) {
                 tenor_type: product.tenor_type,
                 num_of_collections: collection.num_of_collections,
                 interest: product.interest,
+                interestPeriod: product.interest_period,
                 disbursement_date: collection.disbursement_date,
             };
 
@@ -125,7 +126,7 @@ function service(data) {
             send_email(BORROWER_COLLECTION_CONFIRMATION_EMAIL_CONTEXT_ID, confirmation_email_payload);
 
 
-            let result = await requests.createCollectionShedule(params)
+            let result = await requests.createCollectionSchedule(params)
                 .then(async resp => {
                     let bulkdata = [];
                     resp.periods.forEach(async r => {

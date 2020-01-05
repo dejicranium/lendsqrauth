@@ -60,6 +60,7 @@ if (process.env.MONGODB_URI) {
 }
 const reqIp = require('request-ip');
 const logger = require('mlar')('mongolog');
+const locallogger = require('mlar')('locallogger');
 const scrubber = require('mlar')('obscrub');
 const SCRUBVALS = require('./utils/scrubvals.json');
 
@@ -92,8 +93,16 @@ app.use(function (req, res, next) {
     query: scrubber(req.query, scrubs),
     headers: scrubber(req.headers, scrubs),
     useragent: req.headers['user-agent']
-  }
+  };
+
   logger({
+    type: 'request',
+    id: reqid,
+    comment: 'Request',
+    data: reqlog
+  });
+
+  locallogger.info({
     type: 'request',
     id: reqid,
     comment: 'Request',

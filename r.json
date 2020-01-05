@@ -34,7 +34,7 @@
 	"collection_utils": "/utils/collections",
 	"product_utils": "/utils/products",
 	"audit_log": "/utils/audit_log",
-
+	"locallogger": "/logger",
 	"getBanks": "/utils/getbanks",
 	"notifs": "/utils/notifs",
 

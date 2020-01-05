@@ -25,9 +25,9 @@ function service(data){
 		const validParameters = morx.validate(data, spec, {throw_error : true});
         params = validParameters.params;
 
-        assert.mustBeValidPassword(data.new_password);
 
-        if (data.new_password != data.confirm_password) throw new Error("Passwords must match");
+        assert.mustBeValidPassword(data.new_password);
+        if (data.new_password !== data.confirm_password) throw new Error("Passwords must match");
         
         let reset_token = await models.auth_token.findOne({
             where: {

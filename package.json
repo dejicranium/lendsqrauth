@@ -11,7 +11,6 @@
     "coll-test": "mocha test/services/collection --recursive",
     "pref-test": "mocha test/services/preference --recursive",
     "notif-test": "mocha test/notifs --recursive",
-
     "start": "node_modules/.bin/sequelize db:migrate && node app.js"
   },
   "keywords": [],
@@ -23,6 +22,7 @@
     "axios": "^0.19.0",
     "bcrypt": "^3.0.6",
     "body-parser": "^1.19.0",
+    "bunyan": "^1.8.12",
     "crypto": "^1.0.1",
     "csvtojson": "^2.0.10",
     "dotenv": "^8.2.0",
@@ -34,6 +34,7 @@
     "mlite": "0.0.3",
     "moment": "^2.24.0",
     "mongoose": "^5.6.9",
+    "morgan": "^1.9.1",
     "morx": "0.0.5",
     "morx-cha": "0.0.7",
     "mosc": "1.0.0",
@@ -51,7 +52,8 @@
     "sequelize": "3.29.0",
     "sequelize-cli": "2.4.0",
     "underscore": "1.8.3",
-    "uuid": "3.1.0"
+    "uuid": "3.1.0",
+    "winston": "^3.2.1"
   },
   "devDependencies": {
     "chai": "3.5.0",
