@@ -63,7 +63,6 @@ function service(data) {
             if ((params.start_date || collection.start_date) &&  (params.disbursement_date || collection.disbursement_date)) {
                 let start_date = params.start_date || collection.start_date;
                 let disbursement_date = params.disbursement_date || collection.disbursement_date;
-
                 if (!moment(start_date).isAfter(disbursement_date) && !moment(start_date).isSame(disbursement_date, 'day')) throw new Error("Start date cannot be before disbursement date")
             }
 
