@@ -6,10 +6,14 @@ const validators = require('mlar')('validators');
 const assert = require('mlar')('assertions'); 
 const paginate = require('mlar')('paginate');
 
+/**
+ * This endpoint gets a list of borrowers
+ * But the kindof borrowers that are returned depends on the parameters passed
+ * where `profile_id` is passed, it means we are trying to get all the borrowers attached 
+ * to a `profile_id`
+ */
 var spec = morx.spec({}) 
-			   .build('profile_id', 'required:true, eg:1')   
-			    
-			              
+			   .build('profile_id', 'required:false, eg:1')   			    
 			   .end();
 
 function service(data){
@@ -25,12 +29,38 @@ function service(data){
 	q.fcall( async () => {
 		const validParameters = morx.validate(data, spec, {throw_error : true});
 		const params = validParameters.params;
+		
+		// get the borrower role.
+
 		let borrowerRole = await models.role.findOne({where: {name: 'borrower'}});
 		let borrowerRoleId = borrowerRole.id;
-        data.where = {
-			parent_profile_id: params.profile_id,
-			include: [{model: models.profile, where: {role_id: borrowerRole}}]
-        }
+		
+		
+		// if we are getting the borrowers linked to a lender (using profile_id)
+		if (params.profile_id) {
+		
+			data.where = {
+				role_id: borrowerRoleId,
+				parent_profile_id: params.profile_id,
+			}
+			data.include = [{model: models.user, attributes: {exclude: ['password']}}];
+
+		}
+		
+		else { 
+			data.where =  {
+				role_id: borrowerRoleId
+			}
+			data.include = [{model: models.user, attributes: {exclude: ['password']}}];
+
+
+			// if a lender is making the request, get only his borrowers
+			if (['individual_lender', 'business_lender'].includes(data.profile.role)) {
+				data.where.parent_profile_id = data.profile.id
+			}
+		}
+		
+
         return models.profile.findAndCountAll(data);
 
         

@@ -10,7 +10,7 @@ function vinfo(req, res, next){
         
         service(data)
         .then(response => {
-            utils.jsonS(res, response, "Roles"); 
+            utils.jsonS(res, response, "Roles");  //TODO :Rememeber to change the response here
         })
         .catch(error => {
             utils.jsonF(res, null, error.message); 
@@ -21,8 +21,8 @@ vinfo.routeConfig = {};
 vinfo.routeConfig.path = "/roles"; 
 vinfo.routeConfig.method = "get"; 
 vinfo.routeConfig.middlewares = [
-    //auth_middleware ,
-    //profile_middleware,
+    auth_middleware ,
+    profile_middleware,
     //has_role('admin'), 
     routemeta('auth_get_roles', 'none')];
 module.exports = vinfo;

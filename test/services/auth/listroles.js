@@ -13,15 +13,15 @@ describe('#Get users service', () => {
         page: 1
     }
 
-    it('should lists registered users', (done) => {
-        listout(params).then((result)=>{
-            result.should.be.a('object');
-            result.should.have.property('roles');
-            done();
-        })
-        .catch(err=> {
-            done(err);
-        })
+    it.skip('should lists registered users', (done) => {
+        listout(params).then((result) => {
+                result.should.be.a('object');
+                result.should.have.property('roles');
+                done();
+            })
+            .catch(err => {
+                done(err);
+            })
 
     })
 })

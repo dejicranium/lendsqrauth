@@ -1,15 +1,15 @@
-/*
 var utils = require('mlar')('mt1l');
 const routemeta = require('mlar')('routemeta');
 const auth_middleware = require('mlar')('authmiddleware');
-const service = require('mlar').mreq('services', 'profile/get');
+const service = require('mlar').mreq('services', 'collection/complete_registration');
 
 function vinfo(req, res, next){ 
         const data = {...req.body, ...req.query, ...req.headers, ...req.params};
-        data.filter = true;
-        service(data)
+    data.reqData = req;
+
+    service(data)
         .then(response => {
-            utils.jsonS(res, response, "Profile list"); 
+            utils.jsonS(res, response, "Registration completed"); 
         })
         .catch(error => {
             utils.jsonF(res, null, error.message); 
@@ -17,9 +17,8 @@ function vinfo(req, res, next){
 }
 
 vinfo.routeConfig = {};
-vinfo.routeConfig.path = "/"; 
-vinfo.routeConfig.method = "get"; 
-vinfo.routeConfig.middlewares = [auth_middleware, routemeta('get_profile_type', 'none')];
+vinfo.routeConfig.path = "/borrower-signup"; 
+vinfo.routeConfig.method = "post"; 
+vinfo.routeConfig.middlewares = [routemeta('borrower-signup', 'none')];
 module.exports = vinfo;
 
-*/

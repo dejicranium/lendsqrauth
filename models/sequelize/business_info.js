@@ -2,9 +2,10 @@
 module.exports = (sequelize, DataTypes) => {
   const business_info = sequelize.define('business_info', {
     profile_id: DataTypes.INTEGER,
-    url: DataTypes.STRING,
+    website_link: DataTypes.STRING,
     business_logo: DataTypes.STRING,
     business_name: DataTypes.STRING,
+    business_address: DataTypes.STRING,
     business_phone: DataTypes.STRING,
     rc_number: {
       type: DataTypes.STRING,
@@ -25,12 +26,14 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.DATE,
     },
   }, {
-    freezeTableName:true,
+    freezeTableName: true,
     timestamps: false
   });
-  business_info.associate = function(models) {
+  business_info.associate = function (models) {
     // associations can be defined here
-    business_info.belongsTo(models.profile, {foreignKey: 'profile_id'})
+    business_info.belongsTo(models.profile, {
+      foreignKey: 'profile_id'
+    })
   };
   return business_info;
 };

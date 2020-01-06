@@ -15,14 +15,14 @@ describe('#SetPermissionsService', () => {
         permission_id: 1
     }
 
-    it('should set permssion', (done) => {
-        set(params).then((result)=>{
-            result.should.be.a('object');
-            done();
-        })
-        .catch(err=> {
-            done(err);
-        })
+    it.skip('should set permssion', (done) => {
+        set(params).then((result) => {
+                result.should.be.a('object');
+                done();
+            })
+            .catch(err => {
+                done(err);
+            })
 
     })
 })

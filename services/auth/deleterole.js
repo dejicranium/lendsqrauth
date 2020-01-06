@@ -7,6 +7,7 @@ const validators = require('mlar')('validators');
 const obval = require('mlar')('obval'); 
 const assert = require('mlar')('assertions'); 
 const DEFAULT_EXCLUDES = require('mlar')('appvalues').DEFAULT_EXCLUDES;
+const AuditLog = require('mlar')('audit_log');
 
 var spec = morx.spec({}) 
                 .build('role_id', 'required:true, eg:1')   
@@ -33,9 +34,13 @@ function service(data){
         // soft delete
         return role.destroy({force: true});
         
-    }).then((user)=>{
+    }).then(async(user)=>{
         if (!user) throw new Error("An error occured while deleting role");
-        
+
+        // audit log
+        let audit_log = new AuditLog(data.reqData, "DELETE", "deleted role");
+       await audit_log.create();
+
         d.resolve("Successfully deleted role");
     })
 	.catch( (err) => {

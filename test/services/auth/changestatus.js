@@ -16,7 +16,7 @@ describe('#Sign up user', () => {
        
     }
 
-    it("should update user's status", (done) => {
+    it.skip("should update user's status", (done) => {
         changestatus(params).then((result)=>{
             result.should.be.a('string');
             done();

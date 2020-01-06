@@ -33,7 +33,7 @@ function service(data){
 	.spread((collection, params) => { 
         if (!collection) throw new Error("No such collection");
        
-        params.loan_status = 'suspended';
+        params.status = 'suspended';
         // set modification details details
         params.modified_on = new Date();
         params.modified_by = globalUserId;

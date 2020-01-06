@@ -8,6 +8,7 @@ function vinfo(req, res, next){
         const data = {...req.body, ...req.query, ...req.headers, ...req.params};
         data.profile = req.profile;
         data.user = req.user;
+        data.reqData = req;
         service(data)
         .then(response => {
             utils.jsonS(res, response, "Product status changed"); 

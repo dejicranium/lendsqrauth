@@ -1,15 +1,15 @@
 var utils = require('mlar')('mt1l');
-const service = require('mlar').mreq('services', 'auth/reject_or_accept_invitation');
 const routemeta = require('mlar')('routemeta');
 const auth_middleware = require('mlar')('authmiddleware');
-const has_perm_middleware = require('mlar')('hasPermMiddleware');
+const service = require('mlar').mreq('services', 'preference/status');
+const has_role = require('mlar')('hasRoleMiddleware');
 
 function vinfo(req, res, next){ 
-        const data = {...req.query, ...req.body, ...req.headers};
-        
+        const data = {...req.body, ...req.query, ...req.headers, ...req.params};
+        data.USER_ID = req.user.id
         service(data)
         .then(response => {
-            utils.jsonS(res, response, "Process completed successfully"); 
+            utils.jsonS(res, response, "Preference status updated"); 
         })
         .catch(error => {
             utils.jsonF(res, null, error.message); 
@@ -17,9 +17,11 @@ function vinfo(req, res, next){
 }
 
 vinfo.routeConfig = {};
-vinfo.routeConfig.path = "/invites"; 
+vinfo.routeConfig.path = "/:preference_id"; 
 vinfo.routeConfig.method = "put"; 
 vinfo.routeConfig.middlewares = [
-     routemeta('reject_invitation', 'none')];
+    auth_middleware,
+    has_role('admin'),
+    routemeta('update_preference', 'none')];
 module.exports = vinfo;
 

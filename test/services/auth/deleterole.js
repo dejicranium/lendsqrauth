@@ -13,14 +13,14 @@ describe('#Get user service', () => {
         role_id: 1
     }
 
-    it('should delete a role', (done) => {
-        deleteService(params).then((result)=>{
-            result.should.be.a('object');
-            done();
-        })
-        .catch(err=> {
-            done(err);
-        })
+    it.skip('should delete a role', (done) => {
+        deleteService(params).then((result) => {
+                result.should.be.a('object');
+                done();
+            })
+            .catch(err => {
+                done(err);
+            })
 
     })
 })

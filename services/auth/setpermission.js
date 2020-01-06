@@ -9,12 +9,15 @@ const assert = require('mlar')('assertions');
 const crypto = require('crypto');
 const DEFAULT_EXCLUDES = require('mlar')('appvalues').DEFAULT_EXCLUDES;
 const moment = require('moment')
+const AuditLog = require('mlar')('audit_log');
 
 var spec = morx.spec({}) 
-			   .build('entity', 'required:true,eg:role')   
-			   .build('entity_id', 'required:true,eg:1')   
-			   .build('permission_id', 'required:true,eg:1')   
-			   .end();
+                .build('entity', 'required:true,eg:role')
+                .build('entity_id', 'required:false,eg:1')
+                .build('entity_name', 'required:false,eg:1')
+                .build('permission_name', 'required:false,eg:1')
+                .build('permission_id', 'required:false,eg:1')
+                .end();
 
 function service(data){
 
@@ -26,21 +29,33 @@ function service(data){
         
         if (params.entity !== 'profile' &&  params.entity !== 'role') throw new Error("Entity entered is not valid. Choose either `profile` or `role`")
          
-        return [ models.permission.findOne({ where: { id: params.permission_id }}), params];
+        // first: return [ models.permission.findOne({ where: { id: params.permission_id }}), params];
+        return [models.permission.findOne({where: {name: params.permission_name}}), params];
 	}) 
 	.spread(async (permission, params) => { 
         if (!permission) throw new Error("Permission not found")
 
-        if (params.entity == 'role') {
-            let role =  await models.role.findOne({where: {id: params.entity_id}});
-            if (!role) throw new Error("Role is not valid")
+
+        if (params.entity == 'role') { // if entity is role
+            //let role =  await models.role.findOne({where: {id: params.entity_id}});
+            var role =  await models.role.findOne({where: {name: params.entity_name}});
+            if (!role && !role.id) throw new Error("Role is not valid")
         }
+
         if (params.entity == 'profile') {
             let profile =  await models.profile.findOne({where: {id: params.entity_id}});
             if (!profile) throw new Error("Profile is not valid")
         }
 
-        // check if this relation has already been set 
+        // check if this relation has already been set
+
+        //  secodn
+        params.entity_id = role.id;
+        params.permission_id = permission.id;
+
+        delete params.entity_name;
+        delete params.permission_name;
+
         return [ models.entity_permission.findOne({where: {...params}}), params ]
 		 
 		
@@ -50,8 +65,17 @@ function service(data){
         params.created_on = new Date();
         return models.entity_permission.create(params);
 	
-	}).then(created=>  {
+	}).then(async created=>  {
         if (!created) throw new Error("Could not create permission");
+
+        //  audit log
+
+        let audit_log = new AuditLog(data.reqData, "UPDATE", 'set new entity permission');
+        await audit_log.create();
+
+        // end of audit log
+
+
         d.resolve(created);
     })
 	.catch( (err) => {

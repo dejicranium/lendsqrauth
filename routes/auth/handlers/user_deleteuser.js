@@ -6,6 +6,8 @@ const auth_middleware = require('mlar')('authmiddleware');
 function vinfo(req, res, next){ 
         const data = {...req.body, ...req.query, ...req.headers, ...req.params};
         data.user_id = req.user.id;
+        data.user = req.user;
+        data.reqData = req;
         service(data)
         .then(response => {
             utils.jsonS(res, response, "User has been deleted successfully"); 
@@ -18,6 +20,7 @@ function vinfo(req, res, next){
 vinfo.routeConfig = {};
 vinfo.routeConfig.path = "/users"; 
 vinfo.routeConfig.method = "delete"; 
-vinfo.routeConfig.middlewares = [auth_middleware, routemeta('auth_delete_user', 'none')];
+vinfo.routeConfig.middlewares = [
+    auth_middleware, routemeta('auth_delete_user', 'none')];
 module.exports = vinfo;
 

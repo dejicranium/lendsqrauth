@@ -4,7 +4,7 @@ const routemeta = require('mlar')('routemeta');
 
 function vinfo(req, res, next){ 
         const data = {...req.body, ...req.query, ...req.headers, ...req.params};
-        
+        data.reqData = req;
         service(data)
         .then(response => {
             utils.jsonS(res, response, "Admin user signed in successfully"); 

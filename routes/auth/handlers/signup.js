@@ -4,10 +4,11 @@ const routemeta = require('mlar')('routemeta');
 
 function vinfo(req, res, next){ 
         const data = {...req.body, ...req.query, ...req.headers, ...req.params};
-        
+        data.create_profile = true;
+        data.reqData = req;
         signupService(data)
         .then(response => {
-            utils.jsonS(res, null, "User account created successfully"); 
+            utils.jsonS(res, null, "Account created successfully"); 
         })
         .catch(error => {
             utils.jsonF(res, null, error.message); 

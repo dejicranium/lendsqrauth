@@ -8,7 +8,8 @@ const obval = require('mlar')('obval');
 const assert = require('mlar')('assertions'); 
 const crypto = require('crypto');
 const DEFAULT_EXCLUDES = require('mlar')('appvalues').DEFAULT_EXCLUDES;
-const moment = require('moment')
+const moment = require('moment');
+const AuditLog = require('mlar')('audit_log');
 
 var spec = morx.spec({}) 
 			   .build('name', 'required:true, eg:lender')   
@@ -33,7 +34,12 @@ function service(data){
         
     }).then((permission)=>{
         if (!permission) throw new Error("An error occured while carrying out this operation");
-        d.resolve(permission)
+
+        /** audit log ***/
+        let audit_log = new AuditLog(data.reqData, "UPDATE", `created permission named "${permission.name}"`);
+		audit_log.create();
+
+		d.resolve(permission)
     })
 	.catch( (err) => {
 

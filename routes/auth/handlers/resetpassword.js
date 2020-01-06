@@ -5,7 +5,8 @@ const service = require('mlar').mreq('services', 'auth/resetpassword');
 
 function vinfo(req, res, next){ 
         const data = {...req.body, ...req.query, ...req.headers, ...req.params};
-        
+        data.reqData = req;
+
         service(data)
         .then(response => {
             utils.jsonS(res, response, "Password reset"); 

@@ -5,6 +5,8 @@ const bcrypt = require('bcrypt');
 const assert = require('mlar')('assertions'); 
 const config = require('../../config');
 const makeRequest = require('mlar')('makerequest');
+const AuditLog = require('mlar')('audit_log');
+const send_email = require('mlar').mreq('notifs', 'send');
 
 var spec = morx.spec({}) 
 			   .build('current_password', 'required:true, eg:somethingsweet')   
@@ -19,23 +21,23 @@ function service(data){
     
     q.fcall( async () => {
 		const validParameters = morx.validate(data, spec, {throw_error : true});
-		data = validParameters.params;
+		params = validParameters.params;
         
         assert.mustBeValidPassword(data.new_password);
 
-        if (data.confirm_password != data.new_password)
+        if (params.confirm_password !== params.new_password)
             throw new Error("Passwords do not match")
-        if (data.current_password == data.new_password)
+        if (params.current_password === params.new_password)
             throw new Error("Current password cannot be the same as new password")
 
-        if (data.new_password.length < 8) throw new Error("Password cannot be less than 8 characters");
+        if (params.new_password.length < 8) throw new Error("Password cannot be less than 8 characters");
 
         // get and hash password 
-        return [data, models.user.findOne({where: {id: globalUserId}}), bcrypt.hash(data.new_password, 10)];
+        return [params, models.user.findOne({where: {id: globalUserId}}), bcrypt.hash(params.new_password, 10)];
 	}) 
-	.spread(async (data, user, generated_password) => { 
+	.spread(async (params, user, generated_password) => {
         if (!user) throw new Error("Could not fetch user details")
-        const oldPasswordIsAccurate = await bcrypt.compare(data.current_password, user.password);
+        const oldPasswordIsAccurate = await bcrypt.compare(params.current_password, user.password);
         if (!oldPasswordIsAccurate) throw new Error("Entered password does not match current password");
         if (!generated_password) throw new Error("Could not generate new password");
         
@@ -50,7 +52,7 @@ function service(data){
         if (!user) throw new Error("An error occured while updating user's account");
         
         // prepare email;
-        const requestHeaders = {
+        /*const requestHeaders = {
             'Content-Type' : 'application/json',
         }
         
@@ -58,18 +60,27 @@ function service(data){
         const payload = {
             context_id: 79,
             sender: config.sender_email,
-            recipient: user.email,
+            recipient: user.email,e
             sender_id: 1,
         }
         const url = config.notif_base_url + "email/send";
-        
+        */
         // send the change password email 
         //await makeRequest(url, 'POST', payload, requestHeaders, 'send notification');
+
+        const CHANGE_PASSWORD_EMAIL_CONTEXT_ID = 106;
+
+        send_email(CHANGE_PASSWORD_EMAIL_CONTEXT_ID, user.email, {
+            profileURL: config.base_url + '/'
+        });
+
+        let audit_log = new AuditLog(data.reqData, "UPDATE", 'changed their password');
+        await audit_log.create();
 
         d.resolve("Successfully changed user's password");
     })
 	.catch( (err) => {
-
+        console.log(err.stack);
 		d.reject(err);
 
 	});

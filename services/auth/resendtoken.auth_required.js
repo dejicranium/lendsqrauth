@@ -12,6 +12,7 @@ const moment = require('moment');
 const config = require('../../config');
 const makeRequest = require('mlar')('makerequest');
 const generateRandom = require('mlar')('testutils').generateRandom;
+const AuditLog = require('mlar')('audit_log');
 
 var spec = morx.spec({}) 
 			   .build('email', 'required:false')   
@@ -44,12 +45,18 @@ function service(data){
         if (params.subtype == 'verify_bank_otp' && !params.phone) throw new Error("You must provide a phone");
         if (params.subtype == 'resend_invitation' && !params.email) throw new Error("You must provide an email");
         
+        // make sure the type and subtype pair are correct
+        if (params.type != 'otp' && params.subtype == 'verify_bank_otp') {
+            throw new Error("Type for `verify_bank_otp` should be `otp`")
+        }
+        
         const requestHeaders = {
             'Content-Type' : 'application/json',
         }
 
         if (params.type == 'otp') {
             let OTP = generateRandom('digits', 6);
+
             let token_create = await models.auth_token.findOrCreate({
                 where:{ 
                     type: 'verify_bank_otp',
@@ -71,33 +78,29 @@ function service(data){
                 })
             }
 
-            // send otp to phone;
-            let url =  config.notif_base_url + "sms/send";
-            
+            let url =  config.notif_base_url + "sms/send"; // notification servicer
             let payload = {
                 recipient: params.phone,
                 message: `Your OTP is ${OTP}`,
                 sender_id:1
             }
 
+            // send otp to phone;
             return makeRequest(url, 'POST', payload, requestHeaders);
 
         }
         else {
-
             // send email 
             let payload= {
-                context_id: null,
                 sender: config.sender_email,
                 sender_id: 1,
-                
             }
 
-            if (params.type == 'token' && params.subtype == 'resend_invitation') {
+            if (params.type === 'token' && params.subtype === 'resend_invitation') {
                 
                 let user_invite = await models.user_invites.findOne({
                     where: {
-                        inviter: data.user.id,
+                        inviter: data.profile.id,
                         invitee: params.email
                     }
                 })
@@ -124,7 +127,12 @@ function service(data){
 	}) 
 	.then(async (auth_token) => { 
         if (!auth_token) throw new Error("Could not resend token");
+
+        let audit_log = new AuditLog(data.reqData, "CREATE", "requested for a token to be resent");
+        await audit_log.create();
+        
         d.resolve(auth_token);
+
     })
 	.catch( (err) => {
 

@@ -11,19 +11,19 @@ const generateRandom = require('mlar')('testutils').generateRandom;
 
 describe('#Sign up user', () => {
     const params = {
-       type: 'borrower',
-       role_id: 1
-       
+        type: 'borrower',
+        role_id: 1
+
     }
 
-    it("should update role", (done) => {
-        updaterole(params).then((result)=>{
-            result.should.be.a('string');
-            done();
-        })
-        .catch(err=> {
-            done(err);
-        })
+    it.skip("should update role", (done) => {
+        updaterole(params).then((result) => {
+                result.should.be.a('string');
+                done();
+            })
+            .catch(err => {
+                done(err);
+            })
 
     })
 })

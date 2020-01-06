@@ -6,10 +6,13 @@ module.exports = (sequelize, DataTypes) => {
     token: DataTypes.STRING,
     expiry: DataTypes.DATE,
     is_used: DataTypes.BOOLEAN,
+    meta: DataTypes.TEXT,
   }, {});
-  auth_token.associate = function(models) {
+  auth_token.associate = function (models) {
     // associations can be defined here
-    auth_token.belongsTo(models.user, {foreignKey: 'user_id'})
+    auth_token.belongsTo(models.user, {
+      foreignKey: 'user_id'
+    })
   };
   return auth_token;
 };

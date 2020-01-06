@@ -20,7 +20,7 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     timestamps: false
   });
-  collection_debit_schedule.associate = function(models) {
+  collection_debit_schedule.associate = function (models) {
     // associations can be defined here
   };
   return collection_debit_schedule;

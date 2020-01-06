@@ -8,6 +8,8 @@ const obval = require('mlar')('obval');
 const assert = require('mlar')('assertions'); 
 const DEFAULT_EXCLUDES = require('mlar')('appvalues').DEFAULT_EXCLUDES;
 const moment = require('moment');
+const AuditLog = require('mlar')('audit_log');
+
 
 var spec = morx.spec({}) 
                .build('token', 'required:true')
@@ -23,9 +25,9 @@ function service(data){
 		const validParameters = morx.validate(data, spec, {throw_error : true});
         params = validParameters.params;
 
-        assert.mustBeValidPassword(data.new_password);
 
-        if (data.new_password != data.confirm_password) throw new Error("Passwords must match");
+        assert.mustBeValidPassword(data.new_password);
+        if (data.new_password !== data.confirm_password) throw new Error("Passwords must match");
         
         let reset_token = await models.auth_token.findOne({
             where: {
@@ -54,7 +56,12 @@ function service(data){
         
     }).spread(async (user, reset_token)=>{
         if (!user) throw new Error("An error occured while updating user's account");
-        
+
+        data.reqData.user = JSON.parse(JSON.stringify(user));
+        let audit_log = new AuditLog(data.reqData, 'UPDATE', 'reset their password');
+        await audit_log.create();
+
+
         await reset_token.update({
             is_used: 1
         })

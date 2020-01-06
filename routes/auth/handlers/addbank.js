@@ -7,9 +7,11 @@ const has_role = require('mlar')('hasRoleMiddleware');
 function vinfo(req, res, next){ 
         const data = {...req.body, ...req.query, ...req.headers, ...req.params};
         data.user_id = req.user.id;
+        data.user = req.user;
+        data.reqData = req;
         service(data)
         .then(response => {
-            const message = response == 'OTP verified' ? 'OTP correct and account details stored' : "BVN verified and OTP sent to user's phone";
+            const message = response === 'OTP verified' ? 'OTP correct and account details stored' : "BVN verified and OTP sent to user's phone";
             utils.jsonS(res, response, message); 
         })
         .catch(error => {

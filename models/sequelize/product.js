@@ -2,6 +2,7 @@
 module.exports = (sequelize, DataTypes) => {
   const product = sequelize.define('product', {
     profile_id: DataTypes.INTEGER,
+    uuid: DataTypes.STRING,
     product_name: DataTypes.STRING,
     product_description: DataTypes.STRING,
     repayment_model: DataTypes.STRING,
@@ -16,6 +17,10 @@ module.exports = (sequelize, DataTypes) => {
     status: DataTypes.STRING,
     url_slug: DataTypes.STRING,
     deleted_flag: DataTypes.BOOLEAN,
+    created_on: {
+      type: DataTypes.DATE,
+      defaultValue: new Date()
+    },
     created_by: DataTypes.INTEGER,
     modified_on: DataTypes.DATE,
     modified_by: DataTypes.INTEGER,
@@ -24,9 +29,14 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     timestamps: false,
   });
-  product.associate = function(models) {
+  product.associate = function (models) {
     // associations can be defined here
-    product.hasMany(models.collection, {foreignKey: 'product_id'})
+    product.hasMany(models.collection, {
+      foreignKey: 'product_id'
+    })
+    product.belongsTo(models.profile, {
+      foreignKey: 'profile_id'
+    })
   };
   return product;
 };

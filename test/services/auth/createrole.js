@@ -11,18 +11,18 @@ const generateRandom = require('mlar')('testutils').generateRandom;
 
 describe('#Create role', () => {
     const params = {
-       type: 'lender'
-       
+        type: 'lender'
+
     }
 
-    it("should create a new role", (done) => {
-        createrole(params).then((result)=>{
-            result.should.be.a('object');
-            done();
-        })
-        .catch(err=> {
-            done(err);
-        })
+    it.skip("should create a new role", (done) => {
+        createrole(params).then((result) => {
+                result.should.be.a('object');
+                done();
+            })
+            .catch(err => {
+                done(err);
+            })
 
     })
 })

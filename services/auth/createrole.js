@@ -8,7 +8,8 @@ const obval = require('mlar')('obval');
 const assert = require('mlar')('assertions'); 
 const crypto = require('crypto');
 const DEFAULT_EXCLUDES = require('mlar')('appvalues').DEFAULT_EXCLUDES;
-const moment = require('moment')
+const moment = require('moment');
+const AuditLog = require('mlar')('audit_log');
 
 var spec = morx.spec({}) 
 			   .build('name', 'required:true, eg:lender')   
@@ -30,9 +31,11 @@ function service(data){
         if (role) throw new Error(`Role already exists`);
         return models.role.create({name: params.name})        
         
-    }).then((role)=>{
+    }).then(async (role)=>{
         if (!role) throw new Error("An error occured while carrying out this operation");
-        d.resolve(role)
+        let audit_log = new AuditLog(data.reqData, 'CREATE', 'created a new role named "' + role.name + '"')
+        await audit_log.create()
+		d.resolve(role)
     })
 	.catch( (err) => {
 
