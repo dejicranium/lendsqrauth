@@ -11,7 +11,7 @@ function vinfo(req, res, next) {
         ...req.query,
         ...req.headers,
         ...req.params
-    };
+    }
 
     service(data)
         .then(response => {
