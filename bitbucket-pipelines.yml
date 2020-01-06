@@ -1,96 +1,130 @@
-definitions:
-  services:
-    docker:
-      memory: 3072  
-options:
-  docker: true
-image: node:latest
-build_and_test: &build_and_test
+image: node:10.15.3
+build_and_test_step: &build_and_test_step
   - step:
-     name: Run unit tests
-     caches:
-       - node
-     script:
-       - npm install
-      #  - npm run test
-publish_ecr_image: &publish_ecr_image
-  - step:
-      name: Build and publish image to ECR
-      image: atlassian/pipelines-awscli:latest
-      services:
-          - docker
+      name: Build and Test
       caches:
-          - docker
+        - node
       script:
-          - export IMAGE_NAME="${ECS_SERVICE_NAME}:${BITBUCKET_BUILD_NUMBER}"
-          - export ECR_IMAGE_NAME=$ECR_URI/$IMAGE_NAME
-          - $(aws ecr get-login --no-include-email --region $AWS_DEFAULT_REGION)
-          - docker build -f ./deploy/Dockerfile -t $IMAGE_NAME .
-          - docker tag $IMAGE_NAME $ECR_IMAGE_NAME
-          - docker push $ECR_IMAGE_NAME
-
-create_task_in_live_cluster: &create_task_in_live_cluster
+        - npm install
+        - npm run test
+create_release_step: &create_release_step
   - step:
-      name: Create a new ecs task revision
-      image: atlassian/pipelines-awscli:latest
-      deployment: live
-    script:
-      - chmod 777 ./deploy/define-task.sh
-        - ./deploy/define-task.sh
-    artifacts:
-        - ecr_task_version.txt
-
-create_task_for_test_cluster: &create_task_for_test_cluster
-  - step:
-      name: Create a new ecs task revision
-      image: atlassian/pipelines-awscli:latest
-      deployment: test
+      name: Create release
       script:
-        - chmod 777 ./deploy/define-task.sh
-        - ./deploy/define-task.sh
+        - apt-get update
+        - apt-get install -y zip
+        - npm install
+        - echo "Zipping bundle..."
+        - zip -r application.zip *
       artifacts:
-        - ecr_task_version.txt
-
-create_task_for_staging_cluster: &create_task_for_staging_cluster
+        - application.zip
+create_release_step_manual: &create_release_step_manual
   - step:
-      name: Create a new ecs task revision
-      image: atlassian/pipelines-awscli:latest
-      deployment: staging
-    script:
-      - chmod 777 ./deploy/define-task.sh
-        - ./deploy/define-task.sh
-    artifacts:
-        - ecr_task_version.txt
-
-deploy_to_aws: &deploy_to_aws
-  - step:
-      name: Deploy to aws
-      image: atlassian/pipelines-awscli:latest
+      name: Create release
+      trigger: manual
       script:
-        - export TASK_DEFINITION=$(cat ./ecr_task_version.txt)
-        - export ECS_CLUSTER_NAME="$( cut -d '-' -f 1 <<< "${TASK_DEFINITION}")"
-        - echo "Deploying to the cluster $ECS_CLUSTER_NAME on ECS..."
-        - aws ecs update-service --cluster "${ECS_CLUSTER_NAME}" --force-new-deployment --service "${ECS_SERVICE_NAME}" --task-definition
-          "${TASK_DEFINITION}" --desired-count ${TASK_DESIRED_COUNT:-1}
+        - apt-get update
+        - apt-get install -y zip
+        - npm install
+        - echo "Zipping bundle..."
+        - zip -r application.zip *
+      artifacts:
+        - application.zip
+push_to_s3_step: &push_to_s3_step
+  - step:
+      name: Pushing to S3
+      script:
+        - pipe: atlassian/aws-elasticbeanstalk-deploy:0.2.5
+          variables:
+            AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
+            AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
+            AWS_DEFAULT_REGION: $AWS_DEFAULT_REGION
+            ZIP_FILE: 'application.zip'
+            S3_BUCKET: 'elasticbeanstalk-us-east-2-350152003452'
+            APPLICATION_NAME: 'lendsqr-backend'
+            VERSION_LABEL: 'lendsqr-backend-release-$BITBUCKET_BUILD_NUMBER'
+            COMMAND: 'upload-only'
+            WAIT: 'true'
+deploy_to_test_step: &deploy_to_test_step
+  - step:
+      name: Deploy to test
+      deployment: test
+      trigger: manual
+      script:
+        - echo "Deploying to test environment"
+        - pipe: atlassian/aws-elasticbeanstalk-deploy:0.2.5
+          variables:
+            AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
+            AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
+            AWS_DEFAULT_REGION: $AWS_DEFAULT_REGION
+            ZIP_FILE: 'application.zip'
+            S3_BUCKET: 'elasticbeanstalk-us-east-2-350152003452'
+            APPLICATION_NAME: 'lendsqr-backend'
+            ENVIRONMENT_NAME: 'test-lendsqr-backend'
+            VERSION_LABEL: 'lendsqr-backend-release-$BITBUCKET_BUILD_NUMBER'
+            COMMAND: 'deploy-only'
+            WAIT: 'true'
+deploy_to_staging_step: &deploy_to_staging_step
+  - step:
+      name: Deploy to staging
+      deployment: staging
+      script:
+        - echo "Deploying to staging environment"
+        - pipe: atlassian/aws-elasticbeanstalk-deploy:0.2.5
+          variables:
+            AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
+            AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
+            AWS_DEFAULT_REGION: $AWS_DEFAULT_REGION
+            ZIP_FILE: 'application.zip'
+            S3_BUCKET: 'elasticbeanstalk-us-east-2-350152003452'
+            APPLICATION_NAME: 'lendsqr-backend'
+            ENVIRONMENT_NAME: 'staging-lendsqr-backend'
+            VERSION_LABEL: 'lendsqr-backend-release-$BITBUCKET_BUILD_NUMBER'
+            COMMAND: 'deploy-only'
+            WAIT: 'true'
+deploy_to_live_step: &deploy_to_live_step
+  - step:
+      name: Deploy to live
+      deployment: production
+      trigger: manual
+      script:
+        - echo "Deploying to live environment"
+        - pipe: atlassian/aws-elasticbeanstalk-deploy:0.2.5
+          variables:
+            AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
+            AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
+            AWS_DEFAULT_REGION: $AWS_DEFAULT_REGION
+            ZIP_FILE: 'application.zip'
+            S3_BUCKET: 'elasticbeanstalk-us-east-2-350152003452'
+            APPLICATION_NAME: 'lendsqr-backend'
+            ENVIRONMENT_NAME: 'live-lendsqr-backend'
+            VERSION_LABEL: 'lendsqr-backend-release-$BITBUCKET_BUILD_NUMBER'
+            COMMAND: 'deploy-only'
+            WAIT: 'true'
 pipelines:
   default:
-    - <<: *build_and_test
+    - <<: *build_and_test_step
   pull-requests:
     '**':
-      - <<: *build_and_test
+      - <<: *build_and_test_step
   branches:
-   develop:
-    - <<: *build_and_test
-    - <<: *publish_ecr_image
-    - <<: *create_task_for_test_cluster
-    - <<: *deploy_to_aws
-   staging:
-    - <<: *build_and_test
-    - <<: *publish_ecr_image
-    - <<: *create_task_for_staging_cluster
-    - <<: *deploy_to_aws
-   master:
-    - <<: *build_and_test
-    - <<: *publish_ecr_image
-    - <<: *create_task_in_live_cluster
-    - <<: *deploy_to_aws
+    feature/*:
+      - <<: *build_and_test_step
+      - <<: *create_release_step_manual
+      - <<: *push_to_s3_step
+      - <<: *deploy_to_test_step
+    bugfix/*:
+      - <<: *build_and_test_step
+      - <<: *create_release_step_manual
+      - <<: *push_to_s3_step
+      - <<: *deploy_to_test_step
+    develop:
+      - <<: *build_and_test_step
+      - <<: *create_release_step
+      - <<: *push_to_s3_step
+      - <<: *deploy_to_staging_step
+    master:
+      - <<: *build_and_test_step
+      - <<: *create_release_step
+      - <<: *push_to_s3_step
+      - <<: *deploy_to_live_step
