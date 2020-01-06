@@ -63,7 +63,7 @@ function service(data) {
             if (record && !record.deleted_flag) throw new Error("Account number already exists for this user");
 
             // if bvn exists for a user other than the one making the request
-            if (bvnRecord && bvnRecord.user_id != parseInt(globalUserId)) {
+            if (bvnRecord && parseInt(bvnRecord.user_id) !== parseInt(globalUserId)) {
                 throw new Error("A different account is already associated with this BVN");
             }
 
