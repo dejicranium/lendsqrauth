@@ -81,10 +81,10 @@ pipelines:
       - <<: *build_and_test
   branches:
 	 develop:
-	  - <<: *build_and_test
-	  - <<: *publish_ecr_image
-	  - <<: *create_task_for_test_cluster
-	  - <<: *deploy_to_aws
+	   - <<: *build_and_test
+	   - <<: *publish_ecr_image
+	   - <<: *create_task_for_test_cluster
+	   - <<: *deploy_to_aws
 	 staging:
       - <<: *build_and_test
       - <<: *publish_ecr_image
