@@ -85,7 +85,12 @@ pipelines:
      - <<: *create_task_for_test_cluster
      - <<: *deploy_to_aws
    staging:
-     - <<: *build_and_test
+	  - step:
+			name: Run unit tests
+			caches:
+			  - node
+			script:
+			  - npm install
      - <<: *publish_ecr_image
      - <<: *create_task_for_staging_cluster
      - <<: *deploy_to_aws
