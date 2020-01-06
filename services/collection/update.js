@@ -118,7 +118,7 @@ function service(data) {
                 //throw new Error('You need to provide a product id to proceed');
 
                 // if there's no product id, we are updating the stuff at the first stage
-                 let result = await collect.update({
+                 let result = await collection.update({
                     borrower_first_name: params.borrower_first_name,
                     borrower_last_name: params.borrower_last_name,
                     borrower_bvn: params.borrower_bvn,
