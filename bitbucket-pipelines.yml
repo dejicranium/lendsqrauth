@@ -35,6 +35,7 @@ create_task_for_live_cluster: &create_task_for_live_cluster
        image: atlassian/pipelines-awscli:latest
        deployment: live
        script:
+         - chmod 777 ./deploy/define-task.sh
          - ./deploy/define-task.sh
        artifacts:
          - ecr_task_version.txt
@@ -45,6 +46,7 @@ create_task_for_test_cluster: &create_task_for_test_cluster
        image: atlassian/pipelines-awscli:latest
        deployment: test
        script:
+         - chmod 777 ./deploy/define-task.sh
          - ./deploy/define-task.sh
        artifacts:
          - ecr_task_version.txt
@@ -55,6 +57,7 @@ create_task_for_staging_cluster: &create_task_for_staging_cluster
        image: atlassian/pipelines-awscli:latest
        deployment: staging
        script:
+         - chmod 777 ./deploy/define-task.sh
          - ./deploy/define-task.sh
        artifacts:
          - ecr_task_version.txt
