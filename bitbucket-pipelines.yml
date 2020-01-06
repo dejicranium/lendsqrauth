@@ -1,20 +1,20 @@
 definitions:
-	services:
-	  docker:
-		 memory: 3072  
+  services:
+    docker:
+     memory: 3072  
 options:
  docker: true
 image: node:latest
 build_and_test: &build_and_test
-	- step:
-		name: Run unit tests
-		caches:
-		  - node
-		script:
-		  - npm install
-		 #  - npm run test
+  - step:
+    name: Run unit tests
+    caches:
+      - node
+    script:
+      - npm install
+     #  - npm run test
 publish_ecr_image: &publish_ecr_image
-	- step:
+  - step:
      name: Build and publish image to ECR
      image: atlassian/pipelines-awscli:latest
      services:
@@ -28,20 +28,20 @@ publish_ecr_image: &publish_ecr_image
       - docker build -f ./deploy/Dockerfile -t $IMAGE_NAME .
       - docker tag $IMAGE_NAME $ECR_IMAGE_NAME
       - docker push $ECR_IMAGE_NAME
- 
+
 create_task_in_live_cluster: &create_task_in_live_cluster
-	- step:
+  - step:
      name: Create a new ecs task revision
      image: atlassian/pipelines-awscli:latest
      deployment: live
      script:
        - chmod 777 ./deploy/define-task.sh
        - ./deploy/define-task.sh
-	  artifacts:
-		 - ecr_task_version.txt
- 
+    artifacts:
+     - ecr_task_version.txt
+
 create_task_for_test_cluster: &create_task_for_test_cluster
-	- step:
+  - step:
      name: Create a new ecs task revision
      image: atlassian/pipelines-awscli:latest
      deployment: test
@@ -50,9 +50,9 @@ create_task_for_test_cluster: &create_task_for_test_cluster
         - ./deploy/define-task.sh
      artifacts:
        - ecr_task_version.txt
- 
+
 create_task_for_staging_cluster: &create_task_for_staging_cluster
-	- step:
+  - step:
      name: Create a new ecs task revision
      image: atlassian/pipelines-awscli:latest
      deployment: staging
@@ -61,7 +61,7 @@ create_task_for_staging_cluster: &create_task_for_staging_cluster
        - ./deploy/define-task.sh
      artifacts:
        - ecr_task_version.txt
- 
+
 deploy_to_aws: &deploy_to_aws
   - step:
      name: Deploy to aws
