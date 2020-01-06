@@ -79,15 +79,15 @@ pipelines:
     '**':
       - <<: *build_and_test
   branches:
-   staging:
-     - <<: *build_and_test
-     - <<: *publish_ecr_image
-     - <<: *create_task_for_staging_cluster
-     - <<: *deploy_to_aws
+	feature/*:
+	  - <<: *build_and_test
+	  - <<: *publish_ecr_image
+	  - <<: *create_task_for_test_cluster
+	  - <<: *deploy_to_aws
    develop:
      - <<: *build_and_test
      - <<: *publish_ecr_image
-     - <<: *create_task_for_test_cluster
+     - <<: *create_task_for_staging_cluster
      - <<: *deploy_to_aws
    master:
      - <<: *build_and_test
