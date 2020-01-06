@@ -80,7 +80,7 @@ pipelines:
     '**':
       - <<: *build_and_test
   branches:
-   develop:
+   staging:
      - <<: *build_and_test
      - <<: *publish_ecr_image
      - <<: *create_task_for_test_cluster
