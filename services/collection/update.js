@@ -60,7 +60,7 @@ function service(data) {
             if (!collection || !collection.id) throw new Error('Could not find collection');
             if (collection.status === 'active') throw new Error('Cannot update an active collection');
 
-            if ((params.start_date || collection.start_date) &&  (params.disbursement_date || collection.disbursement_date)) {
+            if ((params.start_date || collection.start_date) && (params.disbursement_date || collection.disbursement_date)) {
                 let start_date = params.start_date || collection.start_date;
                 let disbursement_date = params.disbursement_date || collection.disbursement_date;
                 if (!moment(start_date).isAfter(disbursement_date) && !moment(start_date).isSame(disbursement_date, 'day')) throw new Error("Start date cannot be before disbursement date")
@@ -117,14 +117,14 @@ function service(data) {
                 //throw new Error('You need to provide a product id to proceed');
 
                 // if there's no product id, we are updating the stuff at the first stage
-                 let result = await collection.update({
+                let result = await collection.update({
                     borrower_first_name: params.borrower_first_name,
                     borrower_last_name: params.borrower_last_name,
                     borrower_bvn: params.borrower_bvn,
                     borrower_phone: params.borrower_phone
                 });
                 d.resolve(result);
-                 return  d.promise;
+                return d.promise;
             }
 
             if (!product || !product.id) throw new Error('Product does not exist');
@@ -172,13 +172,11 @@ function service(data) {
                 if (!['disbursed', 'active', 'past due'].includes(params.loan_status.toLowerCase()))
                     throw new Error("Loan status should be one of disbursed, active or past due")
             }
-
             if (params.start_date) assert.dateFormatOnly(params.start_date, null, 'Start Date');
 
             if (params.num_of_collections) {
                 assert.digitsOnly(params.num_of_collections, null, 'No. of collections');
             }
-
             return [product, collection, params];
         })
         .spread((product, collection, params) => {
@@ -240,7 +238,7 @@ function service(data) {
                         let email_payload = {
                             lenderFullName: lender_name,
                             loanAmount: collection.amount + ` NGN`,
-                            interestRate: product.interest+  " %",
+                            interestRate: product.interest + " %",
                             interestPeriod: product.interest_period,
                             tenor: collection.tenor + ' ' + product.tenor_type,
                             borrowersFullName: collection.borrower_first_name + ' ' + collection.borrower_last_name,
@@ -261,15 +259,20 @@ function service(data) {
 
                         if (invitation && invitation.id) {
                             /// get the user record so that we can define whether or not we are inviting a new user or not
-                            let borrower = await models.profile.findOne({where: {id: collection.borrower_id},
-                                include: [{model:models.user}] });
+                            let borrower = await models.profile.findOne({
+                                where: {
+                                    id: collection.borrower_id
+                                },
+                                include: [{
+                                    model: models.user
+                                }]
+                            });
 
                             let borrower_is_new_user = !borrower.user || !borrower.user.password;
 
                             if (borrower_is_new_user) {
                                 email_payload.acceptURL = config.base_url + 'signup/borrower?token=' + invitation.token;
-                            }
-                            else {
+                            } else {
                                 email_payload.acceptURL += invitation.token;
                             }
                             email_payload.rejectURL += invitation.token;
