@@ -74,7 +74,7 @@ deploy_to_aws: &deploy_to_aws
         "${TASK_DEFINITION}" --desired-count ${TASK_DESIRED_COUNT:-1}
 pipelines:
   default:
-    - <<: *build_and_test
+      - <<: *build_and_test
   pull-requests:
     '**':
       - <<: *build_and_test
