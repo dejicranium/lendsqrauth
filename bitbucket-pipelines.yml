@@ -1,96 +1,98 @@
 definitions:
-  services:
-    docker:
-      memory: 3072  
+   services:
+     docker:
+       memory: 3072  
 options:
-  docker: true
+   docker: true
 image: node:latest
 build_and_test: &build_and_test
-  - step:
-     name: Run unit tests
-     caches:
-       - node
-     script:
-       - npm install
-      #  - npm run test
-publish_ecr_image: &publish_ecr_image
-  - step:
-      name: Build and publish image to ECR
-      image: atlassian/pipelines-awscli:latest
-      services:
-          - docker
+   - step:
+      name: Run unit tests
       caches:
-          - docker
+        - node
       script:
-          - export IMAGE_NAME="${ECS_SERVICE_NAME}:${BITBUCKET_BUILD_NUMBER}"
-          - export ECR_IMAGE_NAME=$ECR_URI/$IMAGE_NAME
-          - $(aws ecr get-login --no-include-email --region $AWS_DEFAULT_REGION)
-          - docker build -f ./deploy/Dockerfile -t $IMAGE_NAME .
-          - docker tag $IMAGE_NAME $ECR_IMAGE_NAME
-          - docker push $ECR_IMAGE_NAME
-
-create_task_in_live_cluster: &create_task_in_live_cluster
-  - step:
-      name: Create a new ecs task revision
-      image: atlassian/pipelines-awscli:latest
-      deployment: live
-    script:
-      - chmod 777 ./deploy/define-task.sh
-        - ./deploy/define-task.sh
-    artifacts:
-        - ecr_task_version.txt
-
+        - npm install
+      #   - npm run test
+publish_ecr_image: &publish_ecr_image
+   - step:
+       name: Build and publish image to ECR
+       image: atlassian/pipelines-awscli:latest
+       services:
+           - docker
+       caches:
+           - docker
+       script:
+           - export IMAGE_NAME="${ECS_SERVICE_NAME}:${BITBUCKET_BUILD_NUMBER}"
+           - export ECR_IMAGE_NAME=$ECR_URI/$IMAGE_NAME
+           - $(aws ecr get-login --no-include-email --region $AWS_DEFAULT_REGION)
+           - docker build -f ./deploy/Dockerfile -t $IMAGE_NAME .
+           - docker tag $IMAGE_NAME $ECR_IMAGE_NAME
+           - docker push $ECR_IMAGE_NAME
+ 
+create_task_for_live_cluster: &create_task_for_live_cluster
+   - step:
+       name: Create a new ecs task revision
+       image: atlassian/pipelines-awscli:latest
+       deployment: live
+       script:
+         - chmod 777 ./deploy/define-task.sh
+         - ./deploy/define-task.sh
+       artifacts:
+         - ecr_task_version.txt
+ 
 create_task_for_test_cluster: &create_task_for_test_cluster
-  - step:
-      name: Create a new ecs task revision
-      image: atlassian/pipelines-awscli:latest
-      deployment: test
-      script:
-        - chmod 777 ./deploy/define-task.sh
-        - ./deploy/define-task.sh
-      artifacts:
-        - ecr_task_version.txt
-
+   - step:
+       name: Create a new ecs task revision
+       image: atlassian/pipelines-awscli:latest
+       deployment: test
+       script:
+         - chmod 777 ./deploy/define-task.sh
+         - ./deploy/define-task.sh
+       artifacts:
+         - ecr_task_version.txt
+         
 create_task_for_staging_cluster: &create_task_for_staging_cluster
-  - step:
-      name: Create a new ecs task revision
-      image: atlassian/pipelines-awscli:latest
-      deployment: staging
-    script:
-      - chmod 777 ./deploy/define-task.sh
-        - ./deploy/define-task.sh
-    artifacts:
-        - ecr_task_version.txt
-
+   - step:
+       name: Create a new ecs task revision
+       image: atlassian/pipelines-awscli:latest
+       deployment: staging
+       script:
+         - chmod 777 ./deploy/define-task.sh
+         - ./deploy/define-task.sh
+       artifacts:
+         - ecr_task_version.txt
+         
 deploy_to_aws: &deploy_to_aws
-  - step:
-      name: Deploy to aws
-      image: atlassian/pipelines-awscli:latest
-      script:
-        - export TASK_DEFINITION=$(cat ./ecr_task_version.txt)
-        - export ECS_CLUSTER_NAME="$( cut -d '-' -f 1 <<< "${TASK_DEFINITION}")"
-        - echo "Deploying to the cluster $ECS_CLUSTER_NAME on ECS..."
-        - aws ecs update-service --cluster "${ECS_CLUSTER_NAME}" --force-new-deployment --service "${ECS_SERVICE_NAME}" --task-definition
-          "${TASK_DEFINITION}" --desired-count ${TASK_DESIRED_COUNT:-1}
+   - step:
+       name: Deploy to aws
+       image: atlassian/pipelines-awscli:latest
+       script:
+         - export TASK_DEFINITION=$(cat ./ecr_task_version.txt)
+         - export ECS_CLUSTER_NAME="$( cut -d '-' -f 1 <<< "${TASK_DEFINITION}")"
+         - echo "Deploying to the cluster $ECS_CLUSTER_NAME on ECS..."
+         - aws ecs update-service --cluster "${ECS_CLUSTER_NAME}" --force-new-deployment --service "${ECS_SERVICE_NAME}" --task-definition
+           "${TASK_DEFINITION}" --desired-count ${TASK_DESIRED_COUNT:-1}
+ 
 pipelines:
-  default:
-    - <<: *build_and_test
-  pull-requests:
-    '**':
-      - <<: *build_and_test
-  branches:
-   develop:
-    - <<: *build_and_test
-    - <<: *publish_ecr_image
-    - <<: *create_task_for_test_cluster
-    - <<: *deploy_to_aws
-   staging:
-    - <<: *build_and_test
-    - <<: *publish_ecr_image
-    - <<: *create_task_for_staging_cluster
-    - <<: *deploy_to_aws
-   master:
-    - <<: *build_and_test
-    - <<: *publish_ecr_image
-    - <<: *create_task_in_live_cluster
-    - <<: *deploy_to_aws
+   default:
+     - <<: *build_and_test
+   pull-requests:
+     '**':
+       - <<: *build_and_test
+   branches:
+     master:
+       - <<: *build_and_test
+       - <<: *publish_ecr_image
+       - <<: *create_task_for_live_cluster
+       - <<: *deploy_to_aws
+     staging:
+       - <<: *build_and_test
+       - <<: *publish_ecr_image
+       - <<: *create_task_for_staging_cluster
+       - <<: *deploy_to_aws
+     develop:
+       - <<: *build_and_test
+       - <<: *publish_ecr_image
+       - <<: *create_task_for_test_cluster
+       - <<: *deploy_to_aws
+ 
