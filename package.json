@@ -13,7 +13,7 @@
     "notif-test": "mocha test/notifs --recursive",
     "start:live": "NODE_ENV=live && node_modules/.bin/sequelize db:migrate && node app.js",
     "start:staging": "NODE_ENV=staging && node_modules/.bin/sequelize db:migrate && node app.js",
-    "start:test": "NODE_ENV=test && node_modules/.bin/sequelize db:migrate && node app.js"
+    "start:development": "NODE_ENV=development && node_modules/.bin/sequelize db:migrate && node app.js"
   },
   "keywords": [],
   "author": "4y0",
