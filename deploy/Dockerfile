@@ -1,5 +1,7 @@
 FROM node:10
 
+ARG mode
+
 WORKDIR /usr/src/app
 
 COPY package.json ./
@@ -13,4 +15,4 @@ ENV PORT 80
 EXPOSE 80
 
 
-CMD ["npm", "start"]
+CMD ["npm", "run", "start":${mode}]
