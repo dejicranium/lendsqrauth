@@ -11,7 +11,7 @@ build_and_test: &build_and_test
       caches:
         - node
       script:
-        - npm install
+         - echo "Skipping test"
       #   - npm run test
 publish_ecr_image: &publish_ecr_image
    - step:
@@ -22,12 +22,16 @@ publish_ecr_image: &publish_ecr_image
        caches:
            - docker
        script:
-           - export IMAGE_NAME="${ECS_SERVICE_NAME}:${BITBUCKET_BUILD_NUMBER}"
-           - export ECR_IMAGE_NAME=$ECR_URI/$IMAGE_NAME
-           - $(aws ecr get-login --no-include-email --region $AWS_DEFAULT_REGION)
-           - docker build -f ./deploy/Dockerfile -t $IMAGE_NAME .
-           - docker tag $IMAGE_NAME $ECR_IMAGE_NAME
-           - docker push $ECR_IMAGE_NAME
+         - if [ "$BITBUCKET_BRANCH" == "master" ]; then export MODE=live; fi
+         - if [ "$BITBUCKET_BRANCH" == "staging" ]; then export MODE=staging; fi
+         - if [ "$BITBUCKET_BRANCH" == "develop" ]; then export MODE=development; fi
+         - export IMAGE_NAME="${ECS_SERVICE_NAME}:$MODE-${BITBUCKET_BUILD_NUMBER}"
+         - export ECR_IMAGE_NAME=$ECR_URI/$IMAGE_NAME
+         - $(aws ecr get-login --no-include-email --region $AWS_DEFAULT_REGION)
+         - echo "mode is $MODE"
+         - docker build --build-arg mode=$MODE -f ./deploy/Dockerfile -t $IMAGE_NAME .
+         - docker tag $IMAGE_NAME $ECR_IMAGE_NAME
+         - docker push $ECR_IMAGE_NAME
  
 create_task_for_live_cluster: &create_task_for_live_cluster
    - step:
