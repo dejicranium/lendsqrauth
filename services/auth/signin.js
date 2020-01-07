@@ -42,12 +42,12 @@ function service(data) {
                 where: {
                     user_id: user.id
                 }
-            })
+            });
             let admin_role = await models.role.findOne({
                 where: {
                     name: 'admin'
                 }
-            })
+            });
             if (user_profiles.length === 1 && parseInt(user_profiles[0].role_id) === parseInt(admin_role.id)) {
                 throw new Error("Cannot sign in user with only one profile which is an admin profile")
             }

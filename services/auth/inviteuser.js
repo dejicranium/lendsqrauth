@@ -49,7 +49,7 @@ function service(data) {
 			}
 			let role = await models.role.findOne({
 				where: {
-					id: params.role_id
+					id: parseInt(params.role_id)
 				}
 			});
 			if (
@@ -218,6 +218,7 @@ function service(data) {
 			d.resolve('Invited team member');
 		})
 		.catch((err) => {
+			console.log(err.stack);
 			d.reject(err);
 		});
 
