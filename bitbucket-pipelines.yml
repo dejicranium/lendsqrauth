@@ -30,7 +30,7 @@ publish_ecr_image: &publish_ecr_image
          - echo "mode is $MODE"
          - docker build --build-arg mode=$MODE -f ./deploy/Dockerfile -t $IMAGE_NAME .
          - docker tag $IMAGE_NAME $ECR_IMAGE_NAME
-         - docker push $ECR_IMAGE_NAMEE
+         - docker push $ECR_IMAGE_NAME
  
 create_task_for_live_cluster: &create_task_for_live_cluster
    - step:
