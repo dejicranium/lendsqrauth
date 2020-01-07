@@ -2,8 +2,8 @@
 Attempt loading env files
 */
 try {
-  const appEnvProfile = process.env.ENV_PROFILE || "";
-  let envPath = "";
+  const appEnvProfile = process.env.ENV_PROFILE || '';
+  let envPath = '';
   if (appEnvProfile) {
     envPath = `.${appEnvProfile}`;
   }
@@ -64,23 +64,33 @@ const locallogger = require('mlar')('locallogger');
 const scrubber = require('mlar')('obscrub');
 const SCRUBVALS = require('./utils/scrubvals.json');
 
-app.use(bodyParser.urlencoded({
-  extended: true
-}));
+app.use(
+  bodyParser.urlencoded({
+    extended: true
+  })
+);
 app.use(bodyParser.json());
 
-
-
-app.use(function (req, res, next) {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Headers", "Origin, Access-Control-Max-Age, X-Requested-With, Content-Type, Accept, Authorization, requestId, token, api_secret, lendi_auth_token, profile_token, access_token");
-  res.header("Access-Control-Request-Headers", "content-type, Content-Type");
-  res.header("Access-Control-Request-Headers", 'PUT, POST, GET, DELETE, OPTIONS');
-  res.header("Access-Control-Allow-Headers", "Origin, Access-Control-Max-Age, X-Requested-With, Content-Type, Accept, Authorization, requestId, token, api_secret, lendi_auth_token, profile_token, access_token");
+app.use(function(req, res, next) {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header(
+    'Access-Control-Allow-Headers',
+    'Origin, Access-Control-Max-Age, X-Requested-With, Content-Type, Accept, Authorization, requestId, token, api_secret, lendi_auth_token, profile_token, access_token'
+  );
+  res.header('Access-Control-Request-Headers', 'content-type, Content-Type');
+  res.header('Access-Control-Request-Headers', 'PUT, POST, GET, DELETE, OPTIONS');
+  res.header(
+    'Access-Control-Allow-Headers',
+    'Origin, Access-Control-Max-Age, X-Requested-With, Content-Type, Accept, Authorization, requestId, token, api_secret, lendi_auth_token, profile_token, access_token'
+  );
   res.header('Access-Control-Allow-Methods', 'PUT, POST, GET, DELETE, OPTIONS');
 
   //let log_dat = {...req.body, ...req.query, ...req.headers};
-  const reqid = req.body.requestId || req.query.requestId || req.headers.requestid || 'NOREQID' + Math.ceil(Date.now() + (Math.random() * 98984328));
+  const reqid =
+    req.body.requestId ||
+    req.query.requestId ||
+    req.headers.requestid ||
+    'NOREQID' + Math.ceil(Date.now() + Math.random() * 98984328);
   res._$appreqid = reqid; //Need this so response can have the value for logging as well
   const scrubs = SCRUBVALS;
   const reqlog = {
@@ -109,19 +119,17 @@ app.use(function (req, res, next) {
     data: reqlog
   });
 
-
   next();
 });
 
 const base = '/api/v1';
 
-app.get(base, function (req, res, next) {
-
+app.get(base, function(req, res, next) {
   res.json({
-    base: 1.0
+    base: 1.0,
+    env: process.env.NODE_ENV
   });
-
-})
+});
 
 app.use(`${base}`, apis_auth(EndpointRouter));
 app.use(`${base}`, apis_profile(EndpointRouter));
@@ -131,37 +139,42 @@ app.use(`${base}`, apis_preferences(EndpointRouter));
 app.use(`${base}`, apis_dashboard(EndpointRouter));
 app.use(`${base}`, apis_audit(EndpointRouter));
 
-
-
 //app.use(view_routes); //front end
 /*
 Handle 404
 */
 //app.use(mosh.initMoshErrorHandler);
 
-
-app.use(base, function (req, res, next) {
-  utils.jsonF(res, null, `Undefined ${req.method} route access`)
+app.use(base, function(req, res, next) {
+  utils.jsonF(res, null, `Undefined ${req.method} route access`);
 
   // res.json({m: `Undefined ${req.method} route access`})
-})
+});
 
 // start cron job
 
 //get_collection_schedules();
 
-
-
 var force_sync = process.env.FORCESYNC ? true : false;
 
-var stage = process.env.NODE_ENV || "development-local";
-if (stage === "development" || stage === "test" || stage === "local" || stage === "production" || stage === "development-local") {
-  models.sequelize.sync({
-    force: force_sync
-  }).then(function () {
-    app.listen(appConfig.port, function () {
-      //runWorker();
-      console.log([appConfig.name, 'is running on port', appConfig.port.toString()].join(" "));
+var stage = process.env.NODE_ENV || 'development-local';
+if (
+  stage === 'development' ||
+  stage === 'test' ||
+  stage === 'local' ||
+  stage === 'production' ||
+  stage === 'staging' ||
+  stage === 'development-local'
+) {
+  models.sequelize
+    .sync({
+      force: force_sync
+    })
+    .then(function() {
+      app.listen(appConfig.port, function() {
+        //runWorker();
+        console.log('I AM LOGGING THIS');
+        console.log([appConfig.name, 'is running on port', appConfig.port.toString()].join(' '));
+      });
     });
-  });
 }

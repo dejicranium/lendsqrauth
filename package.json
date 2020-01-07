@@ -11,7 +11,9 @@
     "coll-test": "mocha test/services/collection --recursive",
     "pref-test": "mocha test/services/preference --recursive",
     "notif-test": "mocha test/notifs --recursive",
-    "start": "node_modules/.bin/sequelize db:migrate && node app.js"
+    "start:live": "NODE_ENV=live && node_modules/.bin/sequelize db:migrate && node app.js",
+    "start:staging": "NODE_ENV=staging && node_modules/.bin/sequelize db:migrate && node app.js",
+    "start:development": "NODE_ENV=development && node_modules/.bin/sequelize db:migrate && node app.js"
   },
   "keywords": [],
   "author": "4y0",

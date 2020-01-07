@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
-export IMAGE_NAME="${ECS_SERVICE_NAME}:${BITBUCKET_BUILD_NUMBER}"
+if [ "$BITBUCKET_BRANCH" == "master" ]; then export MODE=live; fi
+if [ "$BITBUCKET_BRANCH" == "staging" ]; then export MODE=staging; fi
+if [ "$BITBUCKET_BRANCH" == "develop" ]; then export MODE=development; fi
+export IMAGE_NAME="${ECS_SERVICE_NAME}:$MODE-${BITBUCKET_BUILD_NUMBER}"
 export ECR_IMAGE_NAME="${ECR_URI}/${IMAGE_NAME}"
 export IMAGE_PLACEHOLDER="<IMAGE_VERSION>"
 export ECS_TASK_NAME_PLACEHOLDER="<ECS_TASK_NAME>"
