@@ -126,7 +126,8 @@ const base = '/api/v1';
 
 app.get(base, function(req, res, next) {
   res.json({
-    base: 1.0
+    base: 1.0,
+    env: process.env.NODE_ENV
   });
 });
 
