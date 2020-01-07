@@ -94,7 +94,7 @@ function service(data) {
 				params.uuid = Math.random().toString(36).substr(2, 9);
 				params.created_on = new Date();
 				params.parent_profile_id = data.profile.id;
-				params.user_id = user;
+				params.user_id = user.id;
 
 				// copy existing profile to new profile object
 				/*                
@@ -159,7 +159,6 @@ function service(data) {
 				});
 				new_profile_id = new_profile.id;
 
-
 			}
 
 
@@ -211,7 +210,6 @@ function service(data) {
 			}
 
 			// audit log
-			let audit_description = "sent invitation to a potential team member";
 			if (GLOBAL_USER_EXISTS) audit_description = " with user id " + GLOBAL_USER.id
 			let audit_log = new AuditLog(data.reqData, "CREATE", 'sent invitation to a potential team member')
 			await audit_log.create();
