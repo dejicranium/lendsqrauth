@@ -11,7 +11,7 @@ build_and_test: &build_and_test
       caches:
         - node
       script:
-        - npm install
+         - echo "Skipping test"
       #   - npm run test
 publish_ecr_image: &publish_ecr_image
    - step:
