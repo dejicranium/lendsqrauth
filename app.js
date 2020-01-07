@@ -158,7 +158,14 @@ app.use(base, function(req, res, next) {
 var force_sync = process.env.FORCESYNC ? true : false;
 
 var stage = process.env.NODE_ENV || 'development-local';
-if (stage === 'development' || stage === 'test' || stage === 'local' || stage === 'production' || stage === 'development-local') {
+if (
+  stage === 'development' ||
+  stage === 'test' ||
+  stage === 'local' ||
+  stage === 'production' ||
+  stage === 'staging' ||
+  stage === 'development-local'
+) {
   models.sequelize
     .sync({
       force: force_sync

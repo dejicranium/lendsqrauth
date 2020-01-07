@@ -11,7 +11,7 @@
     "coll-test": "mocha test/services/collection --recursive",
     "pref-test": "mocha test/services/preference --recursive",
     "notif-test": "mocha test/notifs --recursive",
-    "start:staging": "NODE_ENV=staging node_modules/.bin/sequelize db:migrate && node app.js",
+    "start:staging": "node_modules/.bin/sequelize db:migrate && node app.js",
     "start:live": "NODE_ENV=staging node_modules/.bin/sequelize db:migrate && node app.js",
     "start:test": "NODE_ENV=staging node_modules/.bin/sequelize db:migrate && node app.js"
   },
