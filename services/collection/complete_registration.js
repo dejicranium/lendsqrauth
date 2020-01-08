@@ -37,12 +37,12 @@ function service(data) {
     q.fcall(async () => {
 
             const validParameters = morx.validate(data, spec, {
-                    throw_error: true
-                });
+                throw_error: true
+            });
 
             const params = validParameters.params;
 
-            return [ models.borrower_invites.findOne({
+            return [models.borrower_invites.findOne({
                 where: {
                     token: params.token
                 }
@@ -84,7 +84,7 @@ function service(data) {
             // update password;
 
             user.password = await bcrypt.hash(params.password, 10);
-            user.active = 1;            // set user to active
+            user.active = 1; // set user to active
 
             return [user.save(), collection, instance]
 
@@ -94,7 +94,14 @@ function service(data) {
             let lender = await models.profile.findOne({
                 where: {
                     id: collection.lender_id
-                }
+                },
+                include: [{
+                    model: models.user,
+                    attributes: {
+                        exclude: ['password']
+                    }
+                }]
+
             });
             // if (signup_info.id) {
             //     // create a borrower profile for the user
@@ -110,19 +117,19 @@ function service(data) {
             //         parent_profile_id: collection.profile_id
             //     });
 
-                // update the collection 
-                collection.update({
-                    status: 'active',
-                });
+            // update the collection 
+            collection.update({
+                status: 'active',
+            });
 
-                // invalidate token 
-                await instance.update({
-                    token_is_used: true,
-                    status: 'Accepted',
-                    date_joined: new Date(),
-                })
+            // invalidate token 
+            await instance.update({
+                token_is_used: true,
+                status: 'Accepted',
+                date_joined: new Date(),
+            })
 
-                // prepare to send emails
+            // prepare to send emails
 
             // first, send email notification to the lender;
             const LENDER_COLLECTION_CONFIRMATION_EMAIL_CONTEXT_ID = 104;
@@ -136,7 +143,7 @@ function service(data) {
                 interestPeriod: collection.product.interest_period,
                 tenor: collection.tenor + ' ' + collection.product.tenor_type,
                 link: config.base_url + 'collections',
-                loanRepaymentURL: '',  //TODO: makee sure that this links to reapyment schedule url
+                loanRepaymentURL: '', //TODO: makee sure that this links to reapyment schedule url
             };
             // SEND!
             send_email(LENDER_COLLECTION_CONFIRMATION_EMAIL_CONTEXT_ID, confirmation_email_payload);
@@ -145,16 +152,16 @@ function service(data) {
 
             // audit
 
-                data.reqData.user = JSON.parse(JSON.stringify(user));
-                let audit = new AuditLog(data.reqData, "SIGN UP", "signed up as through borrower invitation");
-                await audit.create();
+            data.reqData.user = JSON.parse(JSON.stringify(user));
+            let audit = new AuditLog(data.reqData, "SIGN UP", "signed up as through borrower invitation");
+            await audit.create();
 
-                d.resolve({
-                    first_name: user.first_name,
-                    last_name: user.last_name,
-                    email: user.email,
-                    phone: user.phone
-                })
+            d.resolve({
+                first_name: user.first_name,
+                last_name: user.last_name,
+                email: user.email,
+                phone: user.phone
+            })
         })
         .catch((error) => {
             d.reject(error);
