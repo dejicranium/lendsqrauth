@@ -7,6 +7,7 @@ const assert = require('mlar')('assertions');
 const AuditLog = require('mlar')('audit_log');
 const requests = require('mlar')('requests');
 const send_email = require('mlar').mreq('notifs', 'send');
+const config = require('../../config');
 
 
 /**  this is to be used by a borrower to reject a collections invitation 

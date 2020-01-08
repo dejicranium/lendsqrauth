@@ -8,6 +8,7 @@ const signup = require('mlar')('signupservice');
 const bcrypt = require('bcrypt');
 const AuditLog = require('mlar')('audit_log');
 const send_email = require('mlar').mreq('notifs', 'send');
+const config = require('../../config');
 
 
 /**  this is to be used by a borrower to reject a collections invitation 

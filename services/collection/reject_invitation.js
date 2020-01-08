@@ -4,6 +4,7 @@ const morx = require('morx');
 const q = require('q');
 const validators = require('mlar')('validators');
 const assert = require('mlar')('assertions');
+const config = require('../../config');
 
 /**  this is to be used by a borrower to reject a collections invitation 
  *  sent to him by a lender.
