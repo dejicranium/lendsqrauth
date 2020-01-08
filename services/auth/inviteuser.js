@@ -13,6 +13,7 @@ const makeRequest = require('mlar')('makerequest');
 const crypto = require('crypto');
 const requests = require('mlar')('requests');
 const AuditLog = require('mlar')('audit_log');
+const send_email = require('mlar').mreq('notifs', 'send');
 
 var spec = morx.spec({}).build('email', 'required:true, eg:1').build('role_id', 'required:true, eg:1').end();
 
@@ -96,31 +97,6 @@ function service(data) {
 				params.parent_profile_id = data.profile.id;
 				params.user_id = user.id;
 
-				// copy existing profile to new profile object
-				/*                
-                let newProfile = {};
-
-				params.collaborator_role_id = collaboratorRoleId;
-
-				let paramsToCopy = {
-					...userProfile
-				};
-				paramsToCopy.role_id = params.collaborator_role_id;
-				paramsToCopy.user_id = user.id;
-
-				paramsToCopy.parent_profile_id = globalProfileId;
-				paramsToCopy.created_on = new Date();
-
-				newProfile = paramsToCopy;
-
-				let newProfileContact = {
-					/*
-                                   contact_first_name: params.first_name,
-                                   contact_last_name: params.last_name,
-                                   contact_email: params.email, 
-					created_on: new Date()
-                };
-                */
 
 				return [params, models.profile.create(params), 'none'];
 			} else {
@@ -161,12 +137,8 @@ function service(data) {
 
 			}
 
-
-
 			// invitation token
 			let invite_token = await crypto.randomBytes(32).toString('hex');
-
-
 
 
 			// create a user invite record

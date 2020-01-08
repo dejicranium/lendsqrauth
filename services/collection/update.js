@@ -127,12 +127,21 @@ function service(data) {
                 return d.promise;
             }
 
+
+
             if (!product || !product.id) throw new Error('Product does not exist');
             if (product.status !== 'active')
                 throw new Error("You cannot create a collection for a product that isn't active");
             if (product.profile_id !== data.profile.id)
                 throw new Error("You can't use a product that isn't attached to this profile");
 
+
+            if (params.collection_frequency) {
+                let accepted = ['daily', 'weekly', 'monthly,'];
+                if (!accepted.includes(params.collection_frequency.toLowerCase())) {
+                    throw new Error(`Collection frequency should be one of ${accepted.join(', ')}`)
+                }
+            }
 
             if (params.amount) {
                 assert.digitsOrDecimalOnly(params.amount, null, 'Amount');
