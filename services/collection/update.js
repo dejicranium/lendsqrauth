@@ -12,7 +12,7 @@ const collection_utils = require('mlar')('collection_utils');
 const AuditLog = require('mlar')('audit_log');
 const moment = require('moment');
 const send_email = require('mlar').mreq('notifs', 'send');
-
+const detect_change = require('mlar')('detectchange');
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
 var spec = morx
@@ -59,6 +59,15 @@ function service(data) {
 
             if (!collection || !collection.id) throw new Error('Could not find collection');
             if (collection.status === 'active') throw new Error('Cannot update an active collection');
+
+
+            let change_exists = detect_change(collection, params);
+
+            if (!change_exists) {
+                 // quickly resolve
+                d.resolve(null);
+                return d.promise;
+            }
 
             if ((params.start_date || collection.start_date) && (params.disbursement_date || collection.disbursement_date)) {
                 let start_date = params.start_date || collection.start_date;

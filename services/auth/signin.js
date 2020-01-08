@@ -67,10 +67,10 @@ function service(data) {
 
         })
         .spread(async (user, token, user_profiles) => {
-            if (user.status !== 'active') throw new Error('User is inactive')
+            if (user.status !== 'active') throw new Error('User is inactive');
 
             // ids of the user's profiles 
-            user_profiles = user_profiles.map(profile => profile.id)
+            user_profiles = user_profiles.map(profile => profile.id);
 
             let newToken = await jwt.sign({
                     profiles: user_profiles,
