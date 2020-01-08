@@ -13,6 +13,7 @@ const AuditLog = require('mlar')('audit_log');
 const moment = require('moment');
 const send_email = require('mlar').mreq('notifs', 'send');
 const detect_change = require('mlar')('detectchange');
+
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
 var spec = morx
@@ -61,10 +62,10 @@ function service(data) {
             if (collection.status === 'active') throw new Error('Cannot update an active collection');
 
 
-            let change_exists = detect_change(collection, params);
+            let change_exists = await detect_change(collection, params);
 
             if (!change_exists) {
-                 // quickly resolve
+                // quickly resolve
                 d.resolve(null);
                 return d.promise;
             }
