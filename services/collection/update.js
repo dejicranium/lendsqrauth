@@ -147,7 +147,7 @@ function service(data) {
 
 
             if (params.collection_frequency) {
-                let accepted = ['daily', 'weekly', 'monthly,'];
+                let accepted = ['daily', 'weekly', 'monthly'];
                 if (!accepted.includes(params.collection_frequency.toLowerCase())) {
                     throw new Error(`Collection frequency should be one of ${accepted.join(', ')}`)
                 }
