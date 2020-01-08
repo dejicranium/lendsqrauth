@@ -10,7 +10,7 @@ function util(old_data, new_data) {
         }
     }
 
-    return proceed;
+    return proceed === true;
 }
 
 module.exports = util;
