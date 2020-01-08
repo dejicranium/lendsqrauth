@@ -164,6 +164,7 @@ function service(data) {
 			}
 
 			// send email
+			/*
 			let payload = {
 				context_id: 87,
 				sender: config.sender_email,
@@ -180,8 +181,36 @@ function service(data) {
 			} catch (e) {
 				// silent treatment. To be logged;
 			}
+			*/
+
+
+
+
+			// send email 
+			const emailPayload = {
+				userName: GLOBAL_USER.first_name ? GLOBAL_USER.first_name + ' ' + GLOBAL_USER.last_name : GLOBAL_USER.business_name, // existing team member
+				lenderFullName: data.user.first_name ? data.user.first_name + ' ' + data.user.last_name : data.user.business_name,
+			}
+
+			let INVITATION_EMAIL_CONTEXT_ID = 93;
+			let recipient = null;
+
+			if (!GLOBAL_USER) {
+				INVITATION_EMAIL_CONTEXT_ID = 94;
+				recipient = GLOBAL_USER.email
+			} else {
+				recipient = created1.email
+			}
+
+			try {
+				send_email(INVITATION_EMAIL_CONTEXT_ID, recipient, emailPayload);
+			} catch (e) {
+				// silent treatement
+			}
 
 			// audit log
+			let audit_description = "sent invitation to a potential team member";
+
 			if (GLOBAL_USER_EXISTS) audit_description = " with user id " + GLOBAL_USER.id
 			let audit_log = new AuditLog(data.reqData, "CREATE", 'sent invitation to a potential team member')
 			await audit_log.create();
