@@ -104,7 +104,7 @@ function service(data) {
                 tenor_type: product.tenor_type,
                 num_of_collections: collection.num_of_collections,
                 interest: product.interest,
-                interestPeriod: product.interest_period,
+                interest_period: product.interest_period,
                 disbursement_date: collection.disbursement_date,
             };
 
