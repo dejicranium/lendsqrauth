@@ -13,6 +13,7 @@ const AuditLog = require('mlar')('audit_log');
 const moment = require('moment');
 const send_email = require('mlar').mreq('notifs', 'send');
 const detect_change = require('mlar')('detectchange');
+const validateCollectionSetup = require('../../utils/collections').validateSetup;
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
@@ -61,14 +62,14 @@ function service(data) {
             if (!collection || !collection.id) throw new Error('Could not find collection');
             if (collection.status === 'active') throw new Error('Cannot update an active collection');
 
-            /*
-            let change_exists = await detect_change(collection, params);
 
-            if (!change_exists) {
-                // quickly resolve
-                d.resolve(null);
-                return d.promise;
-            }*/
+
+
+
+
+
+
+
 
             if ((params.start_date || collection.start_date) && (params.disbursement_date || collection.disbursement_date)) {
                 let start_date = params.start_date || collection.start_date;
@@ -139,7 +140,29 @@ function service(data) {
 
 
 
+
+
+
+
             if (!product || !product.id) throw new Error('Product does not exist');
+
+
+            let tenor = params.tenor || collection.tenor;
+            let tenor_type = product.tenor_type;
+            let frequency = params.collection_frequency || collection.frequency;
+            let collections = params.num_of_collections || collection.num_of_collections;
+
+            if (tenor && tenor_type && frequency && collections) {
+                let end_result = validateCollectionSetup(tenor, tenor_type, collections, frequency);
+                let can_proceed = end_result.can_proceed;
+
+                if (!can_proceed) throw new Error( `Collection end (${end_result.collection_end}) is greater than tenor end (${end_result.tenor_end})`)
+            }
+
+
+
+
+
             if (product.status !== 'active')
                 throw new Error("You cannot create a collection for a product that isn't active");
             if (product.profile_id !== data.profile.id)

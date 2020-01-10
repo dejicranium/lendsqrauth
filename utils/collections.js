@@ -13,7 +13,7 @@ function productHasActiveCollection(product) {
 function validateSetup (tenor, tenor_type, collections, frequency) {
     switch (tenor_type) {
         case 'months':
-            tenor_type = 'm';
+            tenor_type = 'M';
             break;
 
         case 'days':
@@ -25,11 +25,11 @@ function validateSetup (tenor, tenor_type, collections, frequency) {
             break;
 
         case 'years':
-            tenor_type = 'y';
+            tenor_type = 'Y';
             break;
 
         default:
-            tenor_type = month;
+            tenor_type = 'M';
             break;
     }
 
@@ -39,7 +39,7 @@ function validateSetup (tenor, tenor_type, collections, frequency) {
             break;
 
         case 'monthly':
-            frequency = 'm';
+            frequency = 'M';
             break;
 
         case 'weekly':
@@ -47,7 +47,7 @@ function validateSetup (tenor, tenor_type, collections, frequency) {
             break;
 
         default:
-            frequency = 'm';
+            frequency = 'M';
             break;
     }
 
