@@ -52,9 +52,9 @@ function validateSetup (tenor, tenor_type, collections, frequency) {
     }
 
 
-    let tenor_end =  moment().add(tenor, tenor_type).format('DD MMMM YYYY');
+    let tenor_end =  moment().add(tenor, tenor_type).format('MMMM DD YYYY');
 
-    let collection_end = moment().add(collections, frequency).format('DD MMMM YYYY');
+    let collection_end = moment().add(collections, frequency).format('MMMM DD YYYY');
     let can_proceed = true;
     if (moment(collection_end).isAfter(tenor_end)) {
        can_proceed = false;

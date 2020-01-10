@@ -156,7 +156,7 @@ function service(data) {
                 let end_result = validateCollectionSetup(tenor, tenor_type, collections, frequency);
                 let can_proceed = end_result.can_proceed;
 
-                if (!can_proceed) throw new Error( `Collection end (${end_result.collection_end}) is greater than tenor end (${end_result.tenor_end})`)
+                if (!can_proceed) throw new Error( `Collection End Date (${end_result.collection_end}) is after the Tenor End Date (${end_result.tenor_end}). Kindly modify the number of collections and/or collection frequency`)
             }
 
 
