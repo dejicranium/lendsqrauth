@@ -106,6 +106,7 @@ function service(data) {
                 interest: product.interest,
                 interest_period: product.interest_period,
                 disbursement_date: collection.disbursement_date,
+                collection_frequency: collection.collection_frequency
             };
 
             // first, send email notification to the lender;

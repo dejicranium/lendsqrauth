@@ -116,6 +116,7 @@ module.exports = {
         */
 
         let tenor_type_value = null;
+        let collection_frequency = null;
         switch (data.tenor_type) {
             case 'days':
                 tenor_type_value = 0;
@@ -133,11 +134,25 @@ module.exports = {
                 tenor_type_value = 1;
 
         }
+        switch (data.collection_frequency) {
+            case 'daily':
+                collection_frequency = 0;
+                break;
+            case 'weekly':
+                collection_frequency = 1;
+                break;
+            case 'monthly':
+                collection_frequency = 2;
+                break;
+            default:
+                collection_frequency = 1;
+
+        }
         console.log('tenor type is ' + data.tenor_type)
         console.log('tenor type value is ' + tenor_type_value)
 
 
-        const d = q.defer()
+        const d = q.defer();
         /*
         let params = {
             "dateFormat": "dd MMMM yyyy",
@@ -171,7 +186,7 @@ module.exports = {
             "loanTermFrequencyType": tenor_type_value,
             "numberOfRepayments": data.num_of_collections,
             "repaymentEvery": 1,
-            "repaymentFrequencyType": tenor_type_value,
+            "repaymentFrequencyType": collection_frequency,
             "interestRatePerPeriod": data.interest,
             "interestRateFrequencyType": data.interest_period,
             "amortizationType": 1,
