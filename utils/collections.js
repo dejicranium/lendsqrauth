@@ -117,8 +117,9 @@ function normalizeTenor (tenor, tenor_type, collections, frequency) {
 
             let weekDateFromNow = moment().add(weeks, 'week');
 
-            if (parseInt(moment(collection_end).diff(weekDateFromNow.format('MMMM DD YYYY'), 'days')) > 0 ) {
-                let daysDifference = parseInt(moment(collection_end).diff(weekDateFromNow.format('MMMM DD YYYY'), 'days'));
+            let daysDifference = parseInt(moment(collection_end).diff(weekDateFromNow.format('MMMM DD YYYY'), 'days'));
+
+            if (daysDifference > 0 ) {
                 weeks += daysDifference;
             }
             return [weeks, 'weeks'];
@@ -131,9 +132,9 @@ function normalizeTenor (tenor, tenor_type, collections, frequency) {
             let monthsDateFromNow = moment().add(months, 'month');
 
 
+            let daysDifference = parseInt(moment(collection_end).diff(monthsDateFromNow.format('MMMM DD YYYY'), 'days'));
 
-            if (parseInt(moment(collection_end).diff(monthsDateFromNow.format('MMMM DD YYYY'), 'days')) > 0 ) {
-                let daysDifference = parseInt(moment(collection_end).diff(monthsDateFromNow.format('MMMM DD YYYY'), 'days'));
+            if (daysDifference > 0 ) {
                 months += daysDifference;
                 //return daysDifference;
             }
@@ -143,8 +144,9 @@ function normalizeTenor (tenor, tenor_type, collections, frequency) {
             let days = moment(end).diff(start, 'days');
             let dayDateFromNow = moment().add(days, 'day');
 
-            if (parseInt(moment(collection_end).diff(dayDateFromNow.format('MMMM DD YYYY'), 'days')) > 0 ) {
-                let daysDifference = parseInt(moment(collection_end).diff(dayDateFromNow.format('MMMM DD YYYY'), 'days'));
+            let daysDifference = parseInt(moment(collection_end).diff(dayDateFromNow.format('MMMM DD YYYY'), 'days'));
+
+            if (daysDifference> 0 ) {
                 days += daysDifference;
                 //return daysDifference;
             }
