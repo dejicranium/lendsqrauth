@@ -39,7 +39,7 @@ function service(data) {
 			})
 		})
 		.then((deleted) => {
-			if (!deleted) throw new Error("User not logged in");
+			//if (!deleted) throw new Error("User not logged in");
 			d.resolve("Log out successful")
 		})
 		.catch((err) => {
