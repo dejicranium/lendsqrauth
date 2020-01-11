@@ -39,7 +39,7 @@ class AuditLog  {
         catch(e) {
             // silent treatement
             console.log(e.stack);
-            //throw new Error(e);
+            throw new Error(e);
         }
     }
 }

@@ -6,19 +6,20 @@ const validators = require('mlar')('validators');
 const assert = require('mlar')('assertions');
 const paginate = require('mlar')('paginate');
 const DEFAULT_EXCLUDES = require('mlar')('appvalues').DEFAULT_EXCLUDES;
+const AuditLog = require('mlar')('audit_log');
 
 var spec = morx.spec({})
-    .build('action_type', 'required:false, eg:lender')
-    .build('actor_meta', 'required:false, eg:lender')
-    .build('actor_id', 'required:false, eg:lender')
-    .build('action', 'required:false, eg:lender')
+    .build('action_type', 'required:true, eg:lender')
+    .build('reqData', 'required:true, eg:lender')
+    .build('action', 'required:true, eg:lender')
 
     .end();
 
 function service(data) {
     let params = morx.validate(data, spec, {throw_error:true}).params;
     q.fcall(() => {
-        return models.audit_log.create(params);
+        let audit = new AuditLog(params.reqData, params.action_type, params.action);
+        return audit.create();
     }) .then(resp=> {
         if (!resp) throw new Error("Could not create audit log");
         d.resolve(resp);
