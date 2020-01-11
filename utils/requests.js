@@ -4,6 +4,7 @@ const makeRequest = require('mlar')('makerequest');
 const q = require('q')
 const moment = require('moment');
 const normalizeTenor = require('../utils/collections').normalizeTenor;
+const resolveCollectionStartDate = require('../utils/collections').resolveStartDate;
 
 
 module.exports = {
@@ -120,9 +121,12 @@ module.exports = {
         let collection_frequency = null;
 
         // normalize the tenor;
+
         let normalizedTenor = normalizeTenor(data.tenor, data.tenor_type, data.num_of_collections, data.collection_frequency);
         data.tenor = normalizedTenor[0];
         data.tenor_type  = normalizedTenor[1];
+
+        data.start_date = resolveCollectionStartDate(data.start_date);    // resolve when collection should start -
 
         switch (data.tenor_type) {
             case 'days':
@@ -199,7 +203,7 @@ module.exports = {
             "amortizationType": 1,
             "interestType": 0,
             "interestCalculationPeriodType": 1,
-            "expectedDisbursementDate": moment(data.disbursement_date).format('DD MMMM YYYY'), //"20 September 2011"
+            "expectedDisbursementDate": moment(data.start_date).format('DD MMMM YYYY'), //"20 September 2011"
             "transactionProcessingStrategyId": 2,
             "submittedOnDate": moment().format('DD MMMM YYYY'), //"20 September 2011",
             "loanType": "individual",

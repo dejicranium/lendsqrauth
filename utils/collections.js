@@ -152,14 +152,19 @@ function normalizeTenor (tenor, tenor_type, collections, frequency) {
             }
             return [days, 'days'];
         }
-
-
-
 }
 
+function resolveStartDate(startDate) {
+    let now = moment();
+    if (now.isAfter(startDate)) {
+        return now
+    }
+    return startDate;
+}
 module.exports = {
     productHasActiveCollection,
     validateSetup,
     normalizeTenor,
-    validateDateThresholds
+    validateDateThresholds,
+    resolveStartDate,
 }

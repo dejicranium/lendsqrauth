@@ -105,7 +105,7 @@ function service(data) {
                 num_of_collections: collection.num_of_collections,
                 interest: product.interest,
                 interest_period: product.interest_period,
-                disbursement_date: collection.disbursement_date,
+                start_date: collection.start_date,
                 collection_frequency: collection.collection_frequency
             };
 
