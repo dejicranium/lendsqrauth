@@ -115,6 +115,12 @@ function normalizeTenor (tenor, tenor_type, collections, frequency) {
         if (frequency === 'weekly') {
             let weeks = moment(end).diff(start, 'weeks');
 
+            let weekDateFromNow = moment().add(weeks, 'week');
+
+            if (parseInt(moment(collection_end).diff(weekDateFromNow.format('MMMM DD YYYY'), 'days')) > 0 ) {
+                let daysDifference = parseInt(moment(collection_end).diff(weekDateFromNow.format('MMMM DD YYYY'), 'days'));
+                weeks += daysDifference;
+            }
             return [weeks, 'weeks'];
 
         }
@@ -122,12 +128,26 @@ function normalizeTenor (tenor, tenor_type, collections, frequency) {
 
 
             let months = moment(end).diff(start, 'months');
+            let monthsDateFromNow = moment().add(months, 'month');
 
+
+
+            if (parseInt(moment(collection_end).diff(monthsDateFromNow.format('MMMM DD YYYY'), 'days')) > 0 ) {
+                let daysDifference = parseInt(moment(collection_end).diff(monthsDateFromNow.format('MMMM DD YYYY'), 'days'));
+                months += daysDifference;
+                //return daysDifference;
+            }
             return [months, 'months'];
         }
         else if (frequency === 'daily') {
             let days = moment(end).diff(start, 'days');
+            let dayDateFromNow = moment().add(days, 'day');
 
+            if (parseInt(moment(collection_end).diff(dayDateFromNow.format('MMMM DD YYYY'), 'days')) > 0 ) {
+                let daysDifference = parseInt(moment(collection_end).diff(dayDateFromNow.format('MMMM DD YYYY'), 'days'));
+                days += daysDifference;
+                //return daysDifference;
+            }
             return [days, 'days'];
         }
 

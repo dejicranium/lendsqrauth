@@ -62,7 +62,7 @@ describe('#Utils ', function(done) {
     });
     it("should throw error", async () => {
         const jwt_decode = require('jwt-decode');
-        let r = await coll.normalizeSchedule(2, 'months', '100', 'weekly');
+        let r = await coll.normalizeTenor(3, 'weeks', '21', 'monthly');
         r.should.be.a('object');
         console.log(r)
     });
