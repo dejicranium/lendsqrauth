@@ -3,6 +3,7 @@ let config = require('../config')
 const makeRequest = require('mlar')('makerequest');
 const q = require('q')
 const moment = require('moment');
+const normalizeTenor = require('../utils/collections').normalizeTenor;
 
 
 module.exports = {
@@ -117,6 +118,12 @@ module.exports = {
 
         let tenor_type_value = null;
         let collection_frequency = null;
+
+        // normalize the tenor;
+        let normalizedTenor = normalizeTenor(data.tenor, data.tenor_type, data.num_of_collections, data.collection_frequency);
+        data.tenor = normalizedTenor[0];
+        data.tenor_type  = normalizedTenor[1];
+
         switch (data.tenor_type) {
             case 'days':
                 tenor_type_value = 0;

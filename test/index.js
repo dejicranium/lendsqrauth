@@ -60,6 +60,12 @@ describe('#Utils ', function(done) {
         r.should.be.a('object');
         console.log(r)
     });
+    it("should throw error", async () => {
+        const jwt_decode = require('jwt-decode');
+        let r = await coll.normalizeSchedule(2, 'months', '100', 'weekly');
+        r.should.be.a('object');
+        console.log(r)
+    });
 });
 
 /*

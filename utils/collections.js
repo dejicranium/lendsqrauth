@@ -60,13 +60,81 @@ function validateSetup (tenor, tenor_type, collections, frequency) {
        can_proceed = false;
     }
     return {tenor_end, collection_end, can_proceed: can_proceed};
+}
+
+function normalizeTenor (tenor, tenor_type, collections, frequency) {
+    switch (tenor_type) {
+        case 'days':
+            tenor_type_value = 0;
+            break;
+        case 'weeks':
+            tenor_type_value = 1;
+            break;
+        case 'months':
+            tenor_type_value = 2;
+            break;
+        case 'years':
+            tenor_type_value = 3;
+            break;
+        default:
+            tenor_type_value = 1;
+
+    }
+    switch (frequency) {
+        case 'daily':
+            collection_frequency = 0;
+            break;
+        case 'weekly':
+            collection_frequency = 1;
+            break;
+        case 'monthly':
+            collection_frequency = 2;
+            break;
+        default:
+            collection_frequency = 1;
+
+    }
+    let tenor_order = ['days', 'weeks', 'months'];
+    let coll_order = ['daily', 'weekly', 'monthly'];
+    if (tenor_type_value < collection_frequency) {
+        let tenor_index  = tenor_order.indexOf(tenor_type);
+
+        let eq_or_less_than_tenor = coll_order.slice(0, tenor_index + 1);
+        throw new Error(`Tenor type (${tenor_type}) must be equivalent or greater than collection frequency (${frequency}). Try out ${eq_or_less_than_tenor.join(', ')} as your collection frequency`)
+    }
+
+    else{
+        // convert collection frequency and collections to fit into tenor type and tenor value
+        let tenor_end = validateSetup(tenor, tenor_type, collections, frequency).tenor_end;
+        let collection_end = validateSetup(tenor, tenor_type, collections, frequency).collection_end;
+        let start = moment();
+        let end = tenor_end;
+
+        if (frequency === 'weekly') {
+            let weeks = moment(end).diff(start, 'weeks');
+
+            return [weeks, 'weeks'];
+
+        }
+        else if (frequency === 'monthly') {
 
 
+            let months = moment(end).diff(start, 'months');
 
+            return [months, 'months'];
+        }
+        else if (frequency === 'daily') {
+            let days = moment(end).diff(start, 'days');
+
+            return [days, 'days'];
+        }
+
+    }
 
 }
 
 module.exports = {
     productHasActiveCollection,
-    validateSetup
+    validateSetup,
+    normalizeTenor
 }
