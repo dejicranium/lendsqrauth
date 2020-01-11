@@ -12,12 +12,13 @@ const config = require('../../config');
 const AuditLog = require('mlar')('audit_log');
 
 
-
+/*
 var spec = morx.spec({})
     .build('password', 'required:true, eg:tinatona98')
     .build('email', 'required:true, eg:tinaton@gmail.com')
     .end();
-
+*/
+/*
 function service(data) {
 
     var d = q.defer();
@@ -174,11 +175,13 @@ function service(data) {
     return d.promise;
 
 }
+
+
 service.morxspc = spec;
 module.exports = service;
 
+*/
 
-/*
 var spec = morx.spec({})
     //.build('password', 'required:true, eg:tinatona98')
     .build('email', 'required:true, eg:tinaton@gmail.com')
@@ -357,6 +360,6 @@ function service(data) {
 
     return d.promise;
 
-}*/
+}
 service.morxspc = spec;
 module.exports = service;
