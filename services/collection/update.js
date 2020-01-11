@@ -156,7 +156,11 @@ function service(data) {
                 let end_result = validateCollectionSetup(tenor, tenor_type, collections, frequency);
                 let can_proceed = end_result.can_proceed;
 
-                if (!can_proceed) throw new Error( `Collection End Date (${end_result.collection_end}) is after the Tenor End Date (${end_result.tenor_end}). Kindly modify the number of collections and/or collection frequency`)
+                if (!can_proceed) {
+
+                    throw new Error(`You need to review your loan settings. With ${collections} collections, each set to occur on a ${frequency} basis, \
+                    the last date of collection is (${end_result.collection_end}), which is beyond the date, (${end_result.tenor_end}, that this loan should have closed.`)
+                }
             }
 
 
