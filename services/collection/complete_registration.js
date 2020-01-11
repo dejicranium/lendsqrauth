@@ -9,7 +9,7 @@ const bcrypt = require('bcrypt');
 const AuditLog = require('mlar')('audit_log');
 const send_email = require('mlar').mreq('notifs', 'send');
 const config = require('../../config');
-
+const requests = require('mlar')('requests');
 
 /**  this is to be used by a borrower to reject a collections invitation 
  *  sent to him by a lender.
@@ -129,9 +129,12 @@ function service(data) {
                 date_joined: new Date(),
             })
 
+
+
+
+
             // prepare to send emails
 
-            // first, send email notification to the lender;
             const LENDER_COLLECTION_CONFIRMATION_EMAIL_CONTEXT_ID = 104;
             const BORROWER_COLLECTION_CONFIRMATION_EMAIL_CONTEXT_ID = 103;
 
@@ -145,9 +148,85 @@ function service(data) {
                 link: config.base_url + 'collections',
                 loanRepaymentURL: '', //TODO: makee sure that this links to reapyment schedule url
             };
+
+
+
             // SEND!
             send_email(LENDER_COLLECTION_CONFIRMATION_EMAIL_CONTEXT_ID, confirmation_email_payload);
             send_email(BORROWER_COLLECTION_CONFIRMATION_EMAIL_CONTEXT_ID, confirmation_email_payload);
+
+
+            // create loan schedule
+            let product = await models.product.findOne({where: {id: collection.product_id}});
+            let params = {
+                amount: collection.amount,
+                tenor: collection.tenor,
+                tenor_type: product.tenor_type,
+                num_of_collections: collection.num_of_collections,
+                interest: product.interest,
+                interest_period: product.interest_period,
+                disbursement_date: collection.disbursement_date,
+                collection_frequency: collection.collection_frequency
+            };
+
+
+            let borrower = await models.profile.findOne({
+                where: {
+                    id: collection.borrower_id
+                }
+            });
+            let borrower_userId = null;
+
+            if (borrower && borrower.user_id) {
+                borrower_userId = borrower.user_id;
+            }
+
+
+            let result = await requests.createCollectionSchedule(params)
+                .then(async resp => {
+                    let bulkdata = [];
+                    resp.periods.forEach(async r => {
+
+
+                        if (resp.periods.indexOf(r) !== 0) {
+                            /*
+                            let borrower_userId = await models.profile.findOne({
+                                where: {
+                                    id: collection.borrower_id
+                                }
+                            });*/
+
+                            let period = {
+                                period_id: r.period,
+                                from_date: r.fromDate.join('-'),
+                                due_date: r.dueDate.join('-'),
+                                days_in_period: r.daysInPeriod,
+                                principal_due: r.principalDue,
+                                interest_due: r.interestDue,
+                                fee: r.feeChargesDue,
+                                total_amount: r.totalDueForPeriod,
+                                loan_id: product.id,
+                                balance_outstanding: r.principalLoanBalanceOutstanding,
+                                interest_outstanding: r.interestOutstanding,
+                                collection_id: collection.id,
+                                lender_userId: lender.user.id,
+                                borrower_userId: borrower_userId,
+                                borrower_id: collection.borrower_id,
+                                lender_id: collection.lender_id,
+                                status: 'Pending',
+                            };
+                            bulkdata.push(period);
+
+                        }
+                    });
+                    await models.collection_schedules.bulkCreate(bulkdata);
+                    console.log(resp);
+                })
+                .catch(err => {
+                    //silent failure
+                    console.log(err)
+                })
+
 
 
             // audit

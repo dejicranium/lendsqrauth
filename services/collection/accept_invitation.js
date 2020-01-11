@@ -155,7 +155,7 @@ function service(data) {
                                 balance_outstanding: r.principalLoanBalanceOutstanding,
                                 interest_outstanding: r.interestOutstanding,
                                 collection_id: collection.id,
-                                lender_userId: data.user.id,
+                                lender_userId: lender.user.id,
                                 borrower_userId: borrower_userId,
                                 borrower_id: collection.borrower_id,
                                 lender_id: collection.lender_id,
