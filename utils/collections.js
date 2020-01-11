@@ -62,7 +62,8 @@ function validateSetup (tenor, tenor_type, collections, frequency) {
     return {tenor_end, collection_end, can_proceed: can_proceed};
 }
 
-function normalizeTenor (tenor, tenor_type, collections, frequency) {
+
+function validateDateThresholds (tenor, tenor_type, collections, frequency) {
     switch (tenor_type) {
         case 'days':
             tenor_type_value = 0;
@@ -102,8 +103,9 @@ function normalizeTenor (tenor, tenor_type, collections, frequency) {
         let eq_or_less_than_tenor = coll_order.slice(0, tenor_index + 1);
         throw new Error(`Tenor type (${tenor_type}) must be equivalent or greater than collection frequency (${frequency}). Try out ${eq_or_less_than_tenor.join(', ')} as your collection frequency`)
     }
+}
+function normalizeTenor (tenor, tenor_type, collections, frequency) {
 
-    else{
         // convert collection frequency and collections to fit into tenor type and tenor value
         let tenor_end = validateSetup(tenor, tenor_type, collections, frequency).tenor_end;
         let collection_end = validateSetup(tenor, tenor_type, collections, frequency).collection_end;
@@ -129,12 +131,13 @@ function normalizeTenor (tenor, tenor_type, collections, frequency) {
             return [days, 'days'];
         }
 
-    }
+
 
 }
 
 module.exports = {
     productHasActiveCollection,
     validateSetup,
-    normalizeTenor
+    normalizeTenor,
+    validateDateThresholds
 }

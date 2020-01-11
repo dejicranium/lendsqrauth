@@ -14,6 +14,7 @@ const moment = require('moment');
 const send_email = require('mlar').mreq('notifs', 'send');
 const detect_change = require('mlar')('detectchange');
 const validateCollectionSetup = require('../../utils/collections').validateSetup;
+const validateDateThresholds = require('../../utils/collections').validateDateThresholds;
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
@@ -152,7 +153,13 @@ function service(data) {
             let frequency = params.collection_frequency || collection.frequency;
             let collections = params.num_of_collections || collection.num_of_collections;
 
+
+
+
             if (tenor && tenor_type && frequency && collections) {
+                // first , validate date thresholds
+                validateDateThresholds(tenor, tenor_type, collections, frequency);
+
                 let end_result = validateCollectionSetup(tenor, tenor_type, collections, frequency);
                 let can_proceed = end_result.can_proceed;
 
