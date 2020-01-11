@@ -66,7 +66,8 @@ function service(data) {
             await instance.update({
                 token_is_used: true,
                 status: ACCEPTED_STATUS,
-                date_accepted: new Date()
+                date_accepted: new Date(),
+                date_joined: new Date()
             });
             // update collection;
             collection.status = 'active';
@@ -106,7 +107,8 @@ function service(data) {
                 interest: product.interest,
                 interest_period: product.interest_period,
                 start_date: collection.start_date,
-                collection_frequency: collection.collection_frequency
+                collection_frequency: collection.collection_frequency,
+                repayment_model: product.repayment_model
             };
 
             // first, send email notification to the lender;

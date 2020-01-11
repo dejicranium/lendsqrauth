@@ -166,7 +166,9 @@ function service(data) {
                 interest: product.interest,
                 interest_period: product.interest_period,
                 start_date: collection.start_date,
-                collection_frequency: collection.collection_frequency
+                collection_frequency: collection.collection_frequency,
+                repayment_model: product.repayment_model
+
             };
 
 

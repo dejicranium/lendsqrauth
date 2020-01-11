@@ -157,10 +157,19 @@ module.exports = {
                 break;
             default:
                 collection_frequency = 1;
-
         }
-        console.log('tenor type is ' + data.tenor_type)
-        console.log('tenor type value is ' + tenor_type_value)
+        let repayment_model = null;
+        switch (data.repayment_model) {
+
+            case 'equal_installments':
+                repayment_model = 1;
+                break;
+            default:
+                repayment_model = 0;
+                break;
+        }
+        console.log('tenor type is ' + data.tenor_type);
+        console.log('tenor type value is ' + tenor_type_value);
 
 
         const d = q.defer();
@@ -200,7 +209,7 @@ module.exports = {
             "repaymentFrequencyType": collection_frequency,
             "interestRatePerPeriod": data.interest,
             "interestRateFrequencyType": data.interest_period,
-            "amortizationType": 1,
+            "amortizationType": repayment_model,
             "interestType": 0,
             "interestCalculationPeriodType": 1,
             "expectedDisbursementDate": moment(data.start_date).format('DD MMMM YYYY'), //"20 September 2011"
