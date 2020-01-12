@@ -17,7 +17,7 @@ module.exports = {
     
     return queryInterface.removeColumn(
       'collections',
-      'borrower'
+      'borrower_name'
     );
   },
   down: (queryInterface, Sequelize) => {
