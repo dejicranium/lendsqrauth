@@ -3,6 +3,8 @@ let config = require('../config')
 const makeRequest = require('mlar')('makerequest');
 const q = require('q')
 const moment = require('moment');
+const normalizeTenor = require('../utils/collections').normalizeTenor;
+const resolveCollectionStartDate = require('../utils/collections').resolveStartDate;
 
 
 module.exports = {
@@ -116,6 +118,16 @@ module.exports = {
         */
 
         let tenor_type_value = null;
+        let collection_frequency = null;
+
+        // normalize the tenor;
+
+        let normalizedTenor = normalizeTenor(data.tenor, data.tenor_type, data.num_of_collections, data.collection_frequency);
+        data.tenor = normalizedTenor[0];
+        data.tenor_type  = normalizedTenor[1];
+
+        data.start_date = resolveCollectionStartDate(data.start_date);    // resolve when collection should start -
+
         switch (data.tenor_type) {
             case 'days':
                 tenor_type_value = 0;
@@ -133,11 +145,34 @@ module.exports = {
                 tenor_type_value = 1;
 
         }
-        console.log('tenor type is ' + data.tenor_type)
-        console.log('tenor type value is ' + tenor_type_value)
+        switch (data.collection_frequency) {
+            case 'daily':
+                collection_frequency = 0;
+                break;
+            case 'weekly':
+                collection_frequency = 1;
+                break;
+            case 'monthly':
+                collection_frequency = 2;
+                break;
+            default:
+                collection_frequency = 1;
+        }
+        let repayment_model = null;
+        switch (data.repayment_model) {
+
+            case 'equal_installments':
+                repayment_model = 1;
+                break;
+            default:
+                repayment_model = 0;
+                break;
+        }
+        console.log('tenor type is ' + data.tenor_type);
+        console.log('tenor type value is ' + tenor_type_value);
 
 
-        const d = q.defer()
+        const d = q.defer();
         /*
         let params = {
             "dateFormat": "dd MMMM yyyy",
@@ -171,12 +206,13 @@ module.exports = {
             "loanTermFrequencyType": tenor_type_value,
             "numberOfRepayments": data.num_of_collections,
             "repaymentEvery": 1,
-            "repaymentFrequencyType": tenor_type_value,
+            "repaymentFrequencyType": collection_frequency,
             "interestRatePerPeriod": data.interest,
-            "amortizationType": 1,
+            "interestRateFrequencyType": data.interest_period,
+            "amortizationType": repayment_model,
             "interestType": 0,
             "interestCalculationPeriodType": 1,
-            "expectedDisbursementDate": moment(data.disbursement_date).format('DD MMMM YYYY'), //"20 September 2011"
+            "expectedDisbursementDate": moment(data.start_date).format('DD MMMM YYYY'), //"20 September 2011"
             "transactionProcessingStrategyId": 2,
             "submittedOnDate": moment().format('DD MMMM YYYY'), //"20 September 2011",
             "loanType": "individual",
@@ -185,18 +221,19 @@ module.exports = {
         const url = config.mifos_base_url + `loans?command=calculateLoanSchedule`
 
         q.fcall(async () => {
+                console.log('weerwer')
                 return makeRequest(url, 'POST', params, constants.mifos_headers, null, false);
             })
             .then(response => {
-
+                //if(!response) throw new Error(response);
                 //d.resolve(moment(data.disbursement_date).format('DD MMMM YYYY'))
-                console.log('response is ' + response)
+                console.log('response is ' + response);
                 console.log(response)
                 d.resolve(response)
 
             })
             .catch(error => {
-                console.log(" error" + error)
+                console.log(" error" + error);
                 d.reject(error)
             })
 

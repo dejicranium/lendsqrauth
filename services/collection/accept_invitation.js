@@ -7,6 +7,7 @@ const assert = require('mlar')('assertions');
 const AuditLog = require('mlar')('audit_log');
 const requests = require('mlar')('requests');
 const send_email = require('mlar').mreq('notifs', 'send');
+const config = require('../../config');
 
 
 /**  this is to be used by a borrower to reject a collections invitation 
@@ -65,7 +66,8 @@ function service(data) {
             await instance.update({
                 token_is_used: true,
                 status: ACCEPTED_STATUS,
-                date_accepted: new Date()
+                date_accepted: new Date(),
+                date_joined: new Date()
             });
             // update collection;
             collection.status = 'active';
@@ -103,8 +105,10 @@ function service(data) {
                 tenor_type: product.tenor_type,
                 num_of_collections: collection.num_of_collections,
                 interest: product.interest,
-                interestPeriod: product.interest_period,
-                disbursement_date: collection.disbursement_date,
+                interest_period: product.interest_period,
+                start_date: collection.start_date,
+                collection_frequency: collection.collection_frequency,
+                repayment_model: product.repayment_model
             };
 
             // first, send email notification to the lender;
@@ -153,7 +157,7 @@ function service(data) {
                                 balance_outstanding: r.principalLoanBalanceOutstanding,
                                 interest_outstanding: r.interestOutstanding,
                                 collection_id: collection.id,
-                                lender_userId: data.user.id,
+                                lender_userId: lender.user.id,
                                 borrower_userId: borrower_userId,
                                 borrower_id: collection.borrower_id,
                                 lender_id: collection.lender_id,

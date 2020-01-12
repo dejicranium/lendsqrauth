@@ -1,7 +1,7 @@
 var utils = require('mlar')('mt1l');
 const routemeta = require('mlar')('routemeta');
 const auth_middleware = require('mlar')('authmiddleware');
-const service = require('mlar').mreq('services', 'audit/get');
+const service = require('mlar').mreq('services', 'audit/create');
 const profile_middleware = require('mlar')('profileVerifyMiddleware');
 const has_role = require('mlar')('hasRoleMiddleware');
 
@@ -11,7 +11,7 @@ function vinfo(req, res, next) {
         ...req.query,
         ...req.headers,
         ...req.params
-    };
+    }
 
     service(data)
         .then(response => {
@@ -24,11 +24,8 @@ function vinfo(req, res, next) {
 
 vinfo.routeConfig = {};
 vinfo.routeConfig.path = "/";
-vinfo.routeConfig.method = "get";
+vinfo.routeConfig.method = "post";
 vinfo.routeConfig.middlewares = [
-    auth_middleware,
-    profile_middleware,
-    has_role('admin'),
     routemeta('get_product', 'none')
 ];
 module.exports = vinfo;

@@ -13,6 +13,7 @@ const makeRequest = require('mlar')('makerequest');
 const crypto = require('crypto');
 const requests = require('mlar')('requests');
 const AuditLog = require('mlar')('audit_log');
+const send_email = require('mlar').mreq('notifs', 'send');
 
 var spec = morx.spec({}).build('email', 'required:true, eg:1').build('role_id', 'required:true, eg:1').end();
 
@@ -49,7 +50,7 @@ function service(data) {
 			}
 			let role = await models.role.findOne({
 				where: {
-					id: params.role_id
+					id: parseInt(params.role_id)
 				}
 			});
 			if (
@@ -94,33 +95,8 @@ function service(data) {
 				params.uuid = Math.random().toString(36).substr(2, 9);
 				params.created_on = new Date();
 				params.parent_profile_id = data.profile.id;
-				params.user_id = user;
+				params.user_id = user.id;
 
-				// copy existing profile to new profile object
-				/*                
-                let newProfile = {};
-
-				params.collaborator_role_id = collaboratorRoleId;
-
-				let paramsToCopy = {
-					...userProfile
-				};
-				paramsToCopy.role_id = params.collaborator_role_id;
-				paramsToCopy.user_id = user.id;
-
-				paramsToCopy.parent_profile_id = globalProfileId;
-				paramsToCopy.created_on = new Date();
-
-				newProfile = paramsToCopy;
-
-				let newProfileContact = {
-					/*
-                                   contact_first_name: params.first_name,
-                                   contact_last_name: params.last_name,
-                                   contact_email: params.email, 
-					created_on: new Date()
-                };
-                */
 
 				return [params, models.profile.create(params), 'none'];
 			} else {
@@ -159,15 +135,10 @@ function service(data) {
 				});
 				new_profile_id = new_profile.id;
 
-
 			}
-
-
 
 			// invitation token
 			let invite_token = await crypto.randomBytes(32).toString('hex');
-
-
 
 
 			// create a user invite record
@@ -193,6 +164,7 @@ function service(data) {
 			}
 
 			// send email
+			/*
 			let payload = {
 				context_id: 87,
 				sender: config.sender_email,
@@ -209,15 +181,43 @@ function service(data) {
 			} catch (e) {
 				// silent treatment. To be logged;
 			}
+			*/
+
+
+
+
+			// send email 
+			const emailPayload = {
+				userName: GLOBAL_USER.first_name ? GLOBAL_USER.first_name + ' ' + GLOBAL_USER.last_name : GLOBAL_USER.business_name, // existing team member
+				lenderFullName: data.user.first_name ? data.user.first_name + ' ' + data.user.last_name : data.user.business_name,
+			}
+
+			let INVITATION_EMAIL_CONTEXT_ID = 93;
+			let recipient = null;
+
+			if (!GLOBAL_USER) {
+				INVITATION_EMAIL_CONTEXT_ID = 94;
+				recipient = GLOBAL_USER.email
+			} else {
+				recipient = created1.email
+			}
+
+			try {
+				send_email(INVITATION_EMAIL_CONTEXT_ID, recipient, emailPayload);
+			} catch (e) {
+				// silent treatement
+			}
 
 			// audit log
 			let audit_description = "sent invitation to a potential team member";
+
 			if (GLOBAL_USER_EXISTS) audit_description = " with user id " + GLOBAL_USER.id
 			let audit_log = new AuditLog(data.reqData, "CREATE", 'sent invitation to a potential team member')
 			await audit_log.create();
 			d.resolve('Invited team member');
 		})
 		.catch((err) => {
+			console.log(err.stack);
 			d.reject(err);
 		});
 

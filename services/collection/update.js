@@ -12,6 +12,9 @@ const collection_utils = require('mlar')('collection_utils');
 const AuditLog = require('mlar')('audit_log');
 const moment = require('moment');
 const send_email = require('mlar').mreq('notifs', 'send');
+const detect_change = require('mlar')('detectchange');
+const validateCollectionSetup = require('../../utils/collections').validateSetup;
+const validateDateThresholds = require('../../utils/collections').validateDateThresholds;
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
@@ -60,7 +63,16 @@ function service(data) {
             if (!collection || !collection.id) throw new Error('Could not find collection');
             if (collection.status === 'active') throw new Error('Cannot update an active collection');
 
-            if ((params.start_date || collection.start_date) &&  (params.disbursement_date || collection.disbursement_date)) {
+
+
+
+
+
+
+
+
+
+            if ((params.start_date || collection.start_date) && (params.disbursement_date || collection.disbursement_date)) {
                 let start_date = params.start_date || collection.start_date;
                 let disbursement_date = params.disbursement_date || collection.disbursement_date;
                 if (!moment(start_date).isAfter(disbursement_date) && !moment(start_date).isSame(disbursement_date, 'day')) throw new Error("Start date cannot be before disbursement date")
@@ -117,22 +129,63 @@ function service(data) {
                 //throw new Error('You need to provide a product id to proceed');
 
                 // if there's no product id, we are updating the stuff at the first stage
-                 let result = await collection.update({
+                let result = await collection.update({
                     borrower_first_name: params.borrower_first_name,
                     borrower_last_name: params.borrower_last_name,
                     borrower_bvn: params.borrower_bvn,
                     borrower_phone: params.borrower_phone
                 });
                 d.resolve(result);
-                 return  d.promise;
+                return d.promise;
             }
 
+
+
+
+
+
+
             if (!product || !product.id) throw new Error('Product does not exist');
+
+
+            let tenor = params.tenor || collection.tenor;
+            let tenor_type = product.tenor_type;
+            let frequency = params.collection_frequency || collection.frequency;
+            let collections = params.num_of_collections || collection.num_of_collections;
+
+
+
+
+            if (tenor && tenor_type && frequency && collections) {
+                // first , validate date thresholds
+                validateDateThresholds(tenor, tenor_type, collections, frequency);
+
+                let end_result = validateCollectionSetup(tenor, tenor_type, collections, frequency);
+                let can_proceed = end_result.can_proceed;
+
+                if (!can_proceed) {
+
+                    throw new Error(`You need to review your loan settings. With ${collections} collections, each set to occur on a ${frequency} basis, \
+                    the last date of collection is (${end_result.collection_end}), which is beyond the date, (${end_result.tenor_end}, that this loan should have closed.`)
+                }
+            }
+
+
+
+
+
             if (product.status !== 'active')
                 throw new Error("You cannot create a collection for a product that isn't active");
             if (product.profile_id !== data.profile.id)
                 throw new Error("You can't use a product that isn't attached to this profile");
 
+
+            if (params.collection_frequency) {
+                let accepted = ['daily', 'weekly', 'monthly'];
+                if (!accepted.includes(params.collection_frequency.toLowerCase())) {
+                    throw new Error(`Collection frequency should be one of ${accepted.join(', ')}`)
+                }
+            }
 
             if (params.amount) {
                 assert.digitsOrDecimalOnly(params.amount, null, 'Amount');
@@ -172,18 +225,15 @@ function service(data) {
                 if (!['disbursed', 'active', 'past due'].includes(params.loan_status.toLowerCase()))
                     throw new Error("Loan status should be one of disbursed, active or past due")
             }
-
             if (params.start_date) assert.dateFormatOnly(params.start_date, null, 'Start Date');
 
             if (params.num_of_collections) {
                 assert.digitsOnly(params.num_of_collections, null, 'No. of collections');
             }
-
             return [product, collection, params];
         })
         .spread((product, collection, params) => {
             if (!collection) throw new Error('No such product exists');
-
             // you can't change a loan's product id after it has been set
             if (params.product_id && collection.status === 'active')
                 throw new Error('Cannot re-update product id of a created collection');
@@ -240,7 +290,7 @@ function service(data) {
                         let email_payload = {
                             lenderFullName: lender_name,
                             loanAmount: collection.amount + ` NGN`,
-                            interestRate: product.interest+  " %",
+                            interestRate: product.interest + " %",
                             interestPeriod: product.interest_period,
                             tenor: collection.tenor + ' ' + product.tenor_type,
                             borrowersFullName: collection.borrower_first_name + ' ' + collection.borrower_last_name,
@@ -261,15 +311,20 @@ function service(data) {
 
                         if (invitation && invitation.id) {
                             /// get the user record so that we can define whether or not we are inviting a new user or not
-                            let borrower = await models.profile.findOne({where: {id: collection.borrower_id},
-                                include: [{model:models.user}] });
+                            let borrower = await models.profile.findOne({
+                                where: {
+                                    id: collection.borrower_id
+                                },
+                                include: [{
+                                    model: models.user
+                                }]
+                            });
 
                             let borrower_is_new_user = !borrower.user || !borrower.user.password;
 
                             if (borrower_is_new_user) {
                                 email_payload.acceptURL = config.base_url + 'signup/borrower?token=' + invitation.token;
-                            }
-                            else {
+                            } else {
                                 email_payload.acceptURL += invitation.token;
                             }
                             email_payload.rejectURL += invitation.token;

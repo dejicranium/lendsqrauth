@@ -19,7 +19,7 @@ module.exports = (sequelize, DataTypes) => {
     disbursement_mode: DataTypes.STRING,
     disbursement_date: DataTypes.DATE,
     num_of_collections: DataTypes.INTEGER,
-    collection_frequency: DataTypes.INTEGER,
+    collection_frequency: DataTypes.STRING,
     repayment_id: DataTypes.INTEGER,
     start_date: DataTypes.DATE,
     deleted_flag: DataTypes.BOOLEAN,
