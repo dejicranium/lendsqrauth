@@ -14,6 +14,7 @@ module.exports = {
     host: process.env.PRODHOST,
     dialect: 'mysql'
   },
+
   staging: {
     username: process.env.DEVUN || 'lender',
     password: process.env.DEVPW || 'Su94LtyGwDx2aV7c',
