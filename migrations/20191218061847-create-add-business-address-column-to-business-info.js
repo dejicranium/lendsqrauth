@@ -2,7 +2,7 @@
 module.exports = {
   up: (queryInterface, Sequelize) => {
     return queryInterface.addColumn(
-      'business_info',
+      'business_infos',
       'business_address',
       Sequelize.STRING
     );
