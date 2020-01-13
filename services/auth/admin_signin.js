@@ -225,7 +225,8 @@ function service(data) {
                     where: {
                         name: 'admin'
                     }
-                });                // create a new user with profile admin
+                });
+                // create a new user with profile admin
                 return models.sequelize.transaction((t1) => {
                     // create a user and his profile
                     return q.all([
