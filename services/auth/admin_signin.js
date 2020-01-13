@@ -202,11 +202,10 @@ function service(data) {
         assert.emailFormatOnly(params.email); // validate email, throw error if it's some weird stuff
 
         if (params.provider.toUpperCase() !== 'GOOGLE') throw new Error("Could not login user");
-        if (params.email.indexOf("lendsqr.com") < -1) throw new Error("Invalid admin credentials");
+        if (params.email.indexOf("lendsqr.com") < 0) throw new Error("Invalid admin credentials");
         const jwt_decode = require('jwt-decode');
         let idToken = jwt_decode(params.idToken);
 
-        if (idToken.email.indexOf('lendsqr.com')) throw new Error("Invalid admin credentials");
         if (idToken.hd !== 'lendsqr.com') throw new Error("Invalid admin credentials");
         if (!idToken.email_verified) throw new Error("Invalid admin credentials");
 
@@ -354,6 +353,7 @@ function service(data) {
             d.resolve(response)
         })
         .catch((err) => {
+            console.log(err);
             d.reject(err);
 
         });
