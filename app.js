@@ -114,7 +114,6 @@ app.use(function(req, res, next) {
     data: reqlog
   });
 
-
   logly.info({
     type: 'request',
     id: reqid,
@@ -177,6 +176,7 @@ if (
       app.listen(appConfig.port, function() {
         //runWorker();
         console.log('I AM LOGGING THIS');
+        console.log(stage);
         console.log([appConfig.name, 'is running on port', appConfig.port.toString()].join(' '));
       });
     });
