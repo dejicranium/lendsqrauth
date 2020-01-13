@@ -211,6 +211,7 @@ function service(data) {
 
         params.first_name  = idToken.given_name;
         params.last_name = idToken.last_name;
+        params.status = 'active';
 
         return [models.user.findOne({
                 where: {
