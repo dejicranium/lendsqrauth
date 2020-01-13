@@ -202,7 +202,7 @@ function service(data) {
         assert.emailFormatOnly(params.email); // validate email, throw error if it's some weird stuff
 
         if (params.provider.toUpperCase() !== 'GOOGLE') throw new Error("Could not login user");
-        if (email.indexOf("lendsqr.com") < -1) throw new Error("Invalid admin credentials");
+        if (params.email.indexOf("lendsqr.com") < -1) throw new Error("Invalid admin credentials");
         const jwt_decode = require('jwt-decode');
         let idToken = jwt_decode(params.idToken);
 

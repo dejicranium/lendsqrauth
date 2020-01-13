@@ -1,6 +1,8 @@
 /*
 Attempt loading env files
 */
+require('./winston-workaround');
+
 try {
   const appEnvProfile = process.env.ENV_PROFILE || '';
   let envPath = '';
@@ -60,7 +62,7 @@ if (process.env.MONGODB_URI) {
 }
 const reqIp = require('request-ip');
 const logger = require('mlar')('mongolog');
-const locallogger = require('mlar')('locallogger');
+const logly = require('mlar')('locallogger');
 const scrubber = require('mlar')('obscrub');
 const SCRUBVALS = require('./utils/scrubvals.json');
 
@@ -112,7 +114,8 @@ app.use(function(req, res, next) {
     data: reqlog
   });
 
-  locallogger.info({
+
+  logly.info({
     type: 'request',
     id: reqid,
     comment: 'Request',
