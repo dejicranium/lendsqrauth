@@ -1,4 +1,3 @@
-
 const models = require('mlar')('models');
 const morx = require('morx');
 const q = require('q');
@@ -184,7 +183,7 @@ function service(data) {
                 let first_name = user.first_name ? user.first_name : user.business_name;
                 let last_name = user.first_name ? user.last_name : user.business_name;
 
-                await createWalletJob(first_name, last_name, user.id);
+                //await createWalletJob(first_name, last_name, user.id);
 
                 let verification_email_context_id = 109;
                 let welcome_email_context_id = 108;
@@ -206,16 +205,16 @@ function service(data) {
                 let service_access_key = '34$4l43*(z.er1*(7)&^'
 
                 await makeRequest(config.wallet_service_base_url + 'wallets', 'POST', {
-                    firstname: firstName,
-                    lastName: lastName,
-                    service_access_key: service_access_key,
-                    user_id: userId
-                }, {
-                    'Content-Type': 'application/json'
-                }).then(resp=> {
-                    console.log(resp)
-                })
-                    .catch(err=> {
+                        firstname: firstName,
+                        lastName: lastName,
+                        service_access_key: service_access_key,
+                        user_id: userId
+                    }, {
+                        'Content-Type': 'application/json'
+                    }).then(resp => {
+                        console.log(resp)
+                    })
+                    .catch(err => {
                         console.log(err)
                     })
 
@@ -245,8 +244,7 @@ function service(data) {
                 */
 
 
-            }
-            catch(e){
+            } catch (e) {
                 // silent treatmentto be logged;
                 throw new Error(e);
             }
