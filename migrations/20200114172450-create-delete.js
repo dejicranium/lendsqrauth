@@ -5,25 +5,9 @@ module.exports = {
       'permissions',
       'deleted_on',
     );
-    queryInterface.removeColumn(
-      'permissions',
-      'deleted_by',
-    );
-    queryInterface.removeColumn(
-      'permissions',
-      'modified_by',
-    );
-    queryInterface.removeColumn(
-      'permissions',
-      'modified_on',
-    );
-    queryInterface.removeColumn(
-      'permissions',
-      'created_on',
-    );
     return queryInterface.removeColumn(
       'permissions',
-      'created_by',
+      'deleted_by',
     );
 
   },

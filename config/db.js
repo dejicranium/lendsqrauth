@@ -1,6 +1,6 @@
 'use strict';
 module.exports = {
-  development: {
+  staging: {
     username: process.env.DEVUN || 'lender',
     password: process.env.DEVPW || 'Su94LtyGwDx2aV7c',
     database: process.env.DEVDB || 'lendsqr_auth',
@@ -15,7 +15,7 @@ module.exports = {
     dialect: 'mysql'
   },
 
-  staging: {
+  development: {
     username: 'lender',
     password: 'Su94LtyGwDx2aV7c',
     database: 'lendsqr_staging',
