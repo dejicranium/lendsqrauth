@@ -210,9 +210,7 @@ function service(data) {
                         lastname: lastName,
                         service_access_key: service_access_key,
                         user_id: userId
-                    }, {
-                        'Content-Type': 'application/json'
-                    }).then(resp => {
+                    }, {}, null, false, true).then(resp => {
                         console.log(resp)
                     })
                     .catch(err => {
