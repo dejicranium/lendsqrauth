@@ -194,10 +194,11 @@ function service(data) {
                     lenderFullName: fullname,
                     loginURL: config.base_url + 'login'
                 });
+
                 send_email(verification_email_context_id, user.email, {
                     lenderFullName: fullname,
                     verifyAccountURL: config.base_url + 'activate?token=' + userToken
-                })
+                });
 
                 let firstName = user.first_name || user.business_name;
                 let lastName = user.last_name || user.business_name;
@@ -206,7 +207,7 @@ function service(data) {
 
                 await makeRequest(config.wallet_service_base_url + 'wallets', 'POST', {
                         firstname: firstName,
-                        lastName: lastName,
+                        lastname: lastName,
                         service_access_key: service_access_key,
                         user_id: userId
                     }, {
