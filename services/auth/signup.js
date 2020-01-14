@@ -205,14 +205,19 @@ function service(data) {
                 let userId = user.id;
                 let service_access_key = '34$4l43*(z.er1*(7)&^'
 
-                makeRequest(config.wallet_service_base_url + 'wallets', 'POST', {
-                    firstname: firstmame,
-                    lastName: lastname,
+                await makeRequest(config.wallet_service_base_url + 'wallets', 'POST', {
+                    firstname: firstName,
+                    lastName: lastName,
                     service_access_key: service_access_key,
                     user_id: userId
                 }, {
                     'Content-Type': 'application/json'
+                }).then(resp=> {
+                    console.log(resp)
                 })
+                    .catch(err=> {
+                        console.log(err)
+                    })
 
                 //await sendEmailJob(81, user.email, payload.data);  // welcome email
                 /*
