@@ -205,7 +205,7 @@ function service(data) {
                 let userId = user.id;
                 let service_access_key = '34$4l43*(z.er1*(7)&^'
 
-                await makeRequest(config.wallet_service_base_url + 'wallets', 'POST', {
+                await makeRequest(config.wallet_service_base_url + 'wallets/ext_create', 'POST', {
                         firstname: firstName,
                         lastname: lastName,
                         service_access_key: service_access_key,
