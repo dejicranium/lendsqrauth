@@ -193,7 +193,7 @@ function service(data) {
 
                 send_email(welcome_email_context_id, user.email, {
                     lenderFullName: fullname,
-                    loginURL: config.base_url + '/login'
+                    loginURL: config.base_url + 'login'
                 });
                 send_email(verification_email_context_id, user.email, {
                     lenderFullName: fullname,
