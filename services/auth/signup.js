@@ -190,12 +190,12 @@ function service(data) {
 
                 let fullname = data.business_name || data.first_name + ' ' + data.last_name;
 
-                send_email(welcome_email_context_id, user.email, {
+                await send_email(welcome_email_context_id, user.email, {
                     lenderFullName: fullname,
                     loginURL: config.base_url + 'login'
                 });
 
-                send_email(verification_email_context_id, user.email, {
+                await send_email(verification_email_context_id, user.email, {
                     lenderFullName: fullname,
                     verifyAccountURL: config.base_url + 'activate?token=' + userToken
                 });
