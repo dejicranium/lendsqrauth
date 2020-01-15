@@ -26,6 +26,7 @@ module.exports = {
       rc_number: {
         type: Sequelize.INTEGER
       },
+
       certificate_of_incorporation: {
         type: Sequelize.INTEGER
       },
