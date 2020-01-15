@@ -10,9 +10,6 @@ module.exports = {
       'business_infos',
       'url',
     );
-
-
-
   },
   down: (queryInterface, Sequelize) => {
     return queryInterface.dropTable('add_boolean_columns_to_users');
