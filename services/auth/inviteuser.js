@@ -196,9 +196,9 @@ function service(data) {
 			let recipient = null;
 
 			if (GLOBAL_USER) {
-				INVITATION_EMAIL_CONTEXT_ID = 94;
 				recipient = GLOBAL_USER.email
 			} else {
+				INVITATION_EMAIL_CONTEXT_ID = 94;
 				recipient = created1.email
 			}
 
