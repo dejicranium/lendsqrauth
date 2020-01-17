@@ -73,7 +73,7 @@ app.use(
 );
 app.use(bodyParser.json());
 
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
   res.header('Access-Control-Allow-Origin', '*');
   res.header(
     'Access-Control-Allow-Headers',
@@ -114,7 +114,7 @@ app.use(function(req, res, next) {
     data: reqlog
   });
 
-  logly.info({
+  logly.error({
     type: 'request',
     id: reqid,
     comment: 'Request',
@@ -126,7 +126,7 @@ app.use(function(req, res, next) {
 
 const base = '/api/v1';
 
-app.get(base, function(req, res, next) {
+app.get(base, function (req, res, next) {
   res.json({
     base: 1.0,
     env: process.env.NODE_ENV
@@ -147,7 +147,7 @@ Handle 404
 */
 //app.use(mosh.initMoshErrorHandler);
 
-app.use(base, function(req, res, next) {
+app.use(base, function (req, res, next) {
   utils.jsonF(res, null, `Undefined ${req.method} route access`);
 
   // res.json({m: `Undefined ${req.method} route access`})
@@ -172,8 +172,8 @@ if (
     .sync({
       force: force_sync
     })
-    .then(function() {
-      app.listen(appConfig.port, function() {
+    .then(function () {
+      app.listen(appConfig.port, function () {
         //runWorker();
         console.log('I AM LOGGING THIS');
         console.log(stage);
