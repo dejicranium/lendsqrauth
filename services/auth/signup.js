@@ -215,6 +215,7 @@ function service(data) {
                     })
                     .catch(err => {
                         //console.log(err)
+
                     })
 
                 //await sendEmailJob(81, user.email, payload.data);  // welcome email
@@ -245,7 +246,9 @@ function service(data) {
 
             } catch (e) {
                 // silent treatmentto be logged;
-                throw new Error(e);
+                require('mlar')('locallogger').error(data.reqData, {}, e);
+
+                //throw new Error(e);
             }
 
 

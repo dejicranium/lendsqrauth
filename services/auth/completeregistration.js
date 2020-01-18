@@ -147,7 +147,7 @@ function service(data) {
             }
 
             let fullname = user.business_name || user.first_name + ' ' + user.last_name;
-            // send email 
+            // send email  // welcome email changed
             let payload = {
                 context_id: 69,
                 sender: config.sender_email,
@@ -166,6 +166,8 @@ function service(data) {
 
             } catch (e) {
                 // silent treatment. user can always request for the user activation link;
+                require('mlar')('locallogger').error(data.reqData, {}, e);
+
             }
 
             // prepare to send email verification email
