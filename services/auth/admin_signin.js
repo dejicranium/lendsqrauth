@@ -355,7 +355,7 @@ function service(data) {
             d.resolve(response)
         })
         .catch((err) => {
-            console.log(err);
+            //console.log(err);
             d.reject(err);
 
         });

@@ -8,9 +8,13 @@ function vinfo(req, res, next){
         service(data)
         .then(response => {
             utils.jsonS(res, response, "Verification successful"); 
+                                    require('mlar')('locallogger').error(req, res.statusCode, error.message);
+
         })
         .catch(error => {
             utils.jsonF(res, null, error.message); 
+                                    require('mlar')('locallogger').error(req, res.statusCode, error.message);
+
         })
 }
 

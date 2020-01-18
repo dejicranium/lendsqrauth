@@ -21,19 +21,29 @@ module.exports = (url, method, payload, headers, caller = null, defaultheaders =
             headers: headers,
         })
     }).then(response => {
-        console.log("called " + url)
+        //console.log("called " + url)
         if (defaultheaders) {
             response = response.data.data
         } else {
             response = response.data
         }
-        console.log(response);
+        //console.log(response);
         d.resolve(response);
     }).catch(err => {
+        err = err.response ? error.response.data: err
+        err = err.error ? err.error : err
+        err = err.message ? err.message: err
+        err= err.errors ? err.errors: err
         console.log(err.response.data.errors)
+                console.log(err)
+
+        require('mlar')('locallogger').error({}, {}, {from: url, type: 'request-error', error: err});
         if (caller) {
             d.reject(new Error(`Could not ${caller}`))
+            //throw new Error(`Could not ${caller}. Reason: ` + err );
+
         }
+        //throw new Error(err);
         d.reject(err)
     })
 

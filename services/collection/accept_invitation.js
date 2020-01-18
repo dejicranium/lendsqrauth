@@ -168,11 +168,11 @@ function service(data) {
                         }
                     });
                     await models.collection_schedules.bulkCreate(bulkdata);
-                    console.log(resp);
+                    //console.log(resp);
                 })
                 .catch(err => {
                     //silent failure
-                    console.log(err)
+                    //console.log(err)
                 })
 
 

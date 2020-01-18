@@ -4,6 +4,7 @@ const auth_middleware = require('mlar')('authmiddleware');
 const profile_middleware = require('mlar')('profileVerifyMiddleware');
 const service = require('mlar').mreq('services', 'dashboard/borrower/repayment_report');
 const has_role = require('mlar')('hasRoleMiddleware');
+const lendlog = require('mlar')('locallogger');
 
 function vinfo(req, res, next) {
     const data = {
@@ -20,6 +21,8 @@ function vinfo(req, res, next) {
         })
         .catch(error => {
             utils.jsonF(res, null, error.message);
+            
+            require('mlar')('locallogger').error(req, res.statusCode, error.message);
         })
 }
 
