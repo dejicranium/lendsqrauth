@@ -53,7 +53,29 @@ function service(data) {
 				if (data.lender_id) query.where.lender_id = data.lender_id;
 				if (data.product_id) query.where.product_id = data.product_id;
 				if (data.loan_status) query.where.loan_status = data.loan_status;
+				if (data.status) query.where.status = data.status;
 				if (data.tenor) query.where.tenor = data.tenor;
+				if (data.tenor_type) query.where.tenor_type = data.tenor_type;
+				if (data.max_tenor) query.where.max_tenor = data.max_tenor;
+				if (data.min_tenor) query.where.min_tenor = data.min_tenor;
+				if (data.interest_period) query.where.interest_period = data.interest_period;
+				if (data.interest) query.where.interest = data.interest;
+				if (data.repayment_method) query.where.repayment_method = data.repayment_method;
+				if (data.repayment_model) query.where.repayment_model = data.repayment_model;
+				if (data.product_description) query.where.product_description = {
+					$like: '%' + data.product_description + '%'
+				};
+				if (data.product_name) query.where.product_name = {
+					$like: '%' + data.product_name + '%'
+				};
+				if (data.uuid) query.where.uuid = {
+					$like: '%' + data.uuid + '%'
+				};
+				if (data.url_slug) query.where.url_slug = {
+					$like: '%' + data.url_slug + '%'
+				};
+				if (data.min_loan_amount) query.min_loan_amount = data.min_loan_amount;
+				if (data.max_loan_amount) query.max_loan_amount = data.max_loan_amount;
 				if (data.borrower_id) query.where.borrower_id = data.borrower_id;
 				if (data.borrower_first_name) query.where.borrower_first_name = data.borrower_first_name;
 				if (data.borrower_last_name) query.where.borrower_last_name = data.borrower_last_name;
