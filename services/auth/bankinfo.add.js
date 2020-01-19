@@ -169,6 +169,7 @@ function service(data) {
                     where: {
                         type: 'verify_bank_otp',
                         user_id: globalUserId,
+                        token: params.otp
                     }
                 });
                 if (!token && !token.id) throw new Error("Invalid OTP");

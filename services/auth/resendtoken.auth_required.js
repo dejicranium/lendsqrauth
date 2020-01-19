@@ -96,7 +96,7 @@ function service(data) {
                     sender: config.sender_email,
                     sender_id: 1,
                 }
-
+                //TODO: resend invitation
                 if (params.type === 'token' && params.subtype === 'resend_invitation') {
 
                     let user_invite = await models.user_invites.findOne({
@@ -118,7 +118,7 @@ function service(data) {
                     payload.recipient = params.email,
                         payload.data = {
                             email: params.email,
-                            name: "Uswr",
+                            name: "User",
                         }
                 }
                 const url = config.notif_base_url + "email/send";
