@@ -121,7 +121,7 @@ function service(data) {
                 });
 
                 // verify account name 
-                verifyAccountName(userId, params);
+                await verifyAccountName(data.user.id, params);
 
                 //if all successful ---
 
