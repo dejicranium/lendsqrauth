@@ -9,7 +9,7 @@ const makeRequest = require('mlar')('makerequest');
 const generateRandom = require('mlar')('testutils').generateRandom;
 const requests = require('mlar')('requests');
 const AuditLog = require('mlar')('audit_log');
-
+const verifyAccountName = require('../../utils/bank').verifyAccountName
 var spec = morx.spec({})
     .build('bvn', 'required:true')
     .build('account_number', 'required:true')
@@ -53,6 +53,7 @@ function service(data) {
                         bvn: params.bvn
                     }
                 }),
+
 
                 params,
             ]
@@ -118,6 +119,9 @@ function service(data) {
                 }).catch(err => {
                     throw new Error("Bank account is invalid")
                 });
+
+                // verify account name 
+                verifyAccountName(userId, params);
 
                 //if all successful ---
 

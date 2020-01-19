@@ -34,7 +34,6 @@ function businessLenderEligibleToCreateProduct(profileId, userId) {
             if (!bankDetails || !bankDetails.id) throw new Error("You cannot add product until you register your bank details");
             if (!businessDetails || !businessDetails.id) throw new Error("You cannot add product until you register your business details");
 
-            if
         })
 }
 
