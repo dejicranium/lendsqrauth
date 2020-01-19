@@ -220,12 +220,13 @@ function service(data) {
             }), params]
         })
         .spread(async (user, params) => {
+            admin_role = await models.role.findOne({
+                where: {
+                    name: 'admin'
+                }
+            });
             if (!user) {
-                admin_role = await models.role.findOne({
-                    where: {
-                        name: 'admin'
-                    }
-                });
+
                 // create a new user with profile admin
                 return models.sequelize.transaction((t1) => {
                     // create a user and his profile
@@ -254,6 +255,7 @@ function service(data) {
         .spread(async (user, profile) => {
             if (!profile) {
                 // creatone // 
+
                 profile = await models.profile.create({
                     role_id: admin_role.id,
                     created_on: new Date()
