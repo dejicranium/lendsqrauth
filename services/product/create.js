@@ -38,7 +38,7 @@ function service(data) {
 			if (params.min_tenor) assert.digitsOnly(params.min_tenor, null, 'min tenor')
 
 			if (params.max_tenor && params.min_tenor) {
-				if (params.min_tenor > params.max_tenor) {
+				if (parseFloat(params.min_tenor) > parseFloat(params.max_tenor)) {
 					throw new Error("Min tenor cannot be greater than max tenor")
 				}
 			}
