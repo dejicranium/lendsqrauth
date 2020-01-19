@@ -6,6 +6,13 @@ if (process.env.NODE_ENV !== 'production') {
     dotenv.config({
         path: 'env'
     });
+
+
+} else if (process.env.NODE_ENV === 'staging') {
+
+    dotenv.config({
+        path: './staging.env'
+    });
 }
 module.exports = {
     JWTsecret: process.env.JWTsecret || 'wd#o,9!fPJZ-> L<~%J-VEVGdnlr6(Gq2dq).XHOpQ^v[q4t1^-%Nq ff-jn_s=g',
@@ -13,7 +20,11 @@ module.exports = {
     sender_email: process.env.sender_email || 'support@lendsqr.com',
     notif_base_url: process.env.notif_base_url || 'https://v2-test.lendsqr.com/api/v1/notification/',
     utility_base_url: process.env.utility_base_url || 'https://v2-test.lendsqr.com/api/v1/util/',
-    base_url: process.env.base_url || 'http://staging-lb-978527258.us-east-2.elb.amazonaws.com/',
+
+
+    base_url: process.env.base_url || 'https://v2-test.lendsqr.com/',
+
+
     admin_reg_token: process.env.admin_reg_token || 'saraytheiconoclast%32$6',
 
     aws_region: process.env.aws_region || 'us-east-2',
@@ -23,7 +34,7 @@ module.exports = {
     mifos_user: process.env.mifos_user || 'mifos',
     mifos_password: process.env.mifos_password || 'password',
 
-    wallet_service_base_url: process.env.wallet_service_base_url || 'https://wallet-service-staging.herokuapp.com/api/v1/',
+    wallet_service_base_url: process.env.wallet_service_base_url || 'https://wallet-service-lendsqr.herokuapp.com/api/v1/',
     sqs_jobs_queue_url: process.env.sqs_jobs_queue_url || 'https://sqs.us-east-2.amazonaws.com/350152003452/LendsqrAsyncJobs'
 
 };

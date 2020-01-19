@@ -120,7 +120,9 @@ function service(data) {
                             transaction: t1
                         }),
                         models.profile.create({
-                            role_id: params.role_id
+                            role_id: params.role_id,
+                            created_on: new Date()
+
                         }, {
                             transaction: t1
                         })

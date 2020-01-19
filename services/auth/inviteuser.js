@@ -125,7 +125,8 @@ function service(data) {
 					role_id: params.role_id,
 					user_id: created1.id,
 					parent_profile_id: globalProfileId,
-					uuid: Math.random().toString(36).substr(2, 9)
+					uuid: Math.random().toString(36).substr(2, 9),
+					created_on: new Date()
 				});
 				new_profile_id = new_profile.id;
 

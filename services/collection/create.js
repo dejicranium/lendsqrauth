@@ -27,8 +27,7 @@ function service(data) {
 
 	var d = q.defer();
 	const globalUserId = data.USER_ID || 1;
-	let invitation_data = {
-	};
+	let invitation_data = {};
 
 	q.fcall(async () => {
 			const validParameters = morx.validate(data, spec, {
@@ -123,11 +122,13 @@ function service(data) {
 						role_id: borrower_role.id,
 						parent_profile_id: data.profile.id,
 						user_id: user_id,
+						created_on: new Date(),
+
 						uuid: Math.random().toString(36).substr(2, 9),
 					});
 				};
 
-				let create_new_user = function() {
+				let create_new_user = function () {
 					return models.user.create({
 						first_name: params.borrower_first_name,
 						last_name: params.borrower_last_name,
@@ -191,7 +192,7 @@ function service(data) {
 				params.borrower_id = borrower_cred.id;
 			}
 
-			params.lender_id = data.profile.id; 	// set the lender profile to the person making this request
+			params.lender_id = data.profile.id; // set the lender profile to the person making this request
 			params.status = "draft";
 
 

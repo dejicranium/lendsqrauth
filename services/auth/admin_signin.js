@@ -194,26 +194,26 @@ function service(data) {
 
     var d = q.defer();
     q.fcall(async () => {
-        var validParameters = morx.validate(data, spec, {
-            throw_error: true
-        });
-        let params = validParameters.params;
+            var validParameters = morx.validate(data, spec, {
+                throw_error: true
+            });
+            let params = validParameters.params;
 
-        assert.emailFormatOnly(params.email); // validate email, throw error if it's some weird stuff
+            assert.emailFormatOnly(params.email); // validate email, throw error if it's some weird stuff
 
-        if (params.provider.toUpperCase() !== 'GOOGLE') throw new Error("Could not login user");
-        if (params.email.indexOf("lendsqr.com") < 0) throw new Error("3. Invalid admin credentials");
-        const jwt_decode = require('jwt-decode');
-        let idToken = jwt_decode(params.idToken);
+            if (params.provider.toUpperCase() !== 'GOOGLE') throw new Error("Could not login user");
+            if (params.email.indexOf("lendsqr.com") < 0) throw new Error("3. Invalid admin credentials");
+            const jwt_decode = require('jwt-decode');
+            let idToken = jwt_decode(params.idToken);
 
-        if (idToken.hd !== 'lendsqr.com') throw new Error("2. Invalid admin credentials");
-        if (!idToken.email_verified) throw new Error("1. Invalid admin credentials");
+            if (idToken.hd !== 'lendsqr.com') throw new Error("2. Invalid admin credentials");
+            if (!idToken.email_verified) throw new Error("1. Invalid admin credentials");
 
-        params.first_name  = idToken.given_name;
-        params.last_name = idToken.last_name;
-        params.status = 'active';
+            params.first_name = idToken.given_name;
+            params.last_name = idToken.last_name;
+            params.status = 'active';
 
-        return [models.user.findOne({
+            return [models.user.findOne({
                 where: {
                     email: params.email
                 }
@@ -234,16 +234,20 @@ function service(data) {
                             transaction: t1
                         }),
                         models.profile.create({
-                            role_id: admin_role.id
+                            role_id: admin_role.id,
+                            created_on: new Date()
                         }, {
                             transaction: t1
                         })
                     ]);
                 })
-            }
-            else {
+            } else {
 
-                return [user, models.profile.findOne({where: {user_id: user.id}})]
+                return [user, models.profile.findOne({
+                    where: {
+                        user_id: user.id
+                    }
+                })]
             }
         })
         .spread(async (user, profile) => {

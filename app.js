@@ -10,7 +10,7 @@ try {
     envPath = `.${appEnvProfile}`;
   }
   const fullEnvPath = './config/env' + envPath + '.json';
- // console.log(fullEnvPath);
+  // console.log(fullEnvPath);
   var envJSON = require(fullEnvPath);
   for (var envProp in envJSON) {
     process.env[envProp] = envJSON[envProp];
@@ -113,18 +113,18 @@ app.use(function (req, res, next) {
     comment: 'Request',
     data: reqlog
   });
-/*
-  logly.info(JSON.stringify({
-    type: 'request',
-    id: reqid,
-    comment: 'Request',
-    data: reqlog,
-    message: 'lame',
-    status: 200,
-    service: "Messaging",
-    method: 'get'
-  }));*/
-  
+  /*
+    logly.info(JSON.stringify({
+      type: 'request',
+      id: reqid,
+      comment: 'Request',
+      data: reqlog,
+      message: 'lame',
+      status: 200,
+      service: "Messaging",
+      method: 'get'
+    }));*/
+
   next();
 });
 
@@ -159,11 +159,15 @@ app.use(base, function (req, res, next) {
 
 // start cron job
 
+console.log("Config file is " + process.env.base_url)
+
 //get_collection_schedules();
 
 var force_sync = process.env.FORCESYNC ? true : false;
 
 var stage = process.env.NODE_ENV || 'development-local';
+
+console.log('environment is ' + process.env.NODE_ENV);
 if (
   stage === 'development' ||
   stage === 'test' ||
@@ -179,7 +183,7 @@ if (
     .then(function () {
       app.listen(appConfig.port, function () {
         //runWorker();
-        console.log(stage);
+        // console.log(stage);
         console.log([appConfig.name, 'is running on port', appConfig.port.toString()].join(' '));
       });
     });
