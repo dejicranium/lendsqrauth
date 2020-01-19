@@ -167,6 +167,9 @@ function service(data) {
                 return `Phone number is: ${phoneNumberFromBVN}`;
             }
 
+
+
+
             // if we only intend to verify otp otp
             else {
                 let token = await models.auth_token.findOne({
@@ -194,15 +197,10 @@ function service(data) {
                 let audit_log = new AuditLog(data.reqData, "CREATE", "added a new bank account");
                 audit_log.create();
 
-                return "OTP verified";
+                d.resolve("OTP verified");
             }
         })
-        .then(success => {
-            if (!success) throw new Error("An error occurred while carrying out this operation")
 
-
-            d.resolve(success);
-        })
         .catch(err => {
             d.reject(err)
         })
