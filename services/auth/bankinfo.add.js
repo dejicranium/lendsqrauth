@@ -44,7 +44,7 @@ function service(data) {
                 models.user_bank.findOne({
                     where: {
                         account_number: params.account_number,
-                        user_id: data.user.id
+                        //user_id: data.user.id
 
                     }
                 }),
@@ -60,7 +60,7 @@ function service(data) {
         })
         .spread(async (record, bvnRecord, params) => {
             // throw error if record exists and it  is not deleted
-            if (record && !record.deleted_flag) throw new Error("Account number already exists for this user");
+            if (record && !record.deleted_flag) throw new Error("Account number already exists on this platform");
 
             // if bvn exists for a user other than the one making the request
             if (bvnRecord && parseInt(bvnRecord.user_id) !== parseInt(globalUserId)) {
@@ -114,7 +114,7 @@ function service(data) {
                 await requests.verifyBank({
                     ...params
                 }).then(resp => {
-                    if (!resp) throw new Error("Bank account is not valid")
+                    if (!resp) throw new Error("Bank account is invalid")
                 }).catch(err => {
                     throw new Error("Bank account is invalid")
                 });
