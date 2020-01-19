@@ -13,7 +13,7 @@ function productHasActiveCollection(product) {
     }
 }
 
-function businessLenderEligibleToCreateProduct(profileId, userId) {
+function individualEligibleToCreateProduct(profileId, userId) {
     // get ban
     const d = q.defer();
     q.fcall(() => {
@@ -23,20 +23,89 @@ function businessLenderEligibleToCreateProduct(profileId, userId) {
                 }
             });
 
+
+            let getuser = models.user.findOne({
+                where: {
+                    id: userId
+                }
+            });
+
             let getBusinessDetails = models.business_info.findOne({
                 where: {
                     profile_id: profileId
                 }
             })
-            return [getbankdetails, getBusinessDetails]
+            return [getbankdetails, getuser, getBusinessDetails]
         })
-        .spread((bankDetails, businessDetails) => {
+        .spread((bankDetails, user, businessDetails) => {
+            if (!bankDetails || !bankDetails.id) throw new Error("You cannot add product until you register your bank details");
+            if (!businessDetails || !businessDetails.id) throw new Error("You cannot add product until you register your business details");
+            let user_required_fields = ['first_name', 'last_name', 'phone'];
+
+            user_required_fields.forEach(field => {
+                if (!user[field]) {
+                    throw new Error("Can't create product until profile information is completed")
+                }
+            });
+            d.resolve('')
+        })
+        .catch(error => {
+            d.reject(error)
+        })
+}
+
+
+function businessEligibleToCreateProduct(profileId, userId) {
+    // get ban
+    const d = q.defer();
+    q.fcall(() => {
+            let getbankdetails = models.user_bank.findOne({
+                where: {
+                    user_id: userId
+                }
+            });
+            let getuser = models.user.findOne({
+                where: {
+                    id: userId
+                }
+            });
+
+            let getBusinessDetails = models.business_info.findOne({
+                where: {
+                    profile_id: profileId
+                }
+            })
+            return [getbankdetails, getuser, getBusinessDetails]
+        })
+        .spread((bankDetails, user, businessDetails) => {
             if (!bankDetails || !bankDetails.id) throw new Error("You cannot add product until you register your bank details");
             if (!businessDetails || !businessDetails.id) throw new Error("You cannot add product until you register your business details");
 
+            let user_required_fields = ['first_name', 'last_name', 'phone'];
+
+            user_required_fields.forEach(field => {
+                if (!user[field]) {
+                    throw new Error("Can't create product until profile information is completed")
+                }
+            });
+
+            let business_required_fields = ['business_name', 'tin_number', 'rc_number', 'business_address', 'state', 'country', 'business_phone']
+            business_required_fields.forEach(field => {
+                console.log('business field = ' +
+                    businessDetails[field])
+                if (!businessDetails[field]) {
+                    throw new Error("Can't create product until business information is completed")
+                }
+            });
+            d.resolve('')
+        })
+        .catch(error => {
+            d.reject(error)
         })
 }
 
 module.exports = {
-    productHasActiveCollection
+    productHasActiveCollection,
+    individualEligibleToCreateProduct,
+    businessEligibleToCreateProduct
 }
