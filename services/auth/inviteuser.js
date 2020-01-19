@@ -186,7 +186,7 @@ function service(data) {
 				//userName: GLOBAL_USER ? GLOBAL_USER.first_name + ' ' + GLOBAL_USER.last_name || GLOBAL_USER.business_name || '' : created1.first_name + ' ' + created1.last_name || created1.business_name || '', // existing team member
 				lenderFullName: data.user.first_name ? data.user.first_name + ' ' + data.user.last_name : data.user.business_name,
 				lenderName: data.user.first_name ? data.user.first_name + ' ' + data.user.last_name : data.user.business_name,
-
+				memberAcceptURL: "",
 			}
 
 			let INVITATION_EMAIL_CONTEXT_ID = 93;

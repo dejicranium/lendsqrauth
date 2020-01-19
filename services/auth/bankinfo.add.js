@@ -173,6 +173,7 @@ function service(data) {
                     }
                 });
                 if (!token || !token.id) throw new Error("Invalid OTP");
+                if (token.token !== params.otp) throw new Error("Invalid OTP");
                 else if (moment(new Date()).isAfter(token.expiry)) throw new Error("The token has expired");
                 else if (token.is_used) throw new Error("Token is already used");
 
