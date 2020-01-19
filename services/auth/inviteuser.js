@@ -183,7 +183,7 @@ function service(data) {
 
 			// send email 
 			const emailPayload = {
-				userName: GLOBAL_USER ? GLOBAL_USER.first_name + ' ' + GLOBAL_USER.last_name || GLOBAL_USER.business_name : created1.first_name + ' ' + created1.last_name || created1.business_name || '', // existing team member
+				//userName: GLOBAL_USER ? GLOBAL_USER.first_name + ' ' + GLOBAL_USER.last_name || GLOBAL_USER.business_name || '' : created1.first_name + ' ' + created1.last_name || created1.business_name || '', // existing team member
 				lenderFullName: data.user.first_name ? data.user.first_name + ' ' + data.user.last_name : data.user.business_name,
 				lenderName: data.user.first_name ? data.user.first_name + ' ' + data.user.last_name : data.user.business_name,
 
@@ -194,9 +194,13 @@ function service(data) {
 
 			if (GLOBAL_USER) {
 				recipient = GLOBAL_USER.email
+				emailPayload.userName = GLOBAL_USER.first_name ? GLOBAL_USER.first_name + ' ' + GLOBAL_USER.last_name : '';
+
 			} else {
 				INVITATION_EMAIL_CONTEXT_ID = 94;
-				recipient = created1.email
+				recipient = created1.email;
+				emailPayload.userName = created1.first_name ? created1.first_name + ' ' + created1.last_name : '';
+
 			}
 
 			try {
