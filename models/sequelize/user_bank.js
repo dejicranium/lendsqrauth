@@ -5,8 +5,10 @@ module.exports = (sequelize, DataTypes) => {
     user_id: DataTypes.INTEGER,
     account_number: {
       type: DataTypes.STRING,
-      unique: true },
+      unique: true
+    },
     bank_code: DataTypes.STRING,
+    account_name: DataTypes.STRING,
     deleted_flag: DataTypes.BOOLEAN,
     created_by: DataTypes.INTEGER,
     modified_on: DataTypes.DATE,
@@ -27,7 +29,7 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     timestamps: false
   });
-  user_bank.associate = function(models) {
+  user_bank.associate = function (models) {
     // associations can be defined here
   };
   return user_bank;

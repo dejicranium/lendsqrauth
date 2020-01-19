@@ -116,6 +116,7 @@ function service(data) {
                     ...params
                 }).then(resp => {
                     if (!resp) throw new Error("Bank account is invalid")
+                    params.account_name = resp.account_name;
                 }).catch(err => {
                     throw new Error("Bank account is invalid")
                 });

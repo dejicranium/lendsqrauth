@@ -1,5 +1,4 @@
 const dotenv = require('dotenv');
-const stagingEnv = require('./staging.env')
 
 if (process.env.NODE_ENV === 'production') {
     //dotenv.load({ path: '.env' });
