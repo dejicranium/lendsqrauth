@@ -86,6 +86,7 @@ function service(data) {
 					query.where.lender_id = data.profile.id
 				} else if (data.profile.role == 'borrower') {
 					query.where.lender_id = data.profile.parent_profile_id
+					query.where.borrower_id = data.profile.id
 				} else if (data.profile.role == 'collaborator') {
 					query.where.lender_id = data.profile.parent_profile_id
 				}
