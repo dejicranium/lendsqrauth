@@ -9,12 +9,12 @@
 //             enforce_hash_check: req.enforce_hash_check
 //         })
 //         .then( service_response => {
-//             ////console.log(service_response);
+//             //console.log(service_response);
 //             //req.user = service_response;
 //             next(); 
 //         })
 //         .catch( service_error => {
-// 			////console.log(service_error);
+// 			//console.log(service_error);
 //             utils.jsonF(res, null, service_error.message); 
 //         })
 // }

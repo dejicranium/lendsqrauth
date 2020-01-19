@@ -37,5 +37,5 @@ for(var x = 0; x < 10; x++) {
     var tn = testnuban + x;
     var kk = new NUBAN('800', tn);
     if(kk.validate())
-        //console.log(xx, tn, kk.validate());
+        console.log(xx, tn, kk.validate());
 }}

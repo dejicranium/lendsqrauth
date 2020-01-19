@@ -99,7 +99,7 @@ function service(data) {
 
 			let getProductName = models.product.findOne({
 				where: {
-					//profile_id: data.profile.id,
+					profile_id: data.profile.id,
 					product_name: params.product_name
 				}
 			})

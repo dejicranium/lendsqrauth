@@ -10,14 +10,14 @@ try {
     envPath = `.${appEnvProfile}`;
   }
   const fullEnvPath = './config/env' + envPath + '.json';
- // //console.log(fullEnvPath);
+ // console.log(fullEnvPath);
   var envJSON = require(fullEnvPath);
   for (var envProp in envJSON) {
     process.env[envProp] = envJSON[envProp];
   }
-  ////console.log(envJSON);
+  //console.log(envJSON);
 } catch (e) {
-  ////console.log(e);
+  //console.log(e);
 }
 //========================
 var models = require('./models/sequelize');
@@ -179,8 +179,8 @@ if (
     .then(function () {
       app.listen(appConfig.port, function () {
         //runWorker();
-        //console.log(stage);
-        //console.log([appConfig.name, 'is running on port', appConfig.port.toString()].join(' '));
+        console.log(stage);
+        console.log([appConfig.name, 'is running on port', appConfig.port.toString()].join(' '));
       });
     });
 }

@@ -211,10 +211,10 @@ function service(data) {
                         service_access_key: service_access_key,
                         user_id: userId
                     }, {}, null, false, true).then(resp => {
-                        //console.log(resp)
+                        console.log(resp)
                     })
                     .catch(err => {
-                        //console.log(err)
+                        console.log(err)
 
                     })
 
@@ -247,7 +247,7 @@ function service(data) {
             } catch (e) {
                 // silent treatmentto be logged;
                 require('mlar')('locallogger').error(data.reqData, {}, e);
-
+                //throw new Error(e);
                 //throw new Error(e);
             }
 
@@ -262,6 +262,7 @@ function service(data) {
         .catch((err) => {
             //console.log(err.stack);
             d.reject(err);
+
 
         });
 

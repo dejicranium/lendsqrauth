@@ -23,10 +23,6 @@ function service(data) {
 	const globalProfileId = data.profile.id;
 	const globalUserId = data.user.id;
 
-	const requestHeaders = {
-		'Content-Type': 'application/json'
-	};
-
 	let GLOBAL_USER_EXISTS = false;
 	let GLOBAL_USER = null;
 	q
@@ -40,14 +36,12 @@ function service(data) {
 
 			if (data.user.email == params.email) throw new Error('Cannot send an invitation to yourself');
 
-			const requestHeaders = {
-				'Content-Type': 'application/json'
-			};
 
 			// check to make sure that only a lender can do this;
 			if (data.profile.role != 'individual_lender' && data.profile.role != 'business_lender') {
 				throw new Error('Only lenders can add team members');
 			}
+
 			let role = await models.role.findOne({
 				where: {
 					id: parseInt(params.role_id)
@@ -188,8 +182,10 @@ function service(data) {
 
 			// send email 
 			const emailPayload = {
-				userName: GLOBAL_USER ? GLOBAL_USER.first_name + ' ' + GLOBAL_USER.last_name || GLOBAL_USER.business_name : created1.first_name + ' ' + created1.last_name || created1.business_name, // existing team member
+				userName: GLOBAL_USER ? GLOBAL_USER.first_name + ' ' + GLOBAL_USER.last_name || GLOBAL_USER.business_name : created1.first_name + ' ' + created1.last_name || created1.business_name || '', // existing team member
 				lenderFullName: data.user.first_name ? data.user.first_name + ' ' + data.user.last_name : data.user.business_name,
+				lenderName: data.user.first_name ? data.user.first_name + ' ' + data.user.last_name : data.user.business_name,
+
 			}
 
 			let INVITATION_EMAIL_CONTEXT_ID = 93;
@@ -217,7 +213,7 @@ function service(data) {
 			d.resolve('Invited team member');
 		})
 		.catch((err) => {
-			//console.log(err.stack);
+			console.log(err.stack);
 			d.reject(err);
 		});
 

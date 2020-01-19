@@ -12,6 +12,7 @@ const moment = require('moment');
 const config = require('../../config');
 const makeRequest = require('mlar')('makerequest');
 const generateRandom = require('mlar')('testutils').generateRandom;
+const send_email = require('mlar').mreq('notifs', 'send');
 
 var spec = morx.spec({})
     .build('email', 'required:false')

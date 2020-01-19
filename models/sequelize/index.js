@@ -8,7 +8,7 @@ var env = process.env.NODE_ENV || 'development';
 var config = require(__dirname + '/../../config/db')[env];
 var db = {};
 
-//console.log(env);
+console.log(env);
 config.logging = false;
 config.timezone = '+01:00';
 if (config.use_env_variable) {

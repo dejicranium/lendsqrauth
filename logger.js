@@ -23,12 +23,10 @@ function error(req, status, error, data = {}) {
     status: status
   };
 
-  logger.error(errorData);
+  return logger.error(errorData);
 }
 
-module.exports = {
-  error,
-};
+module.exports = logger
 /*
 winston.add(winston.transports.Logstash, {
 	port: 5000,
