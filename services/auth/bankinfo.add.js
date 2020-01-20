@@ -10,6 +10,8 @@ const generateRandom = require('mlar')('testutils').generateRandom;
 const requests = require('mlar')('requests');
 const AuditLog = require('mlar')('audit_log');
 const verifyAccountName = require('../../utils/bank').verifyAccountName
+const getBVNVerificationData = require('../../utils/bank').getLocalBVNVerificationData;
+
 var spec = morx.spec({})
     .build('bvn', 'required:true')
     .build('account_number', 'required:true')
@@ -97,6 +99,18 @@ function service(data) {
                     user_id: data.user.id
                 }
 
+
+                // verify bank details 
+                await requests.verifyBank({
+                    ...params
+                }).then(resp => {
+                    if (!resp) throw new Error("Bank account is invalid")
+                    verificationData.account_name = resp.account_name;
+                }).catch(err => {
+                    throw new Error("Bank account is invalid")
+                });
+
+
                 await models.bvn_verifications.findOrCreate({
                         where: {
                             user_id: data.user.id,
@@ -109,17 +123,6 @@ function service(data) {
                             verification.update(verificationData)
                         }
                     })
-
-
-                // verify bank details 
-                await requests.verifyBank({
-                    ...params
-                }).then(resp => {
-                    if (!resp) throw new Error("Bank account is invalid")
-                    params.account_name = resp.account_name;
-                }).catch(err => {
-                    throw new Error("Bank account is invalid")
-                });
 
 
                 // generate otp 
@@ -169,6 +172,11 @@ function service(data) {
 
             // if we only intend to verify otp otp
             else {
+
+                let bvnverificationdata = await getBVNVerificationData(data.user.id, params.bvn);
+                // set thee account name
+                params.account_name = bvnverificationdata.account_name;
+
                 let token = await models.auth_token.findOne({
                     where: {
                         type: 'verify_bank_otp',
@@ -183,6 +191,7 @@ function service(data) {
 
                 // create account number;
                 params.user_id = globalUserId;
+
                 await models.user_bank.create({
                     ...params
                 });

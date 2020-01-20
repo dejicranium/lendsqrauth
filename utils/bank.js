@@ -1,5 +1,6 @@
 const verifyBankAccount = require('./requests').verifyBank;
 const models = require('mlar')('models');
+const q = require('q');
 
 module.exports = {
     async verifyAccountName(userId, data) {
@@ -39,5 +40,26 @@ module.exports = {
         }
 
         if (validnames !== name_as_list.length) throw new Error(`${userFullName} doesn't match account name: ${account_name}`);
+    },
+
+
+    async getLocalBVNVerificationData(userId, bvn) {
+        const d = q.defer();
+
+        q.fcall(() => {
+                return models.bvn_verifications.findOne({
+                    where: {
+                        user_id: userId,
+                    }
+                })
+            })
+            .then(resp => {
+                d.resolve(resp)
+            })
+            .catch(err => {
+                d.reject(err)
+            })
+
+        return d.promise;
     }
 }
