@@ -30,16 +30,11 @@ function individualEligibleToCreateProduct(profileId, userId) {
                 }
             });
 
-            let getBusinessDetails = models.business_info.findOne({
-                where: {
-                    profile_id: profileId
-                }
-            })
-            return [getbankdetails, getuser, getBusinessDetails]
+
+            return [getbankdetails, getuser]
         })
-        .spread((bankDetails, user, businessDetails) => {
+        .spread((bankDetails, user) => {
             if (!bankDetails || !bankDetails.id) throw new Error("You cannot add product until you register your bank details");
-            if (!businessDetails || !businessDetails.id) throw new Error("You cannot add product until you register your business details");
             let user_required_fields = ['first_name', 'last_name', 'phone'];
 
             user_required_fields.forEach(field => {
@@ -47,7 +42,7 @@ function individualEligibleToCreateProduct(profileId, userId) {
                     throw new Error("Can't create product until profile information is completed")
                 }
             });
-            d.resolve('')
+            d.resolve('proceed')
         })
         .catch(error => {
             d.reject(error)
