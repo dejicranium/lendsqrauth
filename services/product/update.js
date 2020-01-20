@@ -5,6 +5,7 @@ const q = require('q');
 const validators = require('mlar')('validators');
 const assert = require('mlar')('assertions');
 const AuditLog = require('mlar')('audit_log');
+const product_utils = require('mlar')('product_utils');
 
 var spec = morx.spec({})
 	.build('product_id', 'required:true, eg:1')
@@ -118,7 +119,9 @@ function service(data) {
 		.spread(async (product, params) => {
 			if (!product) throw new Error("No such product exists");
 			if (product.profile_id != data.profile.id) throw new Error("Can't update someone else's product");
-
+			if (product_utils.productHasActiveCollection(product)) {
+				throw new Error("Cannot update a product with at least one active collection")
+			}
 
 			if (params.product_name && product.product_name && (params.product_name != product.product_name)) {
 				let similar = await models.product.findAll({
@@ -162,7 +165,9 @@ function service(data) {
 				p.min_tenor == null || p.interest_period == null || p.interest == null) {
 				params.status = 'draft';
 			} else {
-				params.status = 'inactive';
+				if (params.status != 'active') {
+					params.status = 'inactive';
+				}
 			}
 
 			await product.update({
