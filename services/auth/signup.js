@@ -105,18 +105,34 @@ function service(data) {
             }), params, role]
         })
         .spread(async (user, params, role) => {
-            if (user) throw new Error("User with these credentials exists");
+            if (user && user.password) throw new Error("User with these credentials exists");
             // set role
             params.role_id = role.id;
             delete params.type;
 
             params.created_on = new Date();
             params.uuid = Math.random().toString(36).substr(2, 9);
-            if (params.create_profile === true) {
+            if (params.create_profile === true && !user) {
                 return models.sequelize.transaction((t1) => {
                     // create a user and his profile            
                     return q.all([
                         models.user.create(params, {
+                            transaction: t1
+                        }),
+                        models.profile.create({
+                            role_id: params.role_id,
+                            created_on: new Date()
+
+                        }, {
+                            transaction: t1
+                        })
+                    ]);
+                })
+            } else if (user && !user.password) {
+                return models.sequelize.transaction((t1) => {
+                    // create a user and his profile            
+                    return q.all([
+                        user.update(params, {
                             transaction: t1
                         }),
                         models.profile.create({
