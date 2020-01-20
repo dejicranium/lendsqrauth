@@ -194,8 +194,11 @@ function service(data) {
                 let audit_log = new AuditLog(data.reqData, "CREATE", "added a new bank account");
                 audit_log.create();
 
-                d.resolve("OTP verified");
+                return "OTP verified";
             }
+        })
+        .then(success => {
+            d.resolve(success)
         })
 
         .catch(err => {
