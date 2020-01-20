@@ -10,6 +10,8 @@ const config = require('../../config');
 const makeRequest = require('mlar')('makerequest');
 const crypto = require('crypto');
 const AuditLog = require('mlar')('audit_log');
+const send_email = require('mlar').mreq('notifs', 'send');
+
 
 /**  this is to be used by a borrower to reject a collections invitation 
  *  sent to him by a lender.
@@ -120,6 +122,9 @@ function service(data) {
         .then(async user => {
             if (!user) throw new Error("Could not create user");
 
+            // create wallet
+            let createWallet = require('../../utils/wallet').create;
+            await createWallet(user);
 
             // create activation token
             const userToken = await crypto.randomBytes(32).toString('hex');
@@ -147,37 +152,24 @@ function service(data) {
             }
 
             let fullname = user.business_name || user.first_name + ' ' + user.last_name;
-            // send email 
-            let payload = {
-                context_id: 69,
-                sender: config.sender_email,
-                recipient: user.email,
-                sender_id: 1,
-                data: {
-                    email: user.email,
-                    name: fullname
-                }
-            }
 
-            const url = config.notif_base_url + "email/send";
-            // send the welcome email 
-            try {
-                await makeRequest(url, 'POST', payload, requestHeaders);
 
-            } catch (e) {
-                // silent treatment. user can always request for the user activation link;
-            }
-
-            // prepare to send email verification email
-            payload.context_id = 81;
-            payload.data.token = userToken;
-            payload.data.url = config.base_url + 'activate?token=' + userToken;
 
             try {
-                await makeRequest(url, 'POST', payload, requestHeaders);
+                //await makeRequest(url, 'POST', payload, requestHeaders);
+                let welcome_email_context_id = 108;
+
+                await send_email(welcome_email_context_id, user.email, {
+                    lenderFullName: fullname,
+                    loginURL: config.base_url + 'login'
+                });
+
             } catch (e) {
+                console.log("got to error")
+                // require('mlar')('locallogger').error(data.reqData, {}, e);
 
             }
+
 
             data.reqData.user = JSON.parse(JSON.stringify(user));
             let audit_log = new AuditLog(data.reqData, 'SIGN UP', 'completed registration as a team member');
@@ -186,8 +178,15 @@ function service(data) {
         })
 
         .catch(err => {
-            console.log(err.stack)
+            //console.log(err.stack)
+            /*require('mlar')('locallogger').error({
+                body: data
+            }, {}, error);*/
+            //let log = require('mlar')('locallogger');
+            //log.error(err)
             d.reject(err)
+
+
         })
 
 

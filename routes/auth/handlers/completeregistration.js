@@ -5,21 +5,27 @@ const auth_middleware = require('mlar')('authmiddleware');
 
 
 
-function vinfo(req, res, next){ 
-        const data = {...req.body, ...req.query, ...req.headers, ...req.params};
-        data.reqData = req;
-        forgotpassword(data)
+function vinfo(req, res, next) {
+    const data = {
+        ...req.body,
+        ...req.query,
+        ...req.headers,
+        ...req.params
+    };
+    data.reqData = req;
+    forgotpassword(data)
         .then(response => {
-            utils.jsonS(res, response, "The process completed successfully"); 
+            utils.jsonS(res, response, "The process completed successfully");
         })
         .catch(error => {
-            utils.jsonF(res, null, error.message); 
+            utils.jsonF(res, null, error.message);
+            //require('mlar')('locallogger').error(req, res.statusCode, error.message);
+
         })
 }
 
 vinfo.routeConfig = {};
-vinfo.routeConfig.path = "/collaborator/signup"; 
-vinfo.routeConfig.method = "post"; 
+vinfo.routeConfig.path = "/collaborator/signup";
+vinfo.routeConfig.method = "post";
 vinfo.routeConfig.middlewares = [routemeta('collaborator_signup', 'none')];
 module.exports = vinfo;
-

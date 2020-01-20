@@ -3,6 +3,8 @@ const morx = require('morx');
 const q = require('q');
 const assert = require('mlar')('assertions');
 const AuditLog = require('mlar')('audit_log');
+const individualEligible = require('../../utils/products').individualEligibleToCreateProduct
+const businessEligible = require('../../utils/products').businessEligibleToCreateProduct
 
 var spec = morx.spec({})
 	//.build('profile_id', 'required:true, eg:lender')   
@@ -29,7 +31,13 @@ function service(data) {
 			const validParameters = morx.validate(data, spec, {
 				throw_error: true
 			});
-			const params = validParameters.params;
+			let params = validParameters.params;
+			// check availablility
+			if (data.profile.role === 'business_lender') {
+				await businessEligible(data.profile.id, data.user.id)
+			} else if (data.profile.role == 'individual_lender') {
+				await individualEligible(data.profile.id, data.user.id)
+			}
 
 			// min tenor and max tenor amount must exist together,
 			assert.mustBeAllOrNone([params.min_tenor, params.max_tenor], ['Min Tenor', 'Max Tenor'])
@@ -38,14 +46,16 @@ function service(data) {
 			if (params.min_tenor) assert.digitsOnly(params.min_tenor, null, 'min tenor')
 
 			if (params.max_tenor && params.min_tenor) {
-				if (params.min_tenor > params.max_tenor) {
+				if (parseFloat(params.min_tenor) > parseFloat(params.max_tenor)) {
 					throw new Error("Min tenor cannot be greater than max tenor")
 				}
 			}
 
+
 			// interest must be a digit or a float
 			if (params.interest) {
 				assert.digitsOrDecimalOnly(params.interest, null, 'interest')
+				if (parseFloat(params.interest) < 1) throw new Error("Interest must be at least 1%");
 			}
 
 			// max loan amount and min_loan amount must exist together,
@@ -99,7 +109,7 @@ function service(data) {
 
 			let getProductName = models.product.findOne({
 				where: {
-					//profile_id: data.profile.id,
+					profile_id: data.profile.id,
 					product_name: params.product_name
 				}
 			})

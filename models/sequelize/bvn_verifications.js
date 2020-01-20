@@ -4,7 +4,8 @@ module.exports = (sequelize, DataTypes) => {
     verified: DataTypes.BOOLEAN,
     user_id: DataTypes.INTEGER,
     bvn: DataTypes.INTEGER,
-    phone: DataTypes.STRING
+    phone: DataTypes.STRING,
+    account_name: DataTypes.STRING
   }, {});
   bvn_verifications.associate = function (models) {
     // associations can be defined here

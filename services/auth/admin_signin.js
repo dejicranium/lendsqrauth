@@ -191,41 +191,43 @@ var spec = morx.spec({})
     .end();
 
 function service(data) {
-
+    let admin_role = null;
     var d = q.defer();
     q.fcall(async () => {
-        var validParameters = morx.validate(data, spec, {
-            throw_error: true
-        });
-        let params = validParameters.params;
+            var validParameters = morx.validate(data, spec, {
+                throw_error: true
+            });
+            let params = validParameters.params;
 
-        assert.emailFormatOnly(params.email); // validate email, throw error if it's some weird stuff
+            assert.emailFormatOnly(params.email); // validate email, throw error if it's some weird stuff
 
-        if (params.provider.toUpperCase() !== 'GOOGLE') throw new Error("Could not login user");
-        if (email.indexOf("lendsqr.com") < -1) throw new Error("Invalid admin credentials");
-        const jwt_decode = require('jwt-decode');
-        let idToken = jwt_decode(params.idToken);
+            if (params.provider.toUpperCase() !== 'GOOGLE') throw new Error("Could not login user");
+            if (params.email.indexOf("lendsqr.com") < 0) throw new Error("3. Invalid admin credentials");
+            const jwt_decode = require('jwt-decode');
+            let idToken = jwt_decode(params.idToken);
 
-        if (idToken.email.indexOf('lendsqr.com')) throw new Error("Invalid admin credentials");
-        if (idToken.hd !== 'lendsqr.com') throw new Error("Invalid admin credentials");
-        if (!idToken.email_verified) throw new Error("Invalid admin credentials");
+            if (idToken.hd !== 'lendsqr.com') throw new Error("2. Invalid admin credentials");
+            if (!idToken.email_verified) throw new Error("1. Invalid admin credentials");
 
-        params.first_name  = idToken.given_name;
-        params.last_name = idToken.last_name;
+            params.first_name = idToken.given_name;
+            params.last_name = idToken.last_name;
+            params.status = 'active';
 
-        return [models.user.findOne({
+            return [models.user.findOne({
                 where: {
                     email: params.email
                 }
             }), params]
         })
         .spread(async (user, params) => {
+            admin_role = await models.role.findOne({
+                where: {
+                    name: 'admin'
+                }
+            });
             if (!user) {
-                let admin_role = await models.role.findOne({
-                    where: {
-                        name: 'admin'
-                    }
-                });                // create a new user with profile admin
+
+                // create a new user with profile admin
                 return models.sequelize.transaction((t1) => {
                     // create a user and his profile
                     return q.all([
@@ -233,20 +235,32 @@ function service(data) {
                             transaction: t1
                         }),
                         models.profile.create({
-                            role_id: admin_role.id
+                            role_id: admin_role.id,
+                            created_on: new Date()
                         }, {
                             transaction: t1
                         })
                     ]);
                 })
-            }
-            else {
+            } else {
 
-                return [user, models.profile.findOne({where: {user_id: user.id}})]
+                return [user, models.profile.findOne({
+                    where: {
+                        user_id: user.id,
+                        role_id: admin_role.id
+                    }
+                })]
             }
         })
         .spread(async (user, profile) => {
+            if (!profile) {
+                // creatone // 
 
+                profile = await models.profile.create({
+                    role_id: admin_role.id,
+                    created_on: new Date()
+                })
+            }
             let permissions = await models.sequelize.query(`
             SELECT p.name as name from permissions as p INNER JOIN entity_permissions AS ep ON p.id = ep.permission_id WHERE  (ep.entity = 'role' AND ep.entity_id = ${profile.role_id} ) OR (ep.entity = 'profile' AND ep.entity_id = ${profile.id}) `)
 
@@ -354,6 +368,7 @@ function service(data) {
             d.resolve(response)
         })
         .catch((err) => {
+            console.log(err);
             d.reject(err);
 
         });

@@ -12,6 +12,7 @@ const moment = require('moment');
 const config = require('../../config');
 const makeRequest = require('mlar')('makerequest');
 const generateRandom = require('mlar')('testutils').generateRandom;
+const send_email = require('mlar').mreq('notifs', 'send');
 
 var spec = morx.spec({})
     .build('email', 'required:false')
@@ -88,15 +89,13 @@ function service(data) {
             } else {
 
                 // send email 
-                let payload = {
-                    context_id: null,
-                    sender: config.sender_email,
-                    sender_id: 1,
 
-                }
+
+
 
                 if (params.type == 'token' && params.subtype == 'user_activation') {
                     // see whether user exists
+
 
                     let user = await models.user.findOne({
                         where: {
@@ -110,12 +109,6 @@ function service(data) {
 
                     let fullname = user.business_name || user.first_name + ' ' + user.last_name;
 
-                    payload.recipient = user.email;
-                    payload.data = {
-                        email: user.email,
-                        name: fullname,
-                    }
-                    payload.context_id = 81;
 
                     // create activation token
                     const userToken = await crypto.randomBytes(32).toString('hex');
@@ -142,7 +135,22 @@ function service(data) {
                         });
                     }
 
-                    payload.data.token = userToken;
+                    //let verification_email_context_id = 109;
+
+                    return send_email(109, user.email, {
+                        lenderFullName: fullname,
+                        verifyAccountURL: config.base_url + 'activate?token=' + userToken
+                    });
+
+
+
+
+
+
+
+
+
+
                 } else if (params.type == 'token' && params.subtype == 'password_reset') {
                     let user = await models.user.findOne({
                         where: {
@@ -197,7 +205,7 @@ function service(data) {
             d.resolve(auth_token);
         })
         .catch((err) => {
-
+            console.log(err.stack)
             d.reject(err);
 
         });

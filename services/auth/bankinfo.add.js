@@ -9,6 +9,8 @@ const makeRequest = require('mlar')('makerequest');
 const generateRandom = require('mlar')('testutils').generateRandom;
 const requests = require('mlar')('requests');
 const AuditLog = require('mlar')('audit_log');
+const verifyAccountName = require('../../utils/bank').verifyAccountName
+const getBVNVerificationData = require('../../utils/bank').getLocalBVNVerificationData;
 
 var spec = morx.spec({})
     .build('bvn', 'required:true')
@@ -24,7 +26,7 @@ function service(data) {
         If there is, we verify OTP
     */
     var d = q.defer();
-    const globalUserId = data.user_id;
+    const globalUserId = parseInt(data.user.id);
     const requestHeaders = {
         'Content-Type': 'application/json',
     };
@@ -44,7 +46,7 @@ function service(data) {
                 models.user_bank.findOne({
                     where: {
                         account_number: params.account_number,
-                        user_id: data.user.id
+                        //user_id: data.user.id
 
                     }
                 }),
@@ -54,13 +56,14 @@ function service(data) {
                     }
                 }),
 
+
                 params,
             ]
 
         })
         .spread(async (record, bvnRecord, params) => {
             // throw error if record exists and it  is not deleted
-            if (record && !record.deleted_flag) throw new Error("Account number already exists for this user");
+            if (record && !record.deleted_flag) throw new Error("Account number already exists on this platform");
 
             // if bvn exists for a user other than the one making the request
             if (bvnRecord && parseInt(bvnRecord.user_id) !== parseInt(globalUserId)) {
@@ -96,6 +99,18 @@ function service(data) {
                     user_id: data.user.id
                 }
 
+
+                // verify bank details 
+                await requests.verifyBank({
+                    ...params
+                }).then(resp => {
+                    if (!resp) throw new Error("Bank account is invalid")
+                    verificationData.account_name = resp.account_name;
+                }).catch(err => {
+                    throw new Error("Bank account is invalid")
+                });
+
+
                 await models.bvn_verifications.findOrCreate({
                         where: {
                             user_id: data.user.id,
@@ -109,17 +124,6 @@ function service(data) {
                         }
                     })
 
-
-                // verify bank details 
-                await requests.verifyBank({
-                    ...params
-                }).then(resp => {
-                    if (!resp) throw new Error("Bank account is not valid")
-                }).catch(err => {
-                    throw new Error("Bank account is invalid")
-                });
-
-                //if all successful ---
 
                 // generate otp 
                 let OTP = generateRandom('digits', 6);
@@ -163,20 +167,31 @@ function service(data) {
                 return `Phone number is: ${phoneNumberFromBVN}`;
             }
 
+
+
+
             // if we only intend to verify otp otp
             else {
+
+                let bvnverificationdata = await getBVNVerificationData(data.user.id, params.bvn);
+                // set thee account name
+                params.account_name = bvnverificationdata.account_name;
+
                 let token = await models.auth_token.findOne({
                     where: {
                         type: 'verify_bank_otp',
                         user_id: globalUserId,
+                        token: params.otp
                     }
                 });
-                if (!token && !token.id) throw new Error("Invalid OTP");
+                if (!token || !token.id) throw new Error("Invalid OTP");
+                if (token.token !== params.otp) throw new Error("Invalid OTP");
                 else if (moment(new Date()).isAfter(token.expiry)) throw new Error("The token has expired");
                 else if (token.is_used) throw new Error("Token is already used");
 
                 // create account number;
                 params.user_id = globalUserId;
+
                 await models.user_bank.create({
                     ...params
                 });
@@ -192,11 +207,9 @@ function service(data) {
             }
         })
         .then(success => {
-            if (!success) throw new Error("An error occurred while carrying out this operation")
-
-
-            d.resolve(success);
+            d.resolve(success)
         })
+
         .catch(err => {
             d.reject(err)
         })

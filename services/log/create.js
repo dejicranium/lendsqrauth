@@ -4,7 +4,7 @@ var morx = require('morx');
 var q = require('q');
 
 var spec = morx.spec({})  
-                .build('id', 'required:true')
+                .build('id', 'required:false')
                 .build('comment', 'required:true')
                 .build('type', 'required:true')
                 .build('data', 'required:false')
@@ -23,7 +23,7 @@ function service(data) {
         params = result.params;
         const ts = Date.now();
         const log = {
-            log_id: params.id,
+            log_id: params.id ||  Math.random().toString(36).substr(2, 7),
             comment: params.comment,
             type: params.type,
             data: params.data,

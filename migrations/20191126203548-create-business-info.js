@@ -18,7 +18,7 @@ module.exports = {
         type: Sequelize.STRING
       },
       business_name: {
-        type: Sequelize.INTEGER
+        type: Sequelize.STRING
       },
       business_phone: {
         type: Sequelize.INTEGER
@@ -26,6 +26,7 @@ module.exports = {
       rc_number: {
         type: Sequelize.INTEGER
       },
+
       certificate_of_incorporation: {
         type: Sequelize.INTEGER
       },

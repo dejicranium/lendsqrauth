@@ -17,7 +17,8 @@ function vinfo(req, res, next) {
 
     service(data)
         .then(response => {
-            utils.jsonS(res, response, "Collection activated");
+            utils.jsonS(res, response, "Collection activated");                        require('mlar')('locallogger').error(req, res.statusCode, error.message);
+
         })
         .catch(error => {
             utils.jsonF(res, null, error.message);

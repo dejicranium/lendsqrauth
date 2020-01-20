@@ -61,6 +61,7 @@ EXPRESS_UTILS.json401 = function (res, data, message) {
 }
 
 EXPRESS_UTILS.log = function (thing_to_log, num, title){
+	/*
   num = num || 5;
   title = title || "LOGSTART";
   console.log("\n\n\n\n\n\n<*****************" + title + "***********************>");
@@ -70,7 +71,7 @@ EXPRESS_UTILS.log = function (thing_to_log, num, title){
   for(var i=0; i < num; i++)
   console.log("**************************************************");
   console.log("<******************"+ title +"-END***********************>\n\n\n\n\n\n");
-
+*/
 }
 
 EXPRESS_UTILS.randomString = function (length, chars) {

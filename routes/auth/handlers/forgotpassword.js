@@ -13,7 +13,9 @@ function vinfo(req, res, next){
             utils.jsonS(res, response.data, "Please check your email for a link to reset your password"); 
         })
         .catch(error => {
-            utils.jsonF(res, null, error.message); 
+            utils.jsonF(res, null, error.message);
+                                    require('mlar')('locallogger').error(req, res.statusCode, error.message);
+ 
         })
 }
 

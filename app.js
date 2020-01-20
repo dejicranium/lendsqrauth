@@ -1,6 +1,8 @@
 /*
 Attempt loading env files
 */
+require('./winston-workaround');
+
 try {
   const appEnvProfile = process.env.ENV_PROFILE || '';
   let envPath = '';
@@ -8,7 +10,7 @@ try {
     envPath = `.${appEnvProfile}`;
   }
   const fullEnvPath = './config/env' + envPath + '.json';
-  console.log(fullEnvPath);
+  // console.log(fullEnvPath);
   var envJSON = require(fullEnvPath);
   for (var envProp in envJSON) {
     process.env[envProp] = envJSON[envProp];
@@ -60,7 +62,7 @@ if (process.env.MONGODB_URI) {
 }
 const reqIp = require('request-ip');
 const logger = require('mlar')('mongolog');
-const locallogger = require('mlar')('locallogger');
+const logly = require('mlar')('locallogger');
 const scrubber = require('mlar')('obscrub');
 const SCRUBVALS = require('./utils/scrubvals.json');
 
@@ -71,7 +73,7 @@ app.use(
 );
 app.use(bodyParser.json());
 
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
   res.header('Access-Control-Allow-Origin', '*');
   res.header(
     'Access-Control-Allow-Headers',
@@ -111,20 +113,24 @@ app.use(function(req, res, next) {
     comment: 'Request',
     data: reqlog
   });
-
-  locallogger.info({
-    type: 'request',
-    id: reqid,
-    comment: 'Request',
-    data: reqlog
-  });
+  /*
+    logly.info(JSON.stringify({
+      type: 'request',
+      id: reqid,
+      comment: 'Request',
+      data: reqlog,
+      message: 'lame',
+      status: 200,
+      service: "Messaging",
+      method: 'get'
+    }));*/
 
   next();
 });
 
 const base = '/api/v1';
 
-app.get(base, function(req, res, next) {
+app.get(base, function (req, res, next) {
   res.json({
     base: 1.0,
     env: process.env.NODE_ENV
@@ -145,7 +151,7 @@ Handle 404
 */
 //app.use(mosh.initMoshErrorHandler);
 
-app.use(base, function(req, res, next) {
+app.use(base, function (req, res, next) {
   utils.jsonF(res, null, `Undefined ${req.method} route access`);
 
   // res.json({m: `Undefined ${req.method} route access`})
@@ -153,11 +159,15 @@ app.use(base, function(req, res, next) {
 
 // start cron job
 
+console.log("Config file is " + process.env.base_url)
+
 //get_collection_schedules();
 
 var force_sync = process.env.FORCESYNC ? true : false;
 
 var stage = process.env.NODE_ENV || 'development-local';
+
+console.log('environment is ' + process.env.NODE_ENV);
 if (
   stage === 'development' ||
   stage === 'test' ||
@@ -170,10 +180,10 @@ if (
     .sync({
       force: force_sync
     })
-    .then(function() {
-      app.listen(appConfig.port, function() {
+    .then(function () {
+      app.listen(appConfig.port, function () {
         //runWorker();
-        console.log('I AM LOGGING THIS');
+        // console.log(stage);
         console.log([appConfig.name, 'is running on port', appConfig.port.toString()].join(' '));
       });
     });

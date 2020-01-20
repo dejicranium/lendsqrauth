@@ -222,8 +222,8 @@ function service(data) {
                     throw new Error("Disbursement mode should be either cash or transfer")
             }
             if (params.loan_status) {
-                if (!['disbursed', 'active', 'past due'].includes(params.loan_status.toLowerCase()))
-                    throw new Error("Loan status should be one of disbursed, active or past due")
+                if (!['disbursed', 'active', 'past due', 'approved'].includes(params.loan_status.toLowerCase()))
+                    throw new Error("Loan status should be one of disbursed, approved, active or past due")
             }
             if (params.start_date) assert.dateFormatOnly(params.start_date, null, 'Start Date');
 
@@ -296,7 +296,7 @@ function service(data) {
                             borrowersFullName: collection.borrower_first_name + ' ' + collection.borrower_last_name,
                             rejectURL: config.base_url + 'signup/borrower/reject?token=',
                             acceptURL: config.base_url + 'signup/borrower/accept?token=',
-                            link: config.base_url + 'collections'
+                            collectionURL: config.base_url + 'collections'
                         };
 
                         /// send collection set up email;

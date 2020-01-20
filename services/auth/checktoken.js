@@ -68,10 +68,13 @@ function service(data) {
 
 				// send new user active email
 
-				let NEED_HELP_EMAIL_CONTEXT_ID = 98;
+				let welcome_email_context_id = 108;
 				let lenderFullName = user.first_name ? `${user.first_name} ${user.last_name}` : user.business_name;
-				send_email(NEED_HELP_EMAIL_CONTEXT_ID, user.email, {lenderFullName});
 
+				await send_email(welcome_email_context_id, user.email, {
+					lenderFullName: lenderFullName,
+					loginURL: config.base_url + 'login'
+				});
 				//requests.sendNewActiveUserEmail({email: user.email, lenderFullName: lenderFullName});
 
 

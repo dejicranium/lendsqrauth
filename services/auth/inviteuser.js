@@ -23,10 +23,6 @@ function service(data) {
 	const globalProfileId = data.profile.id;
 	const globalUserId = data.user.id;
 
-	const requestHeaders = {
-		'Content-Type': 'application/json'
-	};
-
 	let GLOBAL_USER_EXISTS = false;
 	let GLOBAL_USER = null;
 	q
@@ -40,14 +36,12 @@ function service(data) {
 
 			if (data.user.email == params.email) throw new Error('Cannot send an invitation to yourself');
 
-			const requestHeaders = {
-				'Content-Type': 'application/json'
-			};
 
 			// check to make sure that only a lender can do this;
 			if (data.profile.role != 'individual_lender' && data.profile.role != 'business_lender') {
 				throw new Error('Only lenders can add team members');
 			}
+
 			let role = await models.role.findOne({
 				where: {
 					id: parseInt(params.role_id)
@@ -131,7 +125,8 @@ function service(data) {
 					role_id: params.role_id,
 					user_id: created1.id,
 					parent_profile_id: globalProfileId,
-					uuid: Math.random().toString(36).substr(2, 9)
+					uuid: Math.random().toString(36).substr(2, 9),
+					created_on: new Date()
 				});
 				new_profile_id = new_profile.id;
 
@@ -188,18 +183,36 @@ function service(data) {
 
 			// send email 
 			const emailPayload = {
-				userName: GLOBAL_USER.first_name ? GLOBAL_USER.first_name + ' ' + GLOBAL_USER.last_name : GLOBAL_USER.business_name, // existing team member
+				//userName: GLOBAL_USER ? GLOBAL_USER.first_name + ' ' + GLOBAL_USER.last_name || GLOBAL_USER.business_name || '' : created1.first_name + ' ' + created1.last_name || created1.business_name || '', // existing team member
 				lenderFullName: data.user.first_name ? data.user.first_name + ' ' + data.user.last_name : data.user.business_name,
+				lenderName: data.user.first_name ? data.user.first_name + ' ' + data.user.last_name : data.user.business_name,
+				memberAcceptURL: "",
+				memberDeclineURL: config.base_url + 'team/reject?token=' + invite_token
 			}
 
 			let INVITATION_EMAIL_CONTEXT_ID = 93;
 			let recipient = null;
 
-			if (!GLOBAL_USER) {
-				INVITATION_EMAIL_CONTEXT_ID = 94;
+			if (GLOBAL_USER) {
 				recipient = GLOBAL_USER.email
+				emailPayload.userName = GLOBAL_USER.first_name ? GLOBAL_USER.first_name + ' ' + GLOBAL_USER.last_name : '';
+				emailPayload.memberAcceptURL = config.base_url + 'team/accept?token=' + invite_token
+
+
+				// if user had already been invited by some, he won't have a name or firstname
+				if (!emailPayload.userName) {
+					INVITATION_EMAIL_CONTEXT_ID = 94;
+					emailPayload.memberAcceptURL = config.base_url + 'signup/team?token=' + invite_token
+
+				}
+
+
 			} else {
-				recipient = created1.email
+				INVITATION_EMAIL_CONTEXT_ID = 94;
+				recipient = created1.email;
+				emailPayload.userName = created1.first_name ? created1.first_name + ' ' + created1.last_name : '';
+				emailPayload.memberAcceptURL = config.base_url + 'signup/team?token=' + invite_token
+
 			}
 
 			try {
