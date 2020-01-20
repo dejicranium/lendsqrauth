@@ -296,7 +296,7 @@ function service(data) {
                             borrowersFullName: collection.borrower_first_name + ' ' + collection.borrower_last_name,
                             rejectURL: config.base_url + 'signup/borrower/reject?token=',
                             acceptURL: config.base_url + 'signup/borrower/accept?token=',
-                            link: config.base_url + 'collections'
+                            collectionURL: config.base_url + 'collections'
                         };
 
                         /// send collection set up email;

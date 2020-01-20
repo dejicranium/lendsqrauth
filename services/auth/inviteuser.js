@@ -202,6 +202,8 @@ function service(data) {
 				// if user had already been invited by some, he won't have a name or firstname
 				if (!emailPayload.userName) {
 					INVITATION_EMAIL_CONTEXT_ID = 94;
+					memberAcceptURL = config.base_url + 'signup/team?token=' + invite_token
+
 				}
 
 
