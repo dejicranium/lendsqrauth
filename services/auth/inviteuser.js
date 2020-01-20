@@ -196,13 +196,13 @@ function service(data) {
 			if (GLOBAL_USER) {
 				recipient = GLOBAL_USER.email
 				emailPayload.userName = GLOBAL_USER.first_name ? GLOBAL_USER.first_name + ' ' + GLOBAL_USER.last_name : '';
-				memberAcceptURL = config.base_url + 'team/accept?token=' + invite_token
+				emailPayload.memberAcceptURL = config.base_url + 'team/accept?token=' + invite_token
 
 
 				// if user had already been invited by some, he won't have a name or firstname
 				if (!emailPayload.userName) {
 					INVITATION_EMAIL_CONTEXT_ID = 94;
-					memberAcceptURL = config.base_url + 'signup/team?token=' + invite_token
+					emailPayload.memberAcceptURL = config.base_url + 'signup/team?token=' + invite_token
 
 				}
 
@@ -211,7 +211,7 @@ function service(data) {
 				INVITATION_EMAIL_CONTEXT_ID = 94;
 				recipient = created1.email;
 				emailPayload.userName = created1.first_name ? created1.first_name + ' ' + created1.last_name : '';
-				memberAcceptURL = config.base_url + 'signup/team?token=' + invite_token
+				emailPayload.memberAcceptURL = config.base_url + 'signup/team?token=' + invite_token
 
 			}
 
