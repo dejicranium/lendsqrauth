@@ -89,21 +89,12 @@ function service(data) {
             } else {
 
                 // send email 
-                let payload = {
-                    context_id: null,
-                    sender: config.sender_email,
-                    sender_id: 1,
 
-                }
 
 
 
                 if (params.type == 'token' && params.subtype == 'user_activation') {
                     // see whether user exists
-
-
-
-
 
 
                     let user = await models.user.findOne({
@@ -118,7 +109,6 @@ function service(data) {
 
                     let fullname = user.business_name || user.first_name + ' ' + user.last_name;
 
-                    let verification_email_context_id = 109;
 
                     // create activation token
                     const userToken = await crypto.randomBytes(32).toString('hex');
@@ -145,11 +135,20 @@ function service(data) {
                         });
                     }
 
+                    //let verification_email_context_id = 109;
 
-                    send_email(verification_email_context_id, user.email, {
+                    return send_email(109, user.email, {
                         lenderFullName: fullname,
                         verifyAccountURL: config.base_url + 'activate?token=' + userToken
                     });
+
+
+
+
+
+
+
+
 
 
                 } else if (params.type == 'token' && params.subtype == 'password_reset') {
@@ -206,7 +205,7 @@ function service(data) {
             d.resolve(auth_token);
         })
         .catch((err) => {
-
+            console.log(err.stack)
             d.reject(err);
 
         });

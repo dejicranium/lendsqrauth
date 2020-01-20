@@ -42,6 +42,8 @@ module.exports = (url, method, payload, headers, caller = null, defaultheaders =
             type: 'request-error',
             error: err
         });
+
+        console.log(err);
         if (caller) {
             d.reject(new Error(`Could not ${caller}`))
             //throw new Error(`Could not ${caller}. Reason: ` + err );
