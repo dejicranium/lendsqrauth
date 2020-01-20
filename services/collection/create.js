@@ -10,7 +10,7 @@ const crypto = require('crypto');
 const requests = require('mlar')('requests');
 const AuditLog = require('mlar')('audit_log');
 const sendCollectionCreatedEmail = require('../../utils/notifs/collection_created');
-
+const validateBorrowerBvnUniqueness = require('../../utils/collection').validateBorrowerBvnUniqueness
 var spec = morx.spec({})
 	.build('borrower_first_name', 'required:true, eg:lender')
 	.build('borrower_last_name', 'required:true, eg:lender')
@@ -80,6 +80,9 @@ function service(data) {
 				}
 
 			}
+
+			await validateBorrowerBvnUniqueness(params.borrower_email, params.borrower_bvn);
+
 			// make request to verify phone number
 			const verifiedPhone = await makeRequest(
 				config.utility_base_url + 'verify/phone/',

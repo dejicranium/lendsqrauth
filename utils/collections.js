@@ -1,4 +1,7 @@
 const moment = require('moment');
+const q = require('q');
+const models = require('mlar')('models');
+
 function productHasActiveCollection(product) {
     if (product.collections.length) {
         let collections = product.collections;
@@ -10,7 +13,8 @@ function productHasActiveCollection(product) {
         return false;
     }
 }
-function validateSetup (tenor, tenor_type, collections, frequency) {
+
+function validateSetup(tenor, tenor_type, collections, frequency) {
     switch (tenor_type) {
         case 'months':
             tenor_type = 'M';
@@ -52,18 +56,22 @@ function validateSetup (tenor, tenor_type, collections, frequency) {
     }
 
 
-    let tenor_end =  moment().add(tenor, tenor_type).format('MMMM DD YYYY');
+    let tenor_end = moment().add(tenor, tenor_type).format('MMMM DD YYYY');
 
     let collection_end = moment().add(collections, frequency).format('MMMM DD YYYY');
     let can_proceed = true;
     if (moment(collection_end).isAfter(tenor_end)) {
-       can_proceed = false;
+        can_proceed = false;
     }
-    return {tenor_end, collection_end, can_proceed: can_proceed};
+    return {
+        tenor_end,
+        collection_end,
+        can_proceed: can_proceed
+    };
 }
 
 
-function validateDateThresholds (tenor, tenor_type, collections, frequency) {
+function validateDateThresholds(tenor, tenor_type, collections, frequency) {
     switch (tenor_type) {
         case 'days':
             tenor_type_value = 0;
@@ -98,60 +106,59 @@ function validateDateThresholds (tenor, tenor_type, collections, frequency) {
     let tenor_order = ['days', 'weeks', 'months'];
     let coll_order = ['daily', 'weekly', 'monthly'];
     if (tenor_type_value < collection_frequency) {
-        let tenor_index  = tenor_order.indexOf(tenor_type);
+        let tenor_index = tenor_order.indexOf(tenor_type);
 
         let eq_or_less_than_tenor = coll_order.slice(0, tenor_index + 1);
         throw new Error(`Tenor type (${tenor_type}) must be equivalent or greater than collection frequency (${frequency}). Try out ${eq_or_less_than_tenor.join(', ')} as your collection frequency`)
     }
 }
-function normalizeTenor (tenor, tenor_type, collections, frequency) {
 
-        // convert collection frequency and collections to fit into tenor type and tenor value
-        let tenor_end = validateSetup(tenor, tenor_type, collections, frequency).tenor_end;
-        let collection_end = validateSetup(tenor, tenor_type, collections, frequency).collection_end;
-        let start = moment();
-        let end = tenor_end;
+function normalizeTenor(tenor, tenor_type, collections, frequency) {
 
-        if (frequency === 'weekly') {
-            let weeks = moment(end).diff(start, 'weeks');
+    // convert collection frequency and collections to fit into tenor type and tenor value
+    let tenor_end = validateSetup(tenor, tenor_type, collections, frequency).tenor_end;
+    let collection_end = validateSetup(tenor, tenor_type, collections, frequency).collection_end;
+    let start = moment();
+    let end = tenor_end;
 
-            let weekDateFromNow = moment().add(weeks, 'week');
+    if (frequency === 'weekly') {
+        let weeks = moment(end).diff(start, 'weeks');
 
-            let daysDifference = parseInt(moment(collection_end).diff(weekDateFromNow.format('MMMM DD YYYY'), 'days'));
+        let weekDateFromNow = moment().add(weeks, 'week');
 
-            if (daysDifference > 0 ) {
-                weeks += daysDifference;
-            }
-            return [weeks, 'weeks'];
+        let daysDifference = parseInt(moment(collection_end).diff(weekDateFromNow.format('MMMM DD YYYY'), 'days'));
 
+        if (daysDifference > 0) {
+            weeks += daysDifference;
         }
-        else if (frequency === 'monthly') {
+        return [weeks, 'weeks'];
+
+    } else if (frequency === 'monthly') {
 
 
-            let months = moment(end).diff(start, 'months');
-            let monthsDateFromNow = moment().add(months, 'month');
+        let months = moment(end).diff(start, 'months');
+        let monthsDateFromNow = moment().add(months, 'month');
 
 
-            let daysDifference = parseInt(moment(collection_end).diff(monthsDateFromNow.format('MMMM DD YYYY'), 'days'));
+        let daysDifference = parseInt(moment(collection_end).diff(monthsDateFromNow.format('MMMM DD YYYY'), 'days'));
 
-            if (daysDifference > 0 ) {
-                months += daysDifference;
-                //return daysDifference;
-            }
-            return [months, 'months'];
+        if (daysDifference > 0) {
+            months += daysDifference;
+            //return daysDifference;
         }
-        else if (frequency === 'daily') {
-            let days = moment(end).diff(start, 'days');
-            let dayDateFromNow = moment().add(days, 'day');
+        return [months, 'months'];
+    } else if (frequency === 'daily') {
+        let days = moment(end).diff(start, 'days');
+        let dayDateFromNow = moment().add(days, 'day');
 
-            let daysDifference = parseInt(moment(collection_end).diff(dayDateFromNow.format('MMMM DD YYYY'), 'days'));
+        let daysDifference = parseInt(moment(collection_end).diff(dayDateFromNow.format('MMMM DD YYYY'), 'days'));
 
-            if (daysDifference> 0 ) {
-                days += daysDifference;
-                //return daysDifference;
-            }
-            return [days, 'days'];
+        if (daysDifference > 0) {
+            days += daysDifference;
+            //return daysDifference;
         }
+        return [days, 'days'];
+    }
 }
 
 function resolveStartDate(startDate) {
@@ -161,10 +168,46 @@ function resolveStartDate(startDate) {
     }
     return startDate;
 }
+
+function validateBorrowerBvnUniqueness(email, bvn) {
+    const d = q.defer();
+    q.fcall(() => {
+            // see if a bank information already has that bvn
+            return models.user_bank.findOne({
+                where: {
+                    bvn: bvn
+                }
+            })
+        })
+        .then(async bankinfo => {
+            if (!bankinfo) {
+                d.resolve('proceed')
+            } else {
+                // proceed to look whether the owner of the bank info has email that matches the email of the borrower=
+                let user = await models.user.findOne({
+                    where: {
+                        id: bankinfo.user_id
+                    }
+                })
+
+                if (user && user.id && user.email !== email) {
+                    throw new Error("A user with a different email address already exists with this BVN");
+                } else {
+                    d.resolve('proceed')
+                }
+            }
+        })
+        .catch(err => {
+            d.resolve(err)
+        })
+
+    return d.promise;
+}
 module.exports = {
     productHasActiveCollection,
     validateSetup,
     normalizeTenor,
     validateDateThresholds,
     resolveStartDate,
+    validateBorrowerBvnUniqueness
 }
