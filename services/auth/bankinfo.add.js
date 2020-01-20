@@ -121,10 +121,6 @@ function service(data) {
                     throw new Error("Bank account is invalid")
                 });
 
-                // verify account name 
-                await verifyAccountName(data.user.id, params);
-
-                //if all successful ---
 
                 // generate otp 
                 let OTP = generateRandom('digits', 6);
