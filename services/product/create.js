@@ -49,6 +49,13 @@ function service(data) {
 				if (parseFloat(params.min_tenor) > parseFloat(params.max_tenor)) {
 					throw new Error("Min tenor cannot be greater than max tenor")
 				}
+				assert.notDecimal(params.min_tenor, null, "Min Tenor");
+				assert.notDecimal(params.max_tenor, null, "Max Tenor");
+
+				assert.greaterThanZero(params.min_tenor, null, "Min Tenor");
+				assert.greaterThanZero(params.max_tenor, null, "Max Tenor");
+
+
 			}
 
 
@@ -65,12 +72,16 @@ function service(data) {
 			if (params.min_loan_amount) {
 				assert.digitsOrDecimalOnly(params.min_loan_amount)
 				params.min_loan_amount = parseFloat(params.min_loan_amount).toFixed(2);
+				assert.greaterThanZero(params.min_loan_amount, null, "Min Loan Amount");
+
 
 			}
 			// digits or float
 			if (params.max_loan_amount) {
 				assert.digitsOrDecimalOnly(params.max_loan_amount)
 				params.max_loan_amount = parseFloat(params.max_loan_amount).toFixed(2);
+				assert.greaterThanZero(params.max_loan_amount, null, "Max Loan Amount");
+
 			}
 
 			if (params.min_loan_amount && params.max_loan_amount) {

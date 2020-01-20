@@ -1,7 +1,7 @@
 const validator = require('mlar')('validators');
 
-module.exports ={
-    digitsOnly(entity, error=null, param=null) {
+module.exports = {
+    digitsOnly(entity, error = null, param = null) {
         if (!validator.isDigits(entity)) {
             if (error) throw new Error(error);
             const errorField = param ? param.toString() : entity;
@@ -9,7 +9,25 @@ module.exports ={
         }
     },
 
-    digitsOrDecimalOnly(entity, error=null, param=null) {
+    notDecimal(entity, error = null, param = null) {
+        entity = entity.toString();
+        if (entity.indexOf('.') > -1) {
+            if (error) throw new Error(error);
+            const errorField = param ? param.toString() : entity;
+            throw new Error(`${errorField} cannot be in decimal`);
+        }
+
+        return true
+    },
+
+    greaterThanZero(entity, error = null, param = null) {
+        if (parseFloat(entity) <= 0) {
+            if (error) throw new Error(error);
+            const errorField = param ? param.toString() : entity;
+            throw new Error(`${errorField} should be greater than 0`);
+        }
+    },
+    digitsOrDecimalOnly(entity, error = null, param = null) {
         if (!validator.isDigitsOrDecimal(entity)) {
             if (error) throw new Error(error);
             const errorField = param ? param.toString() : entity;
@@ -17,15 +35,15 @@ module.exports ={
         }
     },
 
-    bvnFormatOnly(bvn, error=null, param=null){
-        param =  'BVN';
+    bvnFormatOnly(bvn, error = null, param = null) {
+        param = 'BVN';
         module.exports.digitsOnly(bvn, error, param);
         if (!validator.isOfLength(bvn, 11)) {
             throw new Error('BVN should be 11 digits');
         }
     },
 
-    nubanFormatOnly(entity, error=null, param=null) {
+    nubanFormatOnly(entity, error = null, param = null) {
         if (!validator.isNuban(entity)) {
             if (error) throw new Error(error);
             const errorField = param ? param.toString() : entity;
@@ -33,7 +51,7 @@ module.exports ={
         }
     },
 
-    dateFormatOnly(entity, error=null, param=null) {
+    dateFormatOnly(entity, error = null, param = null) {
         if (!validator.isDate(entity)) {
             if (error) throw new Error(error);
             const errorField = param ? param.toString() : entity;
@@ -41,15 +59,15 @@ module.exports ={
         }
     },
 
-    emailFormatOnly(entity, error=null, param=null) {
+    emailFormatOnly(entity, error = null, param = null) {
         if (!validator.isEmail(entity)) {
             if (error) throw new Error(error);
             const errorField = param ? param.toString() : entity;
             throw new Error(`${errorField} is not a valid email format`);
         }
     },
-    
-    mustBeMutuallyExclusive(entities, error=null, params=null) {
+
+    mustBeMutuallyExclusive(entities, error = null, params = null) {
         if (!validator.areMutuallyExclusive(entities)) {
             if (error) throw new Error(error);
             const errorFields = params.length ? params.map(param => param).join(', ') : entities.map(entity => entity).join(', ');
@@ -69,11 +87,9 @@ module.exports ={
 
             if (/[A-Z]/.test(character)) {
                 oneUpperCaseCharacter = true;
-            }
-            else if (/[a-z]/.test(character)) {
+            } else if (/[a-z]/.test(character)) {
                 oneLowerCaseCharacter = true;
-            }
-            else if (/[0123456789!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(character)) {
+            } else if (/[0123456789!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(character)) {
                 oneSpecialCharacter = true;
             }
 
@@ -94,11 +110,11 @@ module.exports ={
 
         // loop 
         // if an element is not null in the array, gracefully exist;
-        
-        let element = array.find(element=> element !== null && element !== undefined);
+
+        let element = array.find(element => element !== null && element !== undefined);
 
         if (element) {
-            array.forEach(i=> {
+            array.forEach(i => {
                 if (i == undefined || i == null) {
                     let labels = arraylabels.join(', ');
 
@@ -106,7 +122,7 @@ module.exports ={
                 }
             })
         }
-        
+
     }
-    
+
 }
