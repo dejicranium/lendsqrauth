@@ -150,7 +150,7 @@ function service(data) {
                 if (!token_create[1]) { // if token was not created, it exists , so go ahead and update
                     token_create[0].update({
                         token: OTP,
-                        expiry: moment(new Date()).add(20, 'minutes'),
+                        expiry: moment(new Date()).add(10, 'minutes'),
                         is_used: 0
                     })
                 }
@@ -159,7 +159,7 @@ function service(data) {
                 url = config.notif_base_url + "sms/send";
                 payload = {
                     recipient: phoneNumberFromBVN,
-                    message: `Your OTP is ${OTP}`,
+                    message: `Your verification OTP is ${OTP} and it lasts 10 minutes`,
                     sender_id: 1
                 }
                 await makeRequest(url, 'POST', payload, requestHeaders, 'Verify BVN');
