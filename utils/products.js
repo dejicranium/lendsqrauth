@@ -52,6 +52,8 @@ function individualEligibleToCreateProduct(profileId, userId) {
         .catch(error => {
             d.reject(error)
         })
+    return d.promise
+
 }
 
 
@@ -102,6 +104,7 @@ function businessEligibleToCreateProduct(profileId, userId) {
         .catch(error => {
             d.reject(error)
         })
+    return d.promise
 }
 
 module.exports = {

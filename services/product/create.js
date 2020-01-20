@@ -31,6 +31,7 @@ function service(data) {
 			const validParameters = morx.validate(data, spec, {
 				throw_error: true
 			});
+			let params = validParameters.params;
 			// check availablility
 			if (data.profile.role === 'business_lender') {
 				await businessEligible(data.profile.id, data.user.id)
