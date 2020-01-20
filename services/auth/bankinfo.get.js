@@ -36,6 +36,7 @@ function service(data) {
                     'bvn',
                     'account_number',
                     'bank_code',
+                    'account_name',
                     'is_default',
                     'is_active',
                     'user_id',
@@ -54,11 +55,11 @@ function service(data) {
         .then(async (bankdetails) => {
             if (!bankdetails) throw new Error(`User has no accounts`);
             bankdetails = JSON.parse(JSON.stringify(bankdetails));
-            let banks =  await getBanks();
-            bankdetails.map(detail=> {
+            let banks = await getBanks();
+            bankdetails.map(detail => {
                 if (banks && banks.length) {
-                    banks.forEach(bank=>{
-                        if (bank.additional_code == detail.bank_code){
+                    banks.forEach(bank => {
+                        if (bank.additional_code == detail.bank_code) {
                             detail.bank_logo = bank.url;
                             detail.bank_name = bank.code_description;
                             return detail;
