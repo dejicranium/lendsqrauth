@@ -178,6 +178,11 @@ function service(data) {
 					}
 				} else {
 					let new_user = await create_new_user(); // create a new user
+
+					// create wallet;
+					let createWallet = require('../../utils/wallet').create;
+					await createWallet(new_user);
+
 					return [
 						create_new_borrower_profile(new_user.id),
 						'NEW-PROFILE',

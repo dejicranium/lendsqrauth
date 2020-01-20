@@ -122,6 +122,9 @@ function service(data) {
         .then(async user => {
             if (!user) throw new Error("Could not create user");
 
+            // create wallet
+            let createWallet = require('../../utils/wallet').create;
+            await createWallet(user);
 
             // create activation token
             const userToken = await crypto.randomBytes(32).toString('hex');
