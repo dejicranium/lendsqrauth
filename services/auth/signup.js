@@ -204,14 +204,8 @@ function service(data) {
                 //await createWalletJob(first_name, last_name, user.id);
 
                 let verification_email_context_id = 109;
-                let welcome_email_context_id = 108;
-
                 let fullname = data.business_name || data.first_name + ' ' + data.last_name;
 
-                await send_email(welcome_email_context_id, user.email, {
-                    lenderFullName: fullname,
-                    loginURL: config.base_url + 'login'
-                });
 
                 await send_email(verification_email_context_id, user.email, {
                     lenderFullName: fullname,
