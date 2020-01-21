@@ -229,6 +229,7 @@ function service(data) {
 
             if (params.num_of_collections) {
                 assert.digitsOnly(params.num_of_collections, null, 'No. of collections');
+                assert.greaterThanZero(params.num_of_collections, null 'Number of collections');
             }
             return [product, collection, params];
         })
