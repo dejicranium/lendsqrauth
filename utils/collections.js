@@ -175,7 +175,7 @@ function validateBorrowerBvnUniqueness(email, bvn) {
             // see if a bank information already has that bvn
             return models.user_bank.findOne({
                 where: {
-                    bvn: bvn
+                    bvn: bvn.toString()
                 }
             })
         })

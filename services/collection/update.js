@@ -2,13 +2,11 @@ const models = require('mlar')('models');
 const ErrorLogger = require('mlar')('errorlogger');
 const morx = require('morx');
 const q = require('q');
-const validators = require('mlar')('validators');
 const assert = require('mlar')('assertions');
 const requests = require('mlar')('requests');
 const makeRequest = require('mlar')('makerequest');
 const config = require('../../config');
 const resolvers = require('mlar')('resolvers');
-const collection_utils = require('mlar')('collection_utils');
 const AuditLog = require('mlar')('audit_log');
 const moment = require('moment');
 const send_email = require('mlar').mreq('notifs', 'send');
@@ -42,7 +40,6 @@ var spec = morx
 function service(data) {
     var d = q.defer();
     const globalUserId = data.USER_ID || 1;
-    let tenor_just_added = false;
 
     q
         .fcall(async () => {
@@ -235,6 +232,7 @@ function service(data) {
         })
         .spread((product, collection, params) => {
             if (!collection) throw new Error('No such product exists');
+
             // you can't change a loan's product id after it has been set
             if (params.product_id && collection.status === 'active')
                 throw new Error('Cannot re-update product id of a created collection');
@@ -242,8 +240,6 @@ function service(data) {
             //params.profile_id = data.profile.id
             params.modified_on = new Date();
             params.modified_by = globalUserId;
-
-            tenor_just_added = !collection.tenor && params.tenor; // tenor_just_added was declared at the beginning of the function
 
             return [
                 collection.update({
