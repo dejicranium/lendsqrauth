@@ -48,6 +48,7 @@ function service(data) {
 				}
 			}
 
+
 			// interest must be a digit or a float
 			if (params.interest) {
 				assert.digitsOrDecimalOnly(params.interest, null, 'interest')
