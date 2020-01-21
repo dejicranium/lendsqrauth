@@ -64,10 +64,6 @@ function service(data) {
 			);
 
 
-			const requestHeaders = {
-				'Content-Type': 'application/json',
-			};
-
 			await validateBorrowerBvnUniqueness(params.borrower_email, params.borrower_bvn);
 			await verifications.verifyBVN(params.borrower_bvn);
 			await verifications.verifyPhone(params.borrower_phone);
