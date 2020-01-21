@@ -16,7 +16,7 @@ describe('#Collections', function () {
 
     it('verifybvn_uniqueness', async (done) => {
 
-        utils.validateBorrowerBvnUniqueness('itisdeji@gmail.com', '22294409275').then((result) => {
+        utils.validateBorrowerBvnUniqueness('itisdeji@gmal.com', '22294409275').then((result) => {
                 console.log(result);
                 result.should.be.equal('proceed');
                 done();
