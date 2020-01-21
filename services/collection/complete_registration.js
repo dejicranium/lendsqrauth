@@ -65,8 +65,13 @@ function service(data) {
         .spread(async (collection, instance, params) => {
             if (!collection) throw new Error("Could not find collection associated with this invitation");
 
-            let product = await initState.getInitState('collections', collection.id);
-            collection = JSON.parse(JSON.stringify(collection));
+            let product = await models.collection_init_state.findOne({
+                where: {
+                    collection_id: collection.id
+                }
+            });
+
+            //collection = JSON.parse(JSON.stringify(collection));
             collection.product = JSON.parse(product.state);
 
             assert.mustBeValidPassword(params.password);
@@ -254,6 +259,7 @@ function service(data) {
             })
         })
         .catch((error) => {
+            console.log(error.stack)
             d.reject(error);
         })
 
