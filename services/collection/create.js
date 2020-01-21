@@ -70,7 +70,6 @@ function service(data) {
 
 			await validateBorrowerBvnUniqueness(params.borrower_email, params.borrower_bvn);
 			await verifications.verifyBVN(params.borrower_bvn);
-			await verifications.verifyPhoneNumber(params.borrower_phone);
 			await verifications.verifyPhone(params.borrower_phone);
 
 
