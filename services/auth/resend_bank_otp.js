@@ -65,7 +65,7 @@ function service(data) {
 
             let payload = {
                 recipient: verification.phone,
-                message: `Your verification OTP is ${OTP} and it lasts 10 minutes`,
+                message: `Please use this OTP to complete your transaction on Lendsqr: ${OTP}. It expires in 10 minutes.`,
                 sender_id: 1
             }
 

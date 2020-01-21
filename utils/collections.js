@@ -192,7 +192,6 @@ async function validateBorrowerBvnUniqueness(email, bvn) {
                 })
 
                 if (user && user.id && user.email !== email) {
-
                     throw new Error("A user with a different email address already exists with this BVN");
                 } else {
 
