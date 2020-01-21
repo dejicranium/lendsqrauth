@@ -27,7 +27,8 @@ module.exports = (sequelize, DataTypes) => {
     // associations can be defined here
     user_invites.belongsTo(models.profile, {
       foreignKey: 'profile_created_id',
-    })
+    });
+
   };
   return user_invites;
 };
