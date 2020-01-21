@@ -54,7 +54,7 @@ function service(data) {
             profile = JSON.parse(JSON.stringify(profile));
             const default_social_links = {
                 facebook_link: profile.profile_contact ? profile.profile_contact.facebook_link : '',
-                twitter_link: profile.profile_contact ? rofile.profile_contact.twitter_link : '',
+                twitter_link: profile.profile_contact ? profile.profile_contact.twitter_link : '',
                 instagram_link: profile.profile_contact ? profile.profile_contact.instagram_link : '',
                 linkedin_link: profile.profile_contact ? profile.profile_contact.linkedin_link : '',
                 youtube_link: profile.profile_contact ? profile.profile_contact.youtube_link : '',
