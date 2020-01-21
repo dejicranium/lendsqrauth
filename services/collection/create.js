@@ -10,7 +10,7 @@ const crypto = require('crypto');
 const requests = require('mlar')('requests');
 const AuditLog = require('mlar')('audit_log');
 const sendCollectionCreatedEmail = require('../../utils/notifs/collection_created');
-const validateBorrowerBvnUniqueness = require('../../utils/collection').validateBorrowerBvnUniqueness
+const validateBorrowerBvnUniqueness = require('../../utils/collections').validateBorrowerBvnUniqueness
 var spec = morx.spec({})
 	.build('borrower_first_name', 'required:true, eg:lender')
 	.build('borrower_last_name', 'required:true, eg:lender')
