@@ -6,6 +6,7 @@ const validators = require('mlar')('validators');
 const assert = require('mlar')('assertions');
 const paginate = require('mlar')('paginate');
 const DEFAULT_EXCLUDES = require('mlar')('appvalues').DEFAULT_EXCLUDES;
+const roleUtils = require('../../utils/roles');
 
 var spec = morx.spec({})
 	.build('user_id', 'required:false, eg:1')
@@ -34,7 +35,6 @@ function service(data) {
 				exclude: [
 					'role_id',
 					...DEFAULT_EXCLUDES,
-					'parent_profile_id'
 				]
 			}
 
@@ -88,9 +88,24 @@ function service(data) {
 			return models.profile.findAndCountAll(query);
 
 		})
-		.then((profiles) => {
+		.then(async (profiles) => {
 			if (!profiles) throw new Error("No profile found")
-			d.resolve(paginate(profiles.rows, 'profiles', profiles.count, limit, page));
+			profiles.rows = JSON.parse(JSON.stringify(profiles.rows));
+
+
+			let finalresp = [];
+			profiles.rows.forEach(profile => {
+				if ((profile.role.name == "collaborator" || profile.role.name == "borrower")) {
+					if (profile.parent_profile_id) {
+						finalresp.push(profile);
+					}
+				} else {
+					finalresp.push(profile);
+				}
+			})
+
+
+			d.resolve(paginate(finalresp, 'profiles', profiles.count, limit, page));
 			//d.resolve(profiles)
 		})
 		.catch((err) => {
