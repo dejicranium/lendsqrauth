@@ -39,9 +39,9 @@ module.exports = {
             user_id: data.user_id
         }
         q.fcall(() => {
-            let url = config.wallet_service_base_url + 'wallets';
-            return makeRequest(url, 'POST', payload, constants.requestHeaders, 'create wallet');
-        })
+                let url = config.wallet_service_base_url + 'wallets';
+                return makeRequest(url, 'POST', payload, constants.requestHeaders, 'create wallet');
+            })
             .then(response => {
                 console.log(response);
                 d.resolve(response)
@@ -124,9 +124,9 @@ module.exports = {
 
         let normalizedTenor = normalizeTenor(data.tenor, data.tenor_type, data.num_of_collections, data.collection_frequency);
         data.tenor = normalizedTenor[0];
-        data.tenor_type  = normalizedTenor[1];
+        data.tenor_type = normalizedTenor[1];
 
-        data.start_date = resolveCollectionStartDate(data.start_date);    // resolve when collection should start -
+        data.start_date = resolveCollectionStartDate(data.start_date); // resolve when collection should start -
 
         switch (data.tenor_type) {
             case 'days':
@@ -233,7 +233,9 @@ module.exports = {
 
             })
             .catch(error => {
-                console.log(" error" + error);
+                //console.log(" error" + error);
+                console.log(error.response.data.errors)
+
                 d.reject(error)
             })
 
@@ -276,12 +278,12 @@ module.exports = {
                 }
             };
             return makeRequest(url, "POST", payload, constants.requestHeaders, "send email to new active user");
-        }).then(sent=> {
+        }).then(sent => {
             if (!sent) throw new Error("Could not send email to new active user");
             else {
                 d.resolve(sent);
             }
-        }).catch(error=> {
+        }).catch(error => {
             d.reject(error);
         });
 
@@ -290,14 +292,14 @@ module.exports = {
 
     getBanks(data) {
         const d = q.defer();
-        q.fcall(()=> {
-            let url = config.utility_base_url + 'util/fetch/bank';
-            return makeRequest(url, 'GET', payload, constant.requestHeaders, 'get banks');
-        })
-            .then(response=> {
+        q.fcall(() => {
+                let url = config.utility_base_url + 'util/fetch/bank';
+                return makeRequest(url, 'GET', payload, constant.requestHeaders, 'get banks');
+            })
+            .then(response => {
                 d.resolve(response)
             })
-            .catch(err=> {
+            .catch(err => {
                 d.reject(err)
             })
 

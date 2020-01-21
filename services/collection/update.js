@@ -13,7 +13,7 @@ const send_email = require('mlar').mreq('notifs', 'send');
 const detect_change = require('mlar')('detectchange');
 const validateCollectionSetup = require('../../utils/collections').validateSetup;
 const validateDateThresholds = require('../../utils/collections').validateDateThresholds;
-
+const initState = require('../../utils/init_state');
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
 var spec = morx
@@ -111,17 +111,25 @@ function service(data) {
             // see whether there is a product id attached to the collection or if user is trying to input one
 
             if (collection.product_id) {
-                product = await models.product.findOne({
+                /*product = await models.product.findOne({
                     where: {
                         id: collection.product_id
                     }
-                });
+                });*/
+                // get init state 
+                product = await initState.getInitState('collections', collection.id);
+
             } else if (params.product_id) {
                 product = await models.product.findOne({
                     where: {
                         id: params.product_id
                     }
                 });
+
+
+                // store state
+                await initState.storeState(product, 'collections', collection.id);
+
             } else {
                 //throw new Error('You need to provide a product id to proceed');
 
@@ -413,6 +421,8 @@ function service(data) {
             d.resolve(collection);
         })
         .catch((err) => {
+            console.log(err.stack);
+
             d.reject(err);
         });
 

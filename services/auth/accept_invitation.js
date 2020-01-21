@@ -63,7 +63,6 @@ function service(data) {
             d.resolve(`Invitation accepted`);
         })
         .catch((err) => {
-
             d.reject(err);
 
         });

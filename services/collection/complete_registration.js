@@ -10,6 +10,7 @@ const AuditLog = require('mlar')('audit_log');
 const send_email = require('mlar').mreq('notifs', 'send');
 const config = require('../../config');
 const requests = require('mlar')('requests');
+const initState = require('../../utils/init_state');
 
 /**  this is to be used by a borrower to reject a collections invitation 
  *  sent to him by a lender.
@@ -56,13 +57,17 @@ function service(data) {
                 where: {
                     id: instance.collection_id
                 },
-                include: [{
+                /*include: [{
                     model: models.product
-                }]
+                }]*/
             }), instance, params];
         })
         .spread(async (collection, instance, params) => {
             if (!collection) throw new Error("Could not find collection associated with this invitation");
+
+            let product = await initState.getInitState('collections', collection.id);
+            collection = JSON.parse(JSON.stringify(collection));
+            collection.product = JSON.parse(product.state);
 
             assert.mustBeValidPassword(params.password);
             if (params.password !== params.password_confirmation) throw new Error("Passwords do not match");
@@ -157,7 +162,11 @@ function service(data) {
 
 
             // create loan schedule
-            let product = await models.product.findOne({where: {id: collection.product_id}});
+            let product = await models.product.findOne({
+                where: {
+                    id: collection.product_id
+                }
+            });
             let params = {
                 amount: collection.amount,
                 tenor: collection.tenor,
