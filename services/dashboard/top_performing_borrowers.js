@@ -36,8 +36,8 @@ function service(data) {
                 cs.total_amount ELSE 0 END) as total_repaid FROM users as u \
                 INNER JOIN profiles as p ON p.user_id = u.id \
                 INNER JOIN collections AS c ON c.lender_id = p.parent_profile_id \
-                INNER JOIN collection_schedules AS cs ON cs.lender_id = c.lender_id \
-                WHERE p.parent_profile_id = ${data.profile.id} AND u.first_name is not null \
+                INNER JOIN collection_schedules AS cs ON cs.borrower_id = c.borrower_id \
+                WHERE cs.lender_id = ${data.profile.id} AND u.first_name is not null \
                 GROUP BY p.id ORDER BY total_amount DESC LIMIT ${limit}`;
 
             return models.sequelize.query(query)
