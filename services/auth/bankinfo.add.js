@@ -164,7 +164,7 @@ function service(data) {
                 }
                 await makeRequest(url, 'POST', payload, requestHeaders, 'Verify BVN');
 
-                return `Phone number is: ${phoneNumberFromBVN}`;
+                return `OTP sent to phone`;
             }
 
 
