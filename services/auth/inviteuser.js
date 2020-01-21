@@ -88,7 +88,7 @@ function service(data) {
 				});
 				params.uuid = Math.random().toString(36).substr(2, 9);
 				params.created_on = new Date();
-				params.parent_profile_id = data.profile.id;
+				//params.parent_profile_id = data.profile.id;
 				params.user_id = user.id;
 
 
@@ -124,7 +124,7 @@ function service(data) {
 				let new_profile = await models.profile.create({
 					role_id: params.role_id,
 					user_id: created1.id,
-					parent_profile_id: globalProfileId,
+					//parent_profile_id: globalProfileId,
 					uuid: Math.random().toString(36).substr(2, 9),
 					created_on: new Date()
 				});
