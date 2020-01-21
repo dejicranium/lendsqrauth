@@ -9,7 +9,7 @@ function getProfilesRoles(profiles) {
     q.fcall(async () => {
 
         profiles.forEach(profile => {
-            profileObjects.push(profile.role_id);
+            //profileObjects[ne]
         })
 
     })

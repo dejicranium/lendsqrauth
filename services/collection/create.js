@@ -40,6 +40,14 @@ function service(data) {
 			if (params.borrower_first_name.length < 3) throw new Error("Names must be more than 2 characters")
 			if (params.borrower_last_name.length < 3) throw new Error("Names must be more than 2 characters")
 
+			let requestUser = await models.user.findOne({
+				where: {
+					id: data.user.id
+				}
+			})
+
+			if (requestUser.email === params.borrower_email) throw new Error("You can't add yourself as a borrower");
+
 			assert.digitsOnly(params.borrower_bvn, null, 'BVN');
 			assert.digitsOnly(params.borrower_phone, null, 'Phone');
 			assert.emailFormatOnly(params.borrower_email, null, 'Email');
