@@ -106,9 +106,9 @@ function service(data) {
                         }
                     })
 
-                    if (!user_invite)
+                    if (!user_invite || !user_invite.id)
                         throw new Error("You haven't invited user with email: " + params.email);
-                    if (['accepted', 'declined'].includes(user_invite.status))
+                    if (['accepted'].includes(user_invite.status))
                         throw new Error("Invitation already " + user_invite.status);
 
                     payload.recipient = params.email;
