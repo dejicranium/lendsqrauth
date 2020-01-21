@@ -38,7 +38,7 @@ function service(data) {
                 INNER JOIN collections AS c ON c.lender_id = p.parent_profile_id \
                 INNER JOIN collection_schedules AS cs ON cs.borrower_id = c.borrower_id \
                 WHERE cs.lender_id = ${data.profile.id} AND u.first_name is not null \
-                GROUP BY p.id ORDER BY total_amount DESC LIMIT ${limit}`;
+                GROUP BY p.id ORDER BY total_repaid DESC LIMIT ${limit}`;
 
             return models.sequelize.query(query)
 
