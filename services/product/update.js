@@ -120,9 +120,7 @@ function service(data) {
 		.spread(async (product, params) => {
 			if (!product) throw new Error("No such product exists");
 			if (product.profile_id != data.profile.id) throw new Error("Can't update someone else's product");
-			if (product_utils.productHasActiveCollection(product)) {
-				throw new Error("Cannot update a product with at least one active collection")
-			}
+
 
 			if (params.product_name && product.product_name && (params.product_name != product.product_name)) {
 				let similar = await models.product.findAll({
