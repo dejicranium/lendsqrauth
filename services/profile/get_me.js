@@ -53,21 +53,24 @@ function service(data) {
             if (!profile) throw new Error("Profile not found")
             profile = JSON.parse(JSON.stringify(profile));
 
-            let default_social_links = {
-                facebook_link: profile.profile_contact.facebook_link,
-                twitter_link: profile.profile_contact.twitter_link,
-                instagram_link: profile.profile_contact.instagram_link,
-                linkedin_link: profile.profile_contact.linkedin_link,
-                youtube_link: profile.profile_contact.youtube_link
+            if (profile.profile_contact) {
+                let default_social_links = {
+                    facebook_link: profile.profile_contact.facebook_link,
+                    twitter_link: profile.profile_contact.twitter_link,
+                    instagram_link: profile.profile_contact.instagram_link,
+                    linkedin_link: profile.profile_contact.linkedin_link,
+                    youtube_link: profile.profile_contact.youtube_link
+                }
+
+                profile.profile_contact.social_links = default_social_links;
+
+                delete profile.profile_contact.twitter_link
+                delete profile.profile_contact.facebook_link
+                delete profile.profile_contact.twitter_link
+                delete profile.profile_contact.instagram_link
+                delete profile.profile_contact.linkedin_link
             }
 
-            profile.profile_contact.social_links = default_social_links;
-
-            delete profile.profile_contact.twitter_link
-            delete profile.profile_contact.facebook_link
-            delete profile.profile_contact.twitter_link
-            delete profile.profile_contact.instagram_link
-            delete profile.profile_contact.linkedin_link
 
 
             d.resolve(profile)
