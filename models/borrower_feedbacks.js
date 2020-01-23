@@ -5,9 +5,13 @@ module.exports = (sequelize, DataTypes) => {
     collection_id: DataTypes.INTEGER,
     borrower_email: DataTypes.STRING,
     type: DataTypes.STRING,
-    comment: DataTypes.STRING
-  }, {});
-  borrower_feedbacks.associate = function(models) {
+    comment: DataTypes.STRING,
+    created_on: DataTypes.DATE
+  }, {
+    timestamps: false,
+    timestamp: false,
+  });
+  borrower_feedbacks.associate = function (models) {
     // associations can be defined here
   };
   return borrower_feedbacks;

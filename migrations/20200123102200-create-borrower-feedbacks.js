@@ -23,14 +23,10 @@ module.exports = {
       comment: {
         type: Sequelize.STRING
       },
-      createdAt: {
-        allowNull: false,
-        type: Sequelize.DATE
-      },
-      updatedAt: {
-        allowNull: false,
+      created_on: {
         type: Sequelize.DATE
       }
+
     });
   },
   down: (queryInterface, Sequelize) => {
