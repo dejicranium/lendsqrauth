@@ -2,20 +2,18 @@ const models = require('mlar')('models');
 const ErrorLogger = require('mlar')('errorlogger');
 const morx = require('morx');
 const q = require('q');
-const validators = require('mlar')('validators');
 const assert = require('mlar')('assertions');
 const requests = require('mlar')('requests');
 const makeRequest = require('mlar')('makerequest');
 const config = require('../../config');
 const resolvers = require('mlar')('resolvers');
-const collection_utils = require('mlar')('collection_utils');
 const AuditLog = require('mlar')('audit_log');
 const moment = require('moment');
 const send_email = require('mlar').mreq('notifs', 'send');
 const detect_change = require('mlar')('detectchange');
 const validateCollectionSetup = require('../../utils/collections').validateSetup;
 const validateDateThresholds = require('../../utils/collections').validateDateThresholds;
-
+const initState = require('../../utils/init_state');
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
 var spec = morx
@@ -42,7 +40,6 @@ var spec = morx
 function service(data) {
     var d = q.defer();
     const globalUserId = data.USER_ID || 1;
-    let tenor_just_added = false;
 
     q
         .fcall(async () => {
@@ -114,17 +111,25 @@ function service(data) {
             // see whether there is a product id attached to the collection or if user is trying to input one
 
             if (collection.product_id) {
-                product = await models.product.findOne({
+                /*product = await models.product.findOne({
                     where: {
                         id: collection.product_id
                     }
-                });
+                });*/
+                // get init state 
+                product = await initState.getInitState('collections', collection.id);
+
             } else if (params.product_id) {
                 product = await models.product.findOne({
                     where: {
                         id: params.product_id
                     }
                 });
+
+
+                // store state
+                await initState.storeState(product, 'collections', collection.id);
+
             } else {
                 //throw new Error('You need to provide a product id to proceed');
 
@@ -222,18 +227,20 @@ function service(data) {
                     throw new Error("Disbursement mode should be either cash or transfer")
             }
             if (params.loan_status) {
-                if (!['disbursed', 'active', 'past due', 'approved'].includes(params.loan_status.toLowerCase()))
+                if (!['disbursed', 'active', 'past_due', 'approved'].includes(params.loan_status.toLowerCase()))
                     throw new Error("Loan status should be one of disbursed, approved, active or past due")
             }
             if (params.start_date) assert.dateFormatOnly(params.start_date, null, 'Start Date');
 
             if (params.num_of_collections) {
                 assert.digitsOnly(params.num_of_collections, null, 'No. of collections');
+                assert.greaterThanZero(params.num_of_collections, null, 'Number of collections');
             }
             return [product, collection, params];
         })
         .spread((product, collection, params) => {
             if (!collection) throw new Error('No such product exists');
+
             // you can't change a loan's product id after it has been set
             if (params.product_id && collection.status === 'active')
                 throw new Error('Cannot re-update product id of a created collection');
@@ -241,8 +248,6 @@ function service(data) {
             //params.profile_id = data.profile.id
             params.modified_on = new Date();
             params.modified_by = globalUserId;
-
-            tenor_just_added = !collection.tenor && params.tenor; // tenor_just_added was declared at the beginning of the function
 
             return [
                 collection.update({
@@ -395,11 +400,11 @@ function service(data) {
                                     }
                                 })
                                 await models.collection_schedules.bulkCreate(bulkdata)
-                                console.log(resp)
+                                //console.log(resp)
                             })
                             .catch(err => {
                                 //silent failure
-                                console.log(err)
+                                //console.log(err)
                             })
                         */
                     }
@@ -416,6 +421,8 @@ function service(data) {
             d.resolve(collection);
         })
         .catch((err) => {
+            //console.log(err.stack);
+
             d.reject(err);
         });
 

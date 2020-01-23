@@ -43,10 +43,11 @@ function service(data) {
 			if (params.min_tenor) assert.digitsOnly(params.min_tenor, null, 'min tenor')
 
 			if (params.max_tenor && params.min_tenor) {
-				if (params.min_tenor > params.max_tenor) {
+				if (parseInt(params.min_tenor) > parseInt(params.max_tenor)) {
 					throw new Error("Min tenor cannot be greater than max tenor")
 				}
 			}
+
 
 			// interest must be a digit or a float
 			if (params.interest) {
@@ -119,9 +120,7 @@ function service(data) {
 		.spread(async (product, params) => {
 			if (!product) throw new Error("No such product exists");
 			if (product.profile_id != data.profile.id) throw new Error("Can't update someone else's product");
-			if (product_utils.productHasActiveCollection(product)) {
-				throw new Error("Cannot update a product with at least one active collection")
-			}
+
 
 			if (params.product_name && product.product_name && (params.product_name != product.product_name)) {
 				let similar = await models.product.findAll({

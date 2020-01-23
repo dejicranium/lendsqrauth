@@ -22,7 +22,7 @@ function vinfo(req, res, next) {
         .catch(error => {
             utils.jsonF(res, null, error.message);
 
-            //require('mlar')('locallogger').error(req, res.statusCode, error.message);
+            //        })
         })
 }
 

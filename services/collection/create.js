@@ -10,7 +10,9 @@ const crypto = require('crypto');
 const requests = require('mlar')('requests');
 const AuditLog = require('mlar')('audit_log');
 const sendCollectionCreatedEmail = require('../../utils/notifs/collection_created');
-const validateBorrowerBvnUniqueness = require('../../utils/collection').validateBorrowerBvnUniqueness
+const validateBorrowerBvnUniqueness = require('../../utils/collections').validateBorrowerBvnUniqueness
+const verifications = require('../../utils/verifications');
+
 var spec = morx.spec({})
 	.build('borrower_first_name', 'required:true, eg:lender')
 	.build('borrower_last_name', 'required:true, eg:lender')
@@ -38,6 +40,14 @@ function service(data) {
 			if (params.borrower_first_name.length < 3) throw new Error("Names must be more than 2 characters")
 			if (params.borrower_last_name.length < 3) throw new Error("Names must be more than 2 characters")
 
+			let requestUser = await models.user.findOne({
+				where: {
+					id: data.user.id
+				}
+			})
+
+			if (requestUser.email === params.borrower_email) throw new Error("You can't add yourself as a borrower");
+
 			assert.digitsOnly(params.borrower_bvn, null, 'BVN');
 			assert.digitsOnly(params.borrower_phone, null, 'Phone');
 			assert.emailFormatOnly(params.borrower_email, null, 'Email');
@@ -62,36 +72,10 @@ function service(data) {
 			);
 
 
-			const requestHeaders = {
-				'Content-Type': 'application/json',
-			};
-
-			if (params.borrower_bvn) {
-				// first verify that there is a bvn
-				let url = config.utility_base_url + "verify/bvn";
-				let payload = {
-					bvn: params.borrower_bvn
-				};
-
-				let verifiedBVN = await makeRequest(url, 'POST', payload, requestHeaders, 'Verify BVN');
-
-				if (verifiedBVN && verifiedBVN.mobile) {} else {
-					throw new Error("Could not verify BVN");
-				}
-
-			}
-
 			await validateBorrowerBvnUniqueness(params.borrower_email, params.borrower_bvn);
+			await verifications.verifyBVN(params.borrower_bvn);
+			await verifications.verifyPhone(params.borrower_phone);
 
-			// make request to verify phone number
-			const verifiedPhone = await makeRequest(
-				config.utility_base_url + 'verify/phone/',
-				'POST', {
-					phone: params.borrower_phone
-				},
-				requestHeaders,
-				'validate phone number'
-			)
 
 
 			let user_with_email_exists = false;

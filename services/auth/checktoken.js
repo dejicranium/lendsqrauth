@@ -12,6 +12,7 @@ const moment = require('moment');
 const AuditLog = require('mlar')('audit_log');
 const requests = require('mlar')('requests');
 const send_email = require('mlar').mreq('notifs', 'send');
+const config = require('../../config')
 
 
 var spec = morx.spec({})

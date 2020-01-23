@@ -69,15 +69,15 @@ function service(data) {
 
             if (data.profile.role !== 'admin') {
                 //
-                data.where.inviter_id =  data.profile.id
+                data.where.inviter_id = data.profile.id
             }
 
             data.include = [{
                 model: models.collection,
                 attributes: ['id', 'product_id'],
-                include: {
+                /*include: {
                     model: models.product
-                },
+                },*/
             }]
 
             data.order = [
@@ -87,9 +87,25 @@ function service(data) {
             return [models.borrower_invites.findAndCountAll(data), data];
 
         })
-        .spread((borrower_invites, data) => {
+        .spread(async (borrower_invites, data) => {
             if (!borrower_invites) throw new Error("No schedules available");
+            borrower_invites.rows = JSON.parse(JSON.stringify(borrower_invites.rows));
 
+            let collection_ids = borrower_invites.rows.map(iv => iv.collection_id);
+
+            let initStates = await models.collection_init_state.findAll({
+                where: {
+                    collection_id: collection_ids
+                }
+            })
+            borrower_invites.rows.map(iv => {
+                let product_state = initStates.find(s => s.collection_id == iv.collection_id);
+                if (product_state) {
+                    product_state = JSON.parse(product_state.state)
+                    iv.collection.product = product_state;
+                    return iv;
+                }
+            })
             d.resolve(paginate(borrower_invites.rows, 'invitations', borrower_invites.count, Number(data.limit), data.page));
         })
         .catch((err) => {

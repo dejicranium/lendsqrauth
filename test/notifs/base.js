@@ -21,7 +21,7 @@ describe('#Created Collection notif', () => {
     it("should send collection created url", (done) => {
         collection_created(payload).then((result) => {
             result.should.be.a("object");
-            console.log(result);
+            //console.log(result);
             done();
         }).catch(err => {
                 done(err);

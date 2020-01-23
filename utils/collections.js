@@ -169,13 +169,14 @@ function resolveStartDate(startDate) {
     return startDate;
 }
 
-function validateBorrowerBvnUniqueness(email, bvn) {
+async function validateBorrowerBvnUniqueness(email, bvn) {
+    //console.log('verifying borrower uniqueness');
     const d = q.defer();
     q.fcall(() => {
             // see if a bank information already has that bvn
             return models.user_bank.findOne({
                 where: {
-                    bvn: bvn
+                    bvn: bvn.toString()
                 }
             })
         })
@@ -193,12 +194,14 @@ function validateBorrowerBvnUniqueness(email, bvn) {
                 if (user && user.id && user.email !== email) {
                     throw new Error("A user with a different email address already exists with this BVN");
                 } else {
+
                     d.resolve('proceed')
                 }
             }
         })
         .catch(err => {
-            d.resolve(err)
+
+            d.reject(err)
         })
 
     return d.promise;

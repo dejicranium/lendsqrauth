@@ -8,7 +8,7 @@ const AuditLog = require('mlar')('audit_log');
 const requests = require('mlar')('requests');
 const send_email = require('mlar').mreq('notifs', 'send');
 const config = require('../../config');
-
+const initState = require('../../utils/init_state')
 
 /**  this is to be used by a borrower to reject a collections invitation 
  *  sent to him by a lender.
@@ -80,7 +80,10 @@ function service(data) {
             let borrower = await models.profile.findOne({
                 where: {
                     id: collection.borrower_id
-                }
+                },
+                include: [{
+                    model: models.user
+                }]
             });
 
             let borrower_userId = null;
@@ -98,7 +101,14 @@ function service(data) {
             });
 
 
-            let product = await models.product.findOne({where: {id: collection.product_id}});
+            /* let product = await models.product.findOne({
+                 where: {
+                     id: collection.product_id
+                 }
+
+        });*/
+            let product = await initState.getInitState('collections', collection.id);
+
             let params = {
                 amount: collection.amount,
                 tenor: collection.tenor,
@@ -108,7 +118,8 @@ function service(data) {
                 interest_period: product.interest_period,
                 start_date: collection.start_date,
                 collection_frequency: collection.collection_frequency,
-                repayment_model: product.repayment_model
+                repayment_model: product.repayment_model,
+
             };
 
             // first, send email notification to the lender;
@@ -118,16 +129,16 @@ function service(data) {
             let confirmation_email_payload = {
                 lenderFullName: lender.user.first_name ? lender.user.first_name + ' ' + lender.user.last_name : lender.user.business_name,
                 loanAmount: collection.amount,
-                borrowerName:collection.borrower_first_name + ' ' + collection.borrower_last_name,
+                borrowerName: collection.borrower_first_name + ' ' + collection.borrower_last_name,
                 interestRate: product.interest + '%',
                 interestPeriod: product.interest_period,
                 tenor: collection.tenor + ' ' + product.tenor_type,
                 link: config.base_url + 'collections',
-                loanRepaymentURL: '',  //TODO: makee sure that this links to reapyment schedule url
+                loanRepaymentURL: '', //TODO: makee sure that this links to reapyment schedule url
             };
             // SEND!
-            send_email(LENDER_COLLECTION_CONFIRMATION_EMAIL_CONTEXT_ID, confirmation_email_payload);
-            send_email(BORROWER_COLLECTION_CONFIRMATION_EMAIL_CONTEXT_ID, confirmation_email_payload);
+            send_email(LENDER_COLLECTION_CONFIRMATION_EMAIL_CONTEXT_ID, lender.user.email, confirmation_email_payload);
+            send_email(BORROWER_COLLECTION_CONFIRMATION_EMAIL_CONTEXT_ID, borrower.user.email, confirmation_email_payload);
 
 
             let result = await requests.createCollectionSchedule(params)
@@ -168,11 +179,11 @@ function service(data) {
                         }
                     });
                     await models.collection_schedules.bulkCreate(bulkdata);
-                    console.log(resp);
+                    //console.log(resp);
                 })
                 .catch(err => {
                     //silent failure
-                    console.log(err)
+                    //console.log(err)
                 })
 
 
