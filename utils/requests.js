@@ -161,7 +161,7 @@ module.exports = {
         let repayment_model = null;
         switch (data.repayment_model) {
 
-            case 'equal_installments':
+            case 'equal installments':
                 repayment_model = 1;
                 break;
             default:
@@ -210,7 +210,7 @@ module.exports = {
             "interestRatePerPeriod": data.interest,
             "interestRateFrequencyType": data.interest_period,
             "amortizationType": repayment_model,
-            "interestType": 0,
+            "interestType": repayment_model == 1 ? 1 : 0,
             "interestCalculationPeriodType": 1,
             "expectedDisbursementDate": moment(data.start_date).format('DD MMMM YYYY'), //"20 September 2011"
             "transactionProcessingStrategyId": 2,

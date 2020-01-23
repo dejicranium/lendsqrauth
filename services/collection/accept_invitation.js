@@ -118,7 +118,8 @@ function service(data) {
                 interest_period: product.interest_period,
                 start_date: collection.start_date,
                 collection_frequency: collection.collection_frequency,
-                repayment_model: product.repayment_model
+                repayment_model: product.repayment_model,
+
             };
 
             // first, send email notification to the lender;
