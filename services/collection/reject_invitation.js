@@ -80,7 +80,7 @@ function service(data) {
             let feedback = '';
 
             if (params.feedback) {
-                feedback = params.feedback.split(',');
+                feedback = params.feedback.split('--');
                 feedback = JSON.stringify(feedback)
             }
 
