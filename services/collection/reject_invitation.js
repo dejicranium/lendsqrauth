@@ -14,6 +14,8 @@ const config = require('../../config');
  */
 var spec = morx.spec({})
     .build('token', 'required:true')
+    .build('feedback', 'required:false')
+
     .end();
 
 function service(data) {
@@ -39,7 +41,7 @@ function service(data) {
 
             if (!instance) throw new Error("Invalid token");
             if (instance.token_is_used) throw new Error("Token is already used");
-            
+
             return [
                 models.collection.findOne({
                     where: {
@@ -48,13 +50,15 @@ function service(data) {
                     }
                 }),
 
-                instance
+                instance,
+
+                params
             ];
         })
-        .spread(async (collection, instance) => {
+        .spread(async (collection, instance, params) => {
             if (!collection) throw new Error("Could not find collection");
 
-           // DELETE THE CREATED USER ACCOUNT AND PROFILE
+            // DELETE THE CREATED USER ACCOUNT AND PROFILE
             let borrower_profile = await models.profile.findOne({
                 where: {
                     id: instance.profile_created_id
@@ -66,14 +70,27 @@ function service(data) {
                     id: borrower_profile.user_id
                 }
             });
-            await borrower_profile.update({deleted_flag:1});
-            await user.update({deleted_flag:1});
+            await borrower_profile.update({
+                deleted_flag: 1
+            });
+            await user.update({
+                deleted_flag: 1
+            });
+
+            let feedback = '';
+
+            if (params.feedback) {
+                feedback = params.feedback.split(',');
+                feedback = JSON.stringify(feedback)
+            }
 
             await instance.update({
+                feedback,
                 token_is_used: true,
                 status: 'Declined',
-                date_declined: new Date()
+                date_declined: new Date(),
             });
+
 
             collection.status = DECLINED_STATUS;
             return collection.save();
