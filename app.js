@@ -107,6 +107,8 @@ app.use(function (req, res, next) {
     query: scrubber(req.query, scrubs),
     headers: scrubber(req.headers, scrubs),
     useragent: req.headers['user-agent'],
+    environment: process.env.NODE_ENV,
+
 
 
   };

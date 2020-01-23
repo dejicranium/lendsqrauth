@@ -51,6 +51,7 @@ function json_send(res, data, message, status, status_code, meta, is_error) {
 		message: res.statusMessage,
 		userId: res.userId,
 		profileId: res.profileId,
+		environment: process.env.NODE_ENV,
 		data: {
 			status: response_json.status,
 			message: response_json.message,
