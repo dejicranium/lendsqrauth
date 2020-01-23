@@ -156,7 +156,8 @@ function service(data) {
                 interestPeriod: collection.product.interest_period,
                 tenor: collection.tenor + ' ' + collection.product.tenor_type,
                 link: config.base_url + 'collections',
-                loanRepaymentURL: '', //TODO: makee sure that this links to reapyment schedule url
+                collectionScheduleURL: config.base_url + 'collections', //TODO: makee sure that this links to reapyment schedule url
+                loanRepaymentScheduleURL: config.base_url + 'collections'
             };
 
 
