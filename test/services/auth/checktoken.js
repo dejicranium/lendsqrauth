@@ -18,7 +18,7 @@ describe('#Sign up user', () => {
 
     it.skip('should verify an auth token', (done) => {
         checktoken(params).then((result) => {
-                console.log(result);
+                //console.log(result);
                 result.should.be.a('object');
                 done();
             })

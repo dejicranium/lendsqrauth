@@ -1,5 +1,6 @@
 const axios = require('axios');
 const q = require('q');
+const elasticLog = require('mlar')('locallogger');
 
 
 
@@ -12,6 +13,13 @@ module.exports = (url, method, payload, headers, caller = null, defaultheaders =
     if (attachservicekey) {
         headers['service_access_key'] = '34$4l43*(z.er1*(7)&^'
     }
+    elasticLog.info({
+        type: `api-call`,
+        message: `calling: ${url}`,
+        data: payload,
+        url: url,
+        method: method
+    })
 
     q.fcall(() => {
         return axios({
@@ -21,35 +29,35 @@ module.exports = (url, method, payload, headers, caller = null, defaultheaders =
             headers: headers,
         })
     }).then(response => {
-        console.log("called " + url)
         if (defaultheaders) {
             response = response.data.data
         } else {
             response = response.data
         }
-        console.log(response);
+
+        //console.log(response);
         d.resolve(response);
     }).catch(err => {
-        /*err = err.response ? error.response.data : err
-        err = err.error ? err.error : err
-        err = err.message ? err.message : err
+
+        //console.log(err.response.data.errors)*/
+        ////console.log(err)
+
+        err = err.response ? error.response : err
+        err = err.data ? err.data : err
         err = err.errors ? err.errors : err
-        console.log(err.response.data.errors)*/
-        //console.log(err)
 
-        require('mlar')('locallogger').error({}, {}, {
-            from: url,
-            type: 'request-error',
-            error: err
-        });
 
-        console.log(err);
         if (caller) {
             d.reject(new Error(`Could not ${caller}`))
             //throw new Error(`Could not ${caller}. Reason: ` + err );
 
         }
-        //throw new Error(err);
+        elasticLog.info({
+            type: `API call`,
+            message: `Eerror from calling: ${url}. Reason: ${err}`,
+            data: payload
+        })
+
         d.reject(err)
     })
 

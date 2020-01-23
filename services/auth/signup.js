@@ -131,7 +131,7 @@ function service(data) {
             } else if (user && !user.password) {
                 return models.sequelize.transaction((t1) => {
                     // create a user and his profile            
-                    return q.all([
+                    return q.all([   /// in cases wheere user's information had been saved because he was invited by a user and had decined
                         user.update(params, {
                             transaction: t1
                         }),
@@ -223,10 +223,10 @@ function service(data) {
                         service_access_key: service_access_key,
                         user_id: userId
                     }, {}, null, false, true).then(resp => {
-                        console.log(resp)
+                        //console.log(resp)
                     })
                     .catch(err => {
-                        console.log(err)
+                        //console.log(err)
 
                     })
 
@@ -272,7 +272,7 @@ function service(data) {
             d.resolve(user);
         })
         .catch((err) => {
-            //console.log(err.stack);
+            ////console.log(err.stack);
             d.reject(err);
 
 

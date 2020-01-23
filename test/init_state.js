@@ -18,7 +18,7 @@ describe('#INitState', function () {
             'created_on': "ne"
         });
         state.should.be.a('string');
-        console.log(state)
+        //console.log(state)
 
     })
 
@@ -27,22 +27,22 @@ describe('#INitState', function () {
         init_state.storeState({
                 product_name: "Deji"
             }, 'collections', 1).then((result) => {
-                console.log(result);
+                //console.log(result);
                 result.should.be.a('object');
             })
             .catch(err => {
-                console.log(err);
+                //console.log(err);
             })
 
     })
     it('getInitState', async () => {
 
         init_state.getInitState('collections', 12).then((result) => {
-                console.log(result);
+                //console.log(result);
                 result.should.be.a('object');
             })
             .catch(err => {
-                console.log(err);
+                //console.log(err);
             })
 
     })

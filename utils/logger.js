@@ -10,14 +10,14 @@ module.exports = function (data, label, type) {
 	var _type = type || 'log';
 
 	if(do_console_log){
-		console.log(" ");
-		console.log("***************************");
-		console.log("***************************");
-		console.log(_label, new Date());
-		console.log(_data);
-		console.log("***************************");
-		console.log("***************************");
-		console.log(" ");
+		//console.log(" ");
+		//console.log("***************************");
+		//console.log("***************************");
+		//console.log(_label, new Date());
+		//console.log(_data);
+		//console.log("***************************");
+		//console.log("***************************");
+		//console.log(" ");
 	}
 
 	if(send_mlite){

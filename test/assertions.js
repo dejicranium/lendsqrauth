@@ -15,14 +15,14 @@ describe('#Assertions', function () {
 
     it('should not be greater than 0', async (done) => {
         let result = assertions.greaterThanZero(1)
-        console.log(result)
+        //console.log(result)
 
         result.should.be.a('string');
     })
 
     it('should not have decimal', async (done) => {
         let result = assertions.notDecimal(3)
-        console.log(result)
+        //console.log(result)
 
         result.should.be.a('string');
     })

@@ -4,6 +4,9 @@
     "token": 1,
     "api_key": 1,
     "api_secret": 1,
-    "vnuban":1,
-    "bvsn": 1
+    "vnuban": 1,
+    "bvsn": 1,
+    "profile_token": 1,
+    "Authorization Bearer": 1,
+    "authorization": 1
 }

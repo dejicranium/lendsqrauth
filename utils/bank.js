@@ -23,8 +23,8 @@ module.exports = {
 
         let validnames = 0;
 
-        console.log("account name is " + account_name_as_list)
-        console.log(" name is " + name_as_list)
+        //console.log("account name is " + account_name_as_list)
+        //console.log(" name is " + name_as_list)
 
         for (let i = 0; i < name_as_list.length; i++) {
             for (let a = 0; a < account_name_as_list.length; a++) {
@@ -33,7 +33,7 @@ module.exports = {
 
                 if (a_name.indexOf(name_.toLowerCase()) > -1) {
                     validnames++;
-                    //console.log(a_name + " matches " + name_)
+                    ////console.log(a_name + " matches " + name_)
                     continue;
                 }
             }

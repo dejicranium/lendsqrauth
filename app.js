@@ -10,14 +10,14 @@ try {
     envPath = `.${appEnvProfile}`;
   }
   const fullEnvPath = './config/env' + envPath + '.json';
-  // console.log(fullEnvPath);
+  // //console.log(fullEnvPath);
   var envJSON = require(fullEnvPath);
   for (var envProp in envJSON) {
     process.env[envProp] = envJSON[envProp];
   }
-  //console.log(envJSON);
+  ////console.log(envJSON);
 } catch (e) {
-  //console.log(e);
+  ////console.log(e);
 }
 //========================
 var models = require('./models/sequelize');
@@ -62,7 +62,7 @@ if (process.env.MONGODB_URI) {
 }
 const reqIp = require('request-ip');
 const logger = require('mlar')('mongolog');
-const logly = require('mlar')('locallogger');
+const elasticLog = require('mlar')('locallogger');
 const scrubber = require('mlar')('obscrub');
 const SCRUBVALS = require('./utils/scrubvals.json');
 
@@ -95,7 +95,9 @@ app.use(function (req, res, next) {
     'NOREQID' + Math.ceil(Date.now() + Math.random() * 98984328);
   res._$appreqid = reqid; //Need this so response can have the value for logging as well
   const scrubs = SCRUBVALS;
+
   const reqlog = {
+    id: reqid,
     protocol: req.protocol,
     host: req.get('host'),
     endpoint: req.baseUrl + req.path,
@@ -104,26 +106,33 @@ app.use(function (req, res, next) {
     body: scrubber(req.body, scrubs),
     query: scrubber(req.query, scrubs),
     headers: scrubber(req.headers, scrubs),
-    useragent: req.headers['user-agent']
+    useragent: req.headers['user-agent'],
+
+
   };
 
-  logger({
-    type: 'request',
-    id: reqid,
-    comment: 'Request',
-    data: reqlog
-  });
+  elasticLog.info(JSON.Sreqlog)
+  //console.log('req.id req.id ' + reqid)
+  ////console.log('**userId ' + req.user.id)
+
   /*
-    logly.info(JSON.stringify({
+    logger({
       type: 'request',
       id: reqid,
       comment: 'Request',
-      data: reqlog,
-      message: 'lame',
-      status: 200,
-      service: "Messaging",
-      method: 'get'
-    }));*/
+      data: reqlog
+    });
+    /*
+      logly.info(JSON.stringify({
+        type: 'request',
+        id: reqid,
+        comment: 'Request',
+        data: reqlog,
+        message: 'lame',
+        status: 200,
+        service: "Messaging",
+        method: 'get'
+      }));*/
 
   next();
 });
@@ -159,7 +168,7 @@ app.use(base, function (req, res, next) {
 
 // start cron job
 
-console.log("Config file is " + process.env.base_url)
+//console.log("Config file is " + process.env.base_url)
 
 //get_collection_schedules();
 
@@ -167,7 +176,7 @@ var force_sync = process.env.FORCESYNC ? true : false;
 
 var stage = process.env.NODE_ENV || 'development-local';
 
-console.log('environment is ' + process.env.NODE_ENV);
+//console.log('environment is ' + process.env.NODE_ENV);
 if (
   stage === 'development' ||
   stage === 'test' ||
@@ -183,8 +192,8 @@ if (
     .then(function () {
       app.listen(appConfig.port, function () {
         //runWorker();
-        // console.log(stage);
-        console.log([appConfig.name, 'is running on port', appConfig.port.toString()].join(' '));
+        // //console.log(stage);
+        //console.log([appConfig.name, 'is running on port', appConfig.port.toString()].join(' '));
       });
     });
 }

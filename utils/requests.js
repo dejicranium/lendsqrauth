@@ -43,11 +43,11 @@ module.exports = {
                 return makeRequest(url, 'POST', payload, constants.requestHeaders, 'create wallet');
             })
             .then(response => {
-                console.log(response);
+                //console.log(response);
                 d.resolve(response)
             })
             .catch(err => {
-                console.log(err);
+                //console.log(err);
                 d.reject(err);
             });
 
@@ -168,8 +168,8 @@ module.exports = {
                 repayment_model = 0;
                 break;
         }
-        console.log('tenor type is ' + data.tenor_type);
-        console.log('tenor type value is ' + tenor_type_value);
+        //console.log('tenor type is ' + data.tenor_type);
+        //console.log('tenor type value is ' + tenor_type_value);
 
 
         const d = q.defer();
@@ -221,20 +221,20 @@ module.exports = {
         const url = config.mifos_base_url + `loans?command=calculateLoanSchedule`
 
         q.fcall(async () => {
-                console.log('weerwer')
+                //console.log('weerwer')
                 return makeRequest(url, 'POST', params, constants.mifos_headers, null, false);
             })
             .then(response => {
                 //if(!response) throw new Error(response);
                 //d.resolve(moment(data.disbursement_date).format('DD MMMM YYYY'))
-                console.log('response is ' + response);
-                console.log(response)
+                //console.log('response is ' + response);
+                //console.log(response)
                 d.resolve(response)
 
             })
             .catch(error => {
-                //console.log(" error" + error);
-                console.log(error.response.data.errors)
+                ////console.log(" error" + error);
+                //console.log(error.response.data.errors)
 
                 d.reject(error)
             })

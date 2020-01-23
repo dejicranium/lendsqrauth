@@ -37,7 +37,7 @@ function service(data) {
         return logged_object;
     }) 
     .then( created_log => {
-        //console.log(created_log);
+        ////console.log(created_log);
         d.resolve(1);
     })
     .catch( e => {
