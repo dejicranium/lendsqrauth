@@ -37,7 +37,7 @@ function service(data) {
                 FROM lendsqr_auth.users as u 
                     INNER JOIN lendsqr_auth.profiles as p ON p.user_id = u.id 
                     INNER JOIN lendsqr_auth.collection_schedules AS cs ON cs.borrower_id = p.id 
-                    WHERE cs.lender_id = ${data.profile_id} AND u.first_name is not null 
+                    WHERE cs.lender_id = ${data.profile.id} AND u.first_name is not null 
                     GROUP BY p.id ORDER BY total_amount DESC LIMIT ${limit}`;;
 
             return models.sequelize.query(query)
