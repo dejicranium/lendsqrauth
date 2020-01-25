@@ -16,7 +16,11 @@ if (process.env.NODE_ENV === 'production') {
         notif_base_url: process.env.notif_base_url || 'https://v2-test.lendsqr.com/api/v1/notification/',
         utility_base_url: process.env.utility_base_url || 'https://v2-test.lendsqr.com/api/v1/util/',
 
-
+        aws_s3base_url: process.env.AWS_S3BASE || "https://lendsqr-files.s3.us-east-2.amazonaws.com/downloads/",
+        aws_access_key: process.env.aws_access_key || "AKIAVDBVPR56O5DJRBKP",
+        aws_secret_key: process.env.aws_secret_key || "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",
+        
+        
         base_url: process.env.base_url || 'http://staging-lb-978527258.us-east-2.elb.amazonaws.com/',
 
 
@@ -42,6 +46,7 @@ if (process.env.NODE_ENV === 'production') {
         notif_base_url: process.env.notif_base_url || 'https://v2-test.lendsqr.com/api/v1/notification/',
         utility_base_url: process.env.utility_base_url || 'https://v2-test.lendsqr.com/api/v1/util/',
 
+        aws_s3base_url: process.env.AWS_S3BASE || "https://lendsqr-files.s3.us-east-2.amazonaws.com/downloads/",
 
         base_url: process.env.base_url || 'https://v2-test.lendsqr.com/',
 

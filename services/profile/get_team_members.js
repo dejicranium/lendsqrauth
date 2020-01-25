@@ -21,7 +21,6 @@ function service(data) {
 
 	data.limit = limit;
 	data.offset = offset;
-	let g_Invites = null;
 
 	q.fcall(async () => {
 			const validParameters = morx.validate(data, spec, {
@@ -31,13 +30,14 @@ function service(data) {
 
 			data.where = {
 				//parent_profile_id: data.profile.id, // profile of the user making the request
-				status: 'accepted',
+				//status: 'accepted',
 				inviter: data.profile.id
 			};
 
 
 			data.include = [{
 				model: models.profile,
+				where: {},
 				include: [{
 						model: models.role,
 						exclude: DEFAULT_EXCLUDES
@@ -52,41 +52,82 @@ function service(data) {
 				]
 			}]
 
-		if (data.first_name) {
-			data.include[0].include[1].where.first_name = {$like: '%' + data.first_name + '%'};
+			if (data.first_name) {
+				data.include[0].include[1].required = true;
 
-		}
-		if (data.last_name) {
-			data.include[0].include[1].where.last_name = {$like: '%' + data.last_name + '%'};
+				data.include[0].include[1].where.first_name = {
+					$like: '%' + data.first_name + '%'
+				};
 
-		}
-		if (data.email) {
-			data.include[0].include[1].where.email = {$like: '%' + data.email + '%'}
-		}
-		delete  data.first_name;
-		delete data.last_name;
-		delete data.email;
+			}
+			if (data.last_name) {
+				data.include[0].include[1].required = true;
 
-		// if we are searching by term
-		if (data.search) {
-			delete  data.where;
-			// search first name, last name ,email , business name and phone;
-			data.include[0].include[1].where.$or = [
-				{first_name: {$like: '%' + data.search + '%'}},
-				{last_name: {$like: '%' + data.search + '%'}},
-				{business_name: {$like: '%' + data.search + '%'}},
-				{phone: {$like: '%' + data.search + '%'}},
+				data.include[0].include[1].where.last_name = {
+					$like: '%' + data.last_name + '%'
+				};
+
+			}
+
+			if (data.status) {
+				data.status = data.status.toLowerCase();
+				data.where.status = data.status;
+			}
+
+			if (data.email) {
+				data.include[0].include[1].required = true;
+
+				data.include[0].include[1].where.email = {
+					$like: '%' + data.email + '%'
+				}
+			}
+			delete data.first_name;
+			delete data.last_name;
+			delete data.email;
+			delete data.status;
+
+			// if we are searching by term
+			if (data.search) {
+				delete data.where;
+				data.include[0].include[1].required = true;
+				data.include[0].required = true;
+				data.include[0].where.parent_profile_id = data.profile.id;
+
+				// search first name, last name ,email , business name and phone;
+				data.include[0].include[1].where.$or = [{
+						first_name: {
+							$like: '%' + data.search + '%'
+						}
+					},
+					{
+						last_name: {
+							$like: '%' + data.search + '%'
+						}
+					},
+					{
+						business_name: {
+							$like: '%' + data.search + '%'
+						}
+					},
+					{
+						phone: {
+							$like: '%' + data.search + '%'
+						}
+					},
+				];
+			}
+			data.order = [
+				['id', 'DESC']
 			];
-			data.include[0].include[1].required = true;
-		}
-		data.order = [['id', 'DESC']];
-		// if (data.sort)
-		if (data.sort) {
-			data.order = [[
-				data.sort,
-				'DESC'
-			]]
-		}
+			// if (data.sort)
+			if (data.sort) {
+				data.order = [
+					[
+						data.sort,
+						'DESC'
+					]
+				]
+			}
 			return models.user_invites.findAndCountAll(data);
 		})
 		.then((invites) => {
