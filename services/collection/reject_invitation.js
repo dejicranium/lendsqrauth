@@ -5,6 +5,8 @@ const q = require('q');
 const validators = require('mlar')('validators');
 const assert = require('mlar')('assertions');
 const config = require('../../config');
+const send_email = require('mlar').mreq('notifs', 'send');
+
 
 /**  this is to be used by a borrower to reject a collections invitation 
  *  sent to him by a lender.
@@ -57,6 +59,22 @@ function service(data) {
         })
         .spread(async (collection, instance, params) => {
             if (!collection) throw new Error("Could not find collection");
+            let product = await models.collection_init_state.findOne({
+                where: {
+                    collection_id: collection.id
+                }
+            });
+
+            product = JSON.parse(product.state);
+
+            let lender = await models.profile.findOne({
+                where: {
+                    id: collection.lender_id
+                },
+                include: [{
+                    model: models.user
+                }]
+            })
 
             // DELETE THE CREATED USER ACCOUNT AND PROFILE
             let borrower_profile = await models.profile.findOne({
@@ -77,7 +95,15 @@ function service(data) {
                 deleted_flag: 1
             });
 
+
+
+
+
             let feedback = '';
+
+
+
+
 
             if (params.feedback) {
                 feedback = params.feedback.split('--');
@@ -91,6 +117,22 @@ function service(data) {
                 date_declined: new Date(),
             });
 
+            const LENDER_NOTIF = 149;
+            const BORROWER_NOTIF = 150;
+
+            let confirmation_email_payload = {
+                lenderFullName: lender.user.first_name ? lender.user.first_name + ' ' + lender.user.last_name : lender.user.business_name,
+                loanAmount: collection.amount,
+                borrowerName: collection.borrower_first_name + ' ' + collection.borrower_last_name,
+                borrowerFullName: collection.borrower_first_name + ' ' + collection.borrower_last_name,
+                interestRate: product.interest + '%',
+                interestPeriod: product.interest_period,
+                rejectionFeedback: feedback ? feedback : '',
+                collectionScheduleURL: config.base_url + 'collections',
+                loanRepaymentScheduleURL: config.base_url + 'collections',
+            };
+            await send_email(LENDER_NOTIF, lender.user.email, confirmation_email_payload);
+            await send_email(BORROWER_NOTIF, user.email, confirmation_email_payload);
 
             collection.status = DECLINED_STATUS;
             return collection.save();
