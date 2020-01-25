@@ -7,6 +7,7 @@ const chai = require('chai');
 const checktoken = require('mlar').mreq('services', 'auth/checktoken');
 const generateRandom = require('mlar')('testutils').generateRandom;
 const utils = require('../utils/collections');
+const getCollections = require('./../services/collection/get')
 
 
 describe('#Collections', function () {
@@ -24,6 +25,25 @@ describe('#Collections', function () {
             .catch(err => {
                 //console.log(err)
                 done(err);
+            })
+
+    })
+    it('should get collections', async () => {
+
+        getCollections({
+                profile: {
+                    role: 'admin',
+                    status: 'inactive'
+                },
+                status: 'draft'
+
+            }).then((result) => {
+                console.log(result);
+                result.should.be.a('object');
+            })
+            .catch(err => {
+                console.log(err)
+
             })
 
     })

@@ -81,7 +81,33 @@ function service(data) {
 				if (data.borrower_last_name) query.where.borrower_last_name = data.borrower_last_name;
 				if (data.lender_name) query.where.num_of_collections = data.num_of_collections;
 				if (data.collection_frequency) query.where.collection_frequency = data.collection_frequency;
+				/*
+				if (data.search) {
+					delete query.where;
 
+					// search first name, last name ,email , business name and phone;
+					query.where.$or = [{
+							first_name: {
+								$like: '%' + data.search + '%'
+							}
+						},
+						{
+							last_name: {
+								$like: '%' + data.search + '%'
+							}
+						},
+						{
+							business_name: {
+								$like: '%' + data.search + '%'
+							}
+						},
+						{
+							phone: {
+								$like: '%' + data.search + '%'
+							}
+						},
+					];
+				}*/
 				if (['business_lender', 'individual_lender'].includes(data.profile.role)) {
 					query.where.lender_id = data.profile.id
 				} else if (data.profile.role == 'borrower') {
