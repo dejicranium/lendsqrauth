@@ -7,9 +7,10 @@ const chai = require('chai');
 var detectchange = require('mlar')('detectchange');
 const requests = require('mlar')('requests');
 const coll = require('../utils/collections');
+const resendCollectionInvitation = require('../services/collection/resend_invitation')
 
 
-describe('#Utils ', function(done) {
+describe('#Utils ', function (done) {
     this.timeout(1000000000);
     it("should detect change", () => {
         let old_params = {
@@ -37,12 +38,12 @@ describe('#Utils ', function(done) {
             interest: 15,
             disbursement_date: "2020-01-01"
         };
-        requests.createCollectionSchedule(params).then(resp=> {
+        requests.createCollectionSchedule(params).then(resp => {
             //console.log(resp);
             resp.should.be.a('object');
             done()
 
-        }).catch(err=> {
+        }).catch(err => {
             //console.log(err)
             done(err);
         })
@@ -64,6 +65,21 @@ describe('#Utils ', function(done) {
         const jwt_decode = require('jwt-decode');
         let r = await coll.normalizeTenor(3, 'weeks', '21', 'monthly');
         r.should.be.a('object');
+        //console.log(r)
+    });
+    it("should resend collection iv", async () => {
+
+        let r = await resendCollectionInvitation({
+            collection_id: 2,
+            profile: {
+                id: 1
+            },
+            user: {
+                first_name: 'Matem',
+                last_name: "Konama"
+            }
+        });
+        r.should.be.a('string');
         //console.log(r)
     });
 });
