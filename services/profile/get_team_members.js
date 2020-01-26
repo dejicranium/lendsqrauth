@@ -88,7 +88,7 @@ function service(data) {
 
 			// if we are searching by term
 			if (data.search) {
-				delete data.where;
+				//delete data.where;
 				data.include[0].include[1].required = true;
 				data.include[0].required = true;
 				data.include[0].where.parent_profile_id = data.profile.id;

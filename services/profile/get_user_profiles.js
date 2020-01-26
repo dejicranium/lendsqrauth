@@ -103,6 +103,14 @@ function service(data) {
 
 			let finalresp = [];
 
+			// see if any of the profiles is a collaborator 
+			let collaborator_profiles = profiles.rows.filter(profile => profile.role.name == 'collaborator');
+			let collaborator_profiles_ids = collaborator_profiles.map(profile => profile.id);
+			let user_invites = await models.user_invites.findAll({
+				where: {
+					profile_created_id: collaborator_profiles_ids
+				}
+			});
 
 
 
@@ -112,9 +120,11 @@ function service(data) {
 					finalresp.push(profile);
 					continue
 				}
-				if (profile.role.name == 'collaborator' && profile.parent_profile_id) {
-					finalresp.push(profile);
-					continue
+				if (profile.role.name == 'collaborator') {
+					let user_invite = user_invites.find(p => p.profile_created_id == profile.id);
+					if (user_invite.status == 'accepted') {
+						finalresp.push(profile)
+					}
 				}
 				if (profile.role.name !== 'collaborator' && profile.role.name !== 'borrower') {
 					finalresp.push(profile)
