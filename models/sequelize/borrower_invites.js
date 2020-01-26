@@ -19,6 +19,10 @@ module.exports = (sequelize, DataTypes) => {
     borrower_invites.belongsTo(models.collection, {
       foreignKey: 'collection_id'
     })
+    borrower_invites.belongsTo(models.profile, {
+      foreignKey: 'profile_created_id',
+      as: 'borrower_profile'
+    })
   };
   return borrower_invites;
 };

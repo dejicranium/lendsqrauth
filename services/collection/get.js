@@ -28,9 +28,11 @@ function service(data) {
 			});
 			const params = validParameters.params;
 			let getFunction = null;
-
+			let query = {
+				where: {}
+			};
 			if (params.collection_id) {
-				let query = {
+				query = {
 					where: {}
 				};
 				query.where.id = params.collection_id;
@@ -44,11 +46,25 @@ function service(data) {
 				})
 
 			} else {
-				let query = {
+				query = {
 					limit: data.limit,
 					offset: data.offset,
 					where: {}
 				}
+
+				query.include = [{
+					model: models.product,
+					where: {},
+					attributes: ['product_name', 'interest', 'interest_period'],
+					include: [{
+						model: models.profile,
+						where: {},
+						include: [{
+							model: models.user,
+							where: {}
+						}]
+					}]
+				}];
 
 				if (data.lender_id) query.where.lender_id = data.lender_id;
 				if (data.product_id) query.where.product_id = data.product_id;
@@ -81,12 +97,13 @@ function service(data) {
 				if (data.borrower_last_name) query.where.borrower_last_name = data.borrower_last_name;
 				if (data.lender_name) query.where.num_of_collections = data.num_of_collections;
 				if (data.collection_frequency) query.where.collection_frequency = data.collection_frequency;
-				/*
+
 				if (data.search) {
 					delete query.where;
 
 					// search first name, last name ,email , business name and phone;
-					query.where.$or = [{
+					query.include[0].include[0].where.parent_profile_id = data.profile.id
+					query.include[0].include[0].include[0].where.$or = [{
 							first_name: {
 								$like: '%' + data.search + '%'
 							}
@@ -101,40 +118,48 @@ function service(data) {
 								$like: '%' + data.search + '%'
 							}
 						},
-						{
-							phone: {
+					]
+					query.where = {}
+					query.where.$or = [{
+							tenor: {
 								$like: '%' + data.search + '%'
 							}
 						},
+						{
+							amount: {
+								$like: '%' + data.search + '%'
+							}
+
+						}
+					]
+
+					if (['business_lender', 'individual_lender'].includes(data.profile.role)) {
+						query.where.lender_id = data.profile.id
+					} else if (data.profile.role == 'borrower') {
+						query.where.lender_id = data.profile.parent_profile_id
+						query.where.borrower_id = data.profile.id
+					} else if (data.profile.role == 'collaborator') {
+						query.where.lender_id = data.profile.parent_profile_id
+					}
+
+
+					query.order = [
+						['id', 'DESC']
 					];
-				}*/
-				if (['business_lender', 'individual_lender'].includes(data.profile.role)) {
-					query.where.lender_id = data.profile.id
-				} else if (data.profile.role == 'borrower') {
-					query.where.lender_id = data.profile.parent_profile_id
-					query.where.borrower_id = data.profile.id
-				} else if (data.profile.role == 'collaborator') {
-					query.where.lender_id = data.profile.parent_profile_id
+
+					query.where.$or = [{
+						deleted_flag: null
+					}, {
+						deleted_flag: false
+					}]
+					/*query.where.deleted_flag = {
+						$ne: 1
+					};*/
 				}
 
-				query.include = [{
-					model: models.product,
-					attributes: ['product_name', 'interest', 'interest_period']
-				}];
-				query.order = [
-					['id', 'DESC']
-				];
 
-				query.where.$or = [{
-					deleted_flag: null
-				}, {
-					deleted_flag: false
-				}]
-				/*query.where.deleted_flag = {
-					$ne: 1
-				};*/
-				getFunction = models.collection.findAndCountAll(query)
 			}
+			getFunction = models.collection.findAndCountAll(query)
 
 			return [getFunction, params]
 

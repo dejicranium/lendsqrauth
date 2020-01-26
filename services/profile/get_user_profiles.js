@@ -71,7 +71,15 @@ function service(data) {
 						exclude: DEFAULT_EXCLUDES
 					},
 					required: false,
-				}
+				}, {
+					model: models.borrower_invites,
+					attributes: {
+						exclude: DEFAULT_EXCLUDES
+					},
+
+					required: false
+				},
+
 			]
 
 			// if admin is making the request (only the admin route can pass `user_id`
@@ -94,6 +102,27 @@ function service(data) {
 
 
 			let finalresp = [];
+
+
+
+
+			for (let i = 0; i < profiles.rows.length; i++) {
+				let profile = profiles.rows[i];
+				if (profile && profile.borrower_invite && profile.borrower_invite.status == 'Accepted') {
+					finalresp.push(profile);
+					continue
+				}
+				if (profile.role.name == 'collaborator' && profile.parent_profile_id) {
+					finalresp.push(profile);
+					continue
+				}
+				if (profile.role.name !== 'collaborator' && profile.role.name !== 'borrower') {
+					finalresp.push(profile)
+				}
+			}
+
+
+			/*
 			profiles.rows.forEach(profile => {
 				if ((profile.role.name == "collaborator" || profile.role.name == "borrower")) {
 					if (profile.parent_profile_id) {
@@ -104,7 +133,27 @@ function service(data) {
 				}
 			})
 
+			// for borrower profile  -- make sure that there's at least one borrower profile
+			let borrower_profiles = profiles.rows.filter(profile => profile.role.name == 'borrower')
 
+			if (borrower_profiles) {
+				// get all borrower profiles id
+				let borrower_profile_ids = borrower_profiles.map(profile => profile.id);
+
+				let borrower_invites = await models.borrower_invites.findAll({
+					where: {
+						profile_created_id: borrower_profile_ids,
+						status: 'accepted' // get only profiles of accepted invitations
+					}
+				})
+
+
+			
+
+
+			}
+
+			*/
 			d.resolve(paginate(finalresp, 'profiles', profiles.count, limit, page));
 			//d.resolve(profiles)
 		})

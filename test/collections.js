@@ -33,9 +33,11 @@ describe('#Collections', function () {
         getCollections({
                 profile: {
                     role: 'admin',
-                    status: 'inactive'
+                    status: 'inactive',
+                    id: 1
                 },
-                status: 'draft'
+                //status: 'draft'
+                search: 'Matem'
 
             }).then((result) => {
                 console.log(result);
