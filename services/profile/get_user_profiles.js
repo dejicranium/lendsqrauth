@@ -124,6 +124,7 @@ function service(data) {
 					let user_invite = user_invites.find(p => p.profile_created_id == profile.id);
 					if (user_invite.status == 'accepted') {
 						finalresp.push(profile)
+						continue
 					}
 				}
 				if (profile.role.name !== 'collaborator' && profile.role.name !== 'borrower') {
