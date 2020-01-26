@@ -22,7 +22,6 @@ function vinfo(req, res, next) {
 
         })
 }
-
 vinfo.routeConfig = {};
 vinfo.routeConfig.path = "/send-acceptance-iv";
 vinfo.routeConfig.method = "post";
