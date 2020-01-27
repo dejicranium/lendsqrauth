@@ -90,6 +90,8 @@ function service(data) {
 				params.created_on = new Date();
 				params.parent_profile_id = data.profile.id;
 				params.user_id = user.id;
+				params.status = 'pending'
+
 
 
 				return [params, models.profile.create(params), 'none'];
@@ -125,6 +127,7 @@ function service(data) {
 					role_id: params.role_id,
 					user_id: created1.id,
 					parent_profile_id: globalProfileId,
+					status: 'pending',
 					uuid: Math.random().toString(36).substr(2, 9),
 					created_on: new Date()
 				});
