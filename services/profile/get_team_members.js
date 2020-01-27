@@ -140,6 +140,7 @@ function service(data) {
 			invites.rows.map(row => {
 				let object = {};
 				object = row.profile;
+				object.invite_status = row.status;
 				final_invites.push(object);
 
 			});

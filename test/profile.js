@@ -16,7 +16,7 @@ describe('#Profile', function () {
             profile: {
                 id: 7
             },
-            search: 'Sarah'
+
         })
         console.log(result)
         result.should.be.a('object')
