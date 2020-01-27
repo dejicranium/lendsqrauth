@@ -32,12 +32,12 @@ describe('#Collections', function () {
 
         getCollections({
                 profile: {
-                    role: 'admin',
+                    role: 'individual_lender',
                     status: 'inactive',
                     id: 1
                 },
                 //status: 'draft'
-                search: 'Matem'
+                //search: 'Matem'
 
             }).then((result) => {
                 console.log(result);

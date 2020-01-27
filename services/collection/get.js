@@ -102,7 +102,7 @@ function service(data) {
 					delete query.where;
 
 					// search first name, last name ,email , business name and phone;
-					query.include[0].include[0].where.parent_profile_id = data.profile.id
+					//query.include[0].include[0].where.parent_profile_id = data.profile.id
 					query.include[0].include[0].include[0].where.$or = [{
 							first_name: {
 								$like: '%' + data.search + '%'
@@ -120,6 +120,7 @@ function service(data) {
 						},
 					]
 					query.where = {}
+					/*
 					query.where.$or = [{
 							tenor: {
 								$like: '%' + data.search + '%'
@@ -131,7 +132,7 @@ function service(data) {
 							}
 
 						}
-					]
+					]*/
 
 					if (['business_lender', 'individual_lender'].includes(data.profile.role)) {
 						query.where.lender_id = data.profile.id
@@ -156,6 +157,7 @@ function service(data) {
 						$ne: 1
 					};*/
 				}
+
 
 
 			}
@@ -187,8 +189,7 @@ function service(data) {
 
 			collections.rows = JSON.parse(JSON.stringify(collections.rows));
 
-			let lender_ids =
-				collections.rows.map(c => c.lender_id)
+			let lender_ids = collections.rows.map(c => c.lender_id)
 			let lenders = [];
 			if (lender_ids) {
 				lenders = await models.profile.findAll({

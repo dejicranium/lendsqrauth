@@ -328,7 +328,7 @@ function service(data) {
                             let borrower_is_new_user = !borrower.user || !borrower.user.password;
 
                             if (borrower_is_new_user) {
-                                email_payload.acceptURL = config.base_url + 'signup/borrower?token=' + invitation.token;
+                                email_payload.acceptURL = config.base_url + 'signup/borrower?token=' + invitation.token + '&email=' + collection.borrower_email;
                             } else {
                                 email_payload.acceptURL += invitation.token;
                             }
