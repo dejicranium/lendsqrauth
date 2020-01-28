@@ -21,7 +21,7 @@ function service(data) {
             const params = validParameters.params;
             if (Object.keys(params).length === 1) throw new Error("Please pass a value to update") // profile_id will always be there
             if (params.status) {
-                if (!['active', 'inactive'].includes(params.status)) throw new Error("Pass either active or inactive as a status")
+                if (!['active', 'inactive'].includes(params.status.toLowerCase())) throw new Error("Choose either active or inactive as a status")
             }
             if (params.role_id) {
                 //if (!['active', 'inactive'].includes(params.status)) throw new Error("Pass either active or inactive as a status")
@@ -55,7 +55,7 @@ function service(data) {
         }).then(async (profile) => {
             if (!profile) throw new Error("An error occured while updating user's profile");
 
-            let audit = new AuditLog(data.reqData, "UPDATE", "updated team member with profile id "+ profile.id);
+            let audit = new AuditLog(data.reqData, "UPDATE", "updated team member with profile id " + profile.id);
             await audit.create();
 
             d.resolve("Successfully updated user's profile");
