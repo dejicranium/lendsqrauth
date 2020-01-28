@@ -71,7 +71,7 @@ function service(data) {
 
 			if (data.status) {
 				data.status = data.status.toLowerCase();
-				data.where.status = data.status;
+				data.include[0].where.status = data.status;
 			}
 
 			if (data.email) {
@@ -140,7 +140,7 @@ function service(data) {
 			invites.rows.map(row => {
 				let object = {};
 				object = row.profile;
-				object.invite_status = row.status;
+				//object.invite_status = row.status;
 				final_invites.push(object);
 
 			});
