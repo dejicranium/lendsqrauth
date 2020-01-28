@@ -61,9 +61,7 @@ function service(data) {
             d.resolve("Successfully updated user's profile");
         })
         .catch((err) => {
-
             d.reject(err);
-
         });
 
     return d.promise;

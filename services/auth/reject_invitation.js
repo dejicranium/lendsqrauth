@@ -53,7 +53,7 @@ function service(data) {
 
 			profile.status = 'declined';
 			await profile.save();
-
+			/*
 			if (invite.user_created_id) {
 				await models.user.destroy({
 					where: {
@@ -62,7 +62,7 @@ function service(data) {
 				}, {
 					force: true
 				})
-			}
+			}*/
 
 			// create audit_log
 			let audit_log = new AuditLog(data.reqData, 'UPDATE', 'rejected invitation to become a team member');
