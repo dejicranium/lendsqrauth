@@ -5,7 +5,7 @@ const q = require('q');
 const AuditLog = require('mlar')('audit_log');
 
 var spec = morx.spec({})
-    .build('profile_id', 'required:true, eg:lender')
+    .build('token', 'required:true, eg:lender')
     .end();
 
 function service(data) {
@@ -18,29 +18,32 @@ function service(data) {
             });
             const params = validParameters.params;
 
-            //TODO: get profile id 
-            /* let profile_id = params.profile_id;
-
-             return models.collection.findOne({
-                 where: 
-             }) */
+            return models.borrower_invites.findOne({
+                where: {
+                    token: params.token
+                }
+            })
         })
-        .then(async profile => {
-            if (!profile) throw new Error("Profile does not exist");
+        .then(async token => {
+            if (!token) throw new Error('Could not find redirect collection');
 
+            return models.collection.findOne({
+                where: {
+                    id: token.collection_id
+                }
+            })
 
+        }).then(async (collection) => {
+            if (!collection) throw new Error("Could not find collection");
+            let product = await models.collection_init_state.findOne({
+                where: {
+                    collection_id: collection.id
+                }
+            })
+            collection = JSON.parse(JSON.stringify(collection))
+            collection.product = JSON.parse(product.state);
+            d.resolve(collection)
 
-            ern
-
-
-            return profile.update(params)
-        }).then(async (profile) => {
-            if (!profile) throw new Error("An error occured while updating user's profile");
-
-            let audit = new AuditLog(data.reqData, "UPDATE", "updated team member with profile id " + profile.id);
-            await audit.create();
-
-            d.resolve("Successfully updated user's profile");
         })
         .catch((err) => {
             d.reject(err);
