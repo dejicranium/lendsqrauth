@@ -330,7 +330,7 @@ function service(data) {
                             if (borrower_is_new_user) {
                                 email_payload.acceptURL = config.base_url + 'signup/borrower?token=' + invitation.token + '&email=' + collection.borrower_email;
                             } else {
-                                email_payload.acceptURL += invitation.token;
+                                email_payload.acceptURL = config.base_url + 'login?email=' + collection.borrower_email + '&token=' + invitation.token;
                             }
                             email_payload.rejectURL += invitation.token;
                         }
