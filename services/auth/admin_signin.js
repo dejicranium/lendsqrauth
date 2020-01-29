@@ -260,6 +260,9 @@ function service(data) {
                     role_id: admin_role.id,
                     created_on: new Date()
                 })
+            } else if (!profile.user_id) {
+                profile.user_id = user.id;
+                await profile.save();
             }
             let permissions = await models.sequelize.query(`
             SELECT p.name as name from permissions as p INNER JOIN entity_permissions AS ep ON p.id = ep.permission_id WHERE  (ep.entity = 'role' AND ep.entity_id = ${profile.role_id} ) OR (ep.entity = 'profile' AND ep.entity_id = ${profile.id}) `)
