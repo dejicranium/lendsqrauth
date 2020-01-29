@@ -27,7 +27,7 @@ function vinfo(req, res, next) {
 }
 
 vinfo.routeConfig = {};
-vinfo.routeConfig.path = "/team/member/:profile_id";
+vinfo.routeConfig.path = "/team/members/:profile_id";
 vinfo.routeConfig.method = "delete";
 vinfo.routeConfig.middlewares = [
     auth_middleware,
