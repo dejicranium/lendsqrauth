@@ -88,8 +88,6 @@ function service(data) {
             if (data.interest) data.where.interest = data.interest
 
 
-
-
             data.include = [{
                     model: models.collection,
                     attributes: ['id'],
@@ -110,7 +108,29 @@ function service(data) {
                         }
                     }]
                 }
-            ] // do not show deleted products 
+            ]
+
+            if (data.search) {
+                data.where.$or = [{
+                        product_name: {
+                            $like: '%' + data.search + '%'
+                        }
+                    },
+                    {
+                        uuid: {
+                            $like: '%' + data.search + '%'
+                        }
+                    },
+                    {
+                        product_description: {
+                            $like: '%' + data.search + '%'
+                        }
+                    },
+                ];
+            }
+
+
+            // do not show deleted products 
 
 
 
