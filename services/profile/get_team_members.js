@@ -128,6 +128,12 @@ function service(data) {
 					]
 				]
 			}
+			data.include[0].where.$or = [{
+				deleted_flag: null
+			}, {
+				deleted_flag: false
+			}]
+
 			return models.user_invites.findAndCountAll(data);
 		})
 		.then((invites) => {

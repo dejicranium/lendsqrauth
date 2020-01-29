@@ -93,6 +93,12 @@ function service(data) {
 
 			}
 
+			query.where.$or = [{
+				deleted_flag: null
+			}, {
+				deleted_flag: false
+			}];
+
 			return models.profile.findAndCountAll(query);
 
 		})
