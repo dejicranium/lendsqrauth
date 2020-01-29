@@ -101,25 +101,22 @@ function service(data) {
 				if (data.search) {
 					delete query.where;
 
-					// search first name, last name ,email , business name and phone;
-					//query.include[0].include[0].where.parent_profile_id = data.profile.id
-					query.include[0].include[0].include[0].where.$or = [{
-							first_name: {
-								$like: '%' + data.search + '%'
-							}
-						},
-						{
-							last_name: {
-								$like: '%' + data.search + '%'
-							}
-						},
-						{
-							business_name: {
-								$like: '%' + data.search + '%'
-							}
-						},
-					]
+
 					query.where = {}
+					query.where.$or = [{
+						borrower_first_name: {
+							$like: '%' + data.search + '%'
+						},
+						borrower_last_name: {
+							$like: '%' + data.search + '%'
+						},
+						tenor: {
+							$like: '%' + data.search + '%'
+						},
+						amount: {
+							$like: '%' + data.search + '%'
+						}
+					}]
 					/*
 					query.where.$or = [{
 							tenor: {
