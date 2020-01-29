@@ -150,7 +150,7 @@ function service(data) {
 					inviter: data.profile.id,
 					token: invite_token,
 					profile_created_id: new_profile_id, // we need to track the profile that was created as a result of this process
-					user_created_id: created2 == 'user-created' ? created1.id : null
+					user_created_id: created2 == 'user-created' ? created1.id : GLOBAL_USER.id
 				}
 			});
 

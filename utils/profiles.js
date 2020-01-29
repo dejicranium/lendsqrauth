@@ -14,3 +14,19 @@ function getProfilesRoles(profiles) {
 
     })
 }
+
+function getProfileById(id) {
+    return await models.profile.findOne({
+        where: {
+            id: id
+        },
+        include: [{
+            model: models.user,
+
+        }]
+    })
+}
+
+module.exports = {
+    getProfileById
+}
