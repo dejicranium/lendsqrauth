@@ -8,7 +8,7 @@ const checktoken = require('mlar').mreq('services', 'auth/checktoken');
 const generateRandom = require('mlar')('testutils').generateRandom;
 const utils = require('../utils/collections');
 const getCollections = require('./../services/collection/get')
-
+const sendReminder = require('./../services/collection/send_invitation_reminder')
 
 describe('#Collections', function () {
 
@@ -46,6 +46,18 @@ describe('#Collections', function () {
             .catch(err => {
                 console.log(err)
 
+            })
+
+    })
+    it('send collection reminder', async () => {
+
+        sendReminder(2)
+            .then(result => {
+                result.should.be.equal('done')
+                console.log(result)
+            })
+            .catch(err => {
+                console.log(err)
             })
 
     })

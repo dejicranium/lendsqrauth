@@ -11,7 +11,13 @@ module.exports = {
                 }
             })
         }
-
+        if (typeof (userDetails) === 'string') { // let us say it is an email
+            user = await models.user.findOne({
+                where: {
+                    email: userDetails
+                }
+            })
+        }
         let exists = user.password !== undefined && user.password !== null;
 
         return {
