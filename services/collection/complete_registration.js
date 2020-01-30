@@ -113,6 +113,19 @@ function service(data) {
                 }]
 
             });
+
+            let borrower = await models.profile.findOne({
+                where: {
+                    id: collection.borrower_id
+                },
+                include: [{
+                    model: models.user,
+                    attributes: {
+                        exclude: ['password']
+                    }
+                }]
+
+            });
             // if (signup_info.id) {
             //     // create a borrower profile for the user
             //     let borrower_role = await models.role.findOne({
@@ -163,8 +176,8 @@ function service(data) {
 
 
             // SEND!
-            send_email(LENDER_COLLECTION_CONFIRMATION_EMAIL_CONTEXT_ID, confirmation_email_payload);
-            send_email(BORROWER_COLLECTION_CONFIRMATION_EMAIL_CONTEXT_ID, confirmation_email_payload);
+            send_email(LENDER_COLLECTION_CONFIRMATION_EMAIL_CONTEXT_ID, lender.user.email, confirmation_email_payload);
+            send_email(BORROWER_COLLECTION_CONFIRMATION_EMAIL_CONTEXT_ID, borrower.user.email, confirmation_email_payload);
 
 
             // create loan schedule
