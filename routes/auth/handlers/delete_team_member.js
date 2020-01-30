@@ -1,5 +1,5 @@
 var utils = require('mlar')('mt1l');
-const service = require('mlar').mreq('services', 'auth/delete_team_member');
+const service = require('mlar').mreq('services', 'profile/delete_team_member');
 const routemeta = require('mlar')('routemeta');
 const auth_middleware = require('mlar')('authmiddleware');
 const has_perm_middleware = require('mlar')('hasPermMiddleware');
