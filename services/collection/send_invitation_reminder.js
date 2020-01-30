@@ -60,7 +60,7 @@ function service(borrower_invite) {
             borrowerFullName: collection.borrower_first_name + ' ' + collection.borrower_last_name,
             collectionURL: config.base_url + 'collections',
             tenor: collection.tenor,
-            interestRate: product.interest + '%',
+            interestRate: product.interest + ' %',
             Period: product.interest_period,
             rejectURL: config.base_url + 'signup/borrower/reject?token=' + borrower_invite.token,
             acceptURL: config.base_url + 'signup/borrower/accept?token=',

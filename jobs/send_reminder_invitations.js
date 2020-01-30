@@ -99,7 +99,7 @@ module.exports = () => {
 
 
 
-    cron.schedule('*/1 * * * *', async () => {
+    cron.schedule('*/50 * * * *', async () => {
 
         let invites = await getRemindersDue();
         console.log('sending reminders for ' + invites.length + ' invitation');
