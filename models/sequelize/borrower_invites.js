@@ -12,7 +12,9 @@ module.exports = (sequelize, DataTypes) => {
     date_joined: DataTypes.DATE,
     date_declined: DataTypes.DATE,
     collection_id: DataTypes.INTEGER,
-    feedback: DataTypes.TEXT
+    feedback: DataTypes.TEXT,
+    next_reminder_date: DataTypes.DATE,
+
   }, {});
   borrower_invites.associate = function (models) {
     // associations can be defined here

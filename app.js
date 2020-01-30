@@ -66,6 +66,14 @@ const logger = require('mlar')('mongolog');
 const elasticLog = require('mlar')('locallogger');
 const scrubber = require('mlar')('obscrub');
 const SCRUBVALS = require('./utils/scrubvals.json');
+const sendCollectionRemindersCron = require('./jobs/send_reminder_invitations');
+
+
+
+// start sendCollection reminders cron
+sendCollectionRemindersCron();
+
+
 
 app.use(
   bodyParser.urlencoded({

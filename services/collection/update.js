@@ -314,6 +314,10 @@ function service(data) {
                             }
                         });
 
+                        invitation.next_reminder_date = moment().add(4, 'days'); //post date the next invitation
+                        await invitation.save();
+
+
                         if (invitation && invitation.id) {
                             /// get the user record so that we can define whether or not we are inviting a new user or not
                             let borrower = await models.profile.findOne({

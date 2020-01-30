@@ -2,7 +2,7 @@
 module.exports = {
   up: (queryInterface, Sequelize) => {
     return queryInterface.addColumn(
-      'collections',
+      'borrower_invites',
       'next_reminder_date',
       Sequelize.TEXT
     );

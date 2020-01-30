@@ -2,20 +2,16 @@ const models = require('mlar')('models');
 const q = require('q');
 const config = require('../../config');
 const send_email = require('mlar').mreq('notifs', 'send');
-const userIsRegistered = require('../../utils/user');
+const userUtils = require('../../utils/user');
 
 
-function service(invite_id) {
+function service(borrower_invite) {
     const d = q.defer();
     const LENDER_INVITATION_CONTEXT_ID = 151
     const BORROWER_INVITATION_CONTEXT_ID = 152
 
     q.fcall(() => {
-        return models.borrower_invites.findOne({
-            where: {
-                id: invite_id
-            }
-        })
+        return borrower_invite
     }).then(async borrower_invite => {
         if (!borrower_invite) d.resolve({})
 
@@ -26,7 +22,7 @@ function service(invite_id) {
             }
         });
 
-        const product = await collection_init_state.findOne({
+        const product = await models.collection_init_state.findOne({
             where: {
                 collection_id: collection.id
             }
@@ -73,7 +69,7 @@ function service(invite_id) {
         let {
             borrowerUserAccount,
             exists
-        } = await userIsRegistered(collection.borrower_email);
+        } = await userUtils.isRegisteredUser(collection.borrower_email);
 
         if (exists) {
             acceptURL = config.base_url + 'login?email=' + collection.borrower_email + '&token=' + borrower_invite.token;

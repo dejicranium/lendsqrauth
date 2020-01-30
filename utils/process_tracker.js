@@ -6,15 +6,15 @@ function next_process_cycle(latest_stop_id, date) {
 
     if (is_today) {
         return {
-            offset: latest_stop_id + 1,
-            date // return same date
+            offset: latest_stop_id,
+            date: moment(date).format('YYYY-MM-DD') // return same date
         }
 
 
     } else {
         return {
             offset: 0,
-            date: moment(date).add(1, 'days')
+            date: moment().format('YYYY-MM-DD')
         }
     }
 
