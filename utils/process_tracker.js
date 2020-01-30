@@ -19,3 +19,7 @@ function next_process_cycle(latest_stop_id, date) {
     }
 
 }
+
+module.exports = {
+    next_process_cycle
+}
