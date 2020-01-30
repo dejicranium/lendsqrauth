@@ -15,7 +15,7 @@ function getProfilesRoles(profiles) {
     })
 }
 
-function getProfileById(id) {
+async function getProfileById(id) {
     return await models.profile.findOne({
         where: {
             id: id

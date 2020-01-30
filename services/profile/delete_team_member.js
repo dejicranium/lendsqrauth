@@ -6,8 +6,6 @@ const AuditLog = require('mlar')('audit_log');
 
 var spec = morx.spec({})
     .build('profile_id', 'required:true, eg:lender')
-    .build('role_id', 'required:false, eg:lender')
-    .build('status', 'required:false, eg:lender')
     .end();
 
 function service(data) {
