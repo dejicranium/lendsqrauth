@@ -53,6 +53,7 @@ function service(data) {
 
             if (!instance) throw new Error("Invalid token");
             if (instance.token_is_used) throw new Error("Token has already been used");
+
             return [models.collection.findOne({
                 where: {
                     id: instance.collection_id

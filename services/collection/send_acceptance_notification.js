@@ -28,17 +28,26 @@ function service(data) {
             });
             const params = validParameters.params;
 
+            return [
+                models.collection.findOne({
+                    where: {
+                        id: params.collection_id
+                    }
+                }),
 
-
-            return models.collection.findOne({
-                where: {
-                    id: params.collection_id
-                }
-            })
-
+                models.borrower_invites.findOne({
+                    where: {
+                        collection_id: params.collection_id
+                    }
+                })
+            ]
         })
-        .then(async (collection) => {
+        .spread(async (collection, invite) => {
             if (!collection) throw new Error("Could not find collection");
+
+            // update invite to accepted.
+            invite.status = "Accepted"
+            await invite.save();
 
             let product = await initState.getInitState('collections', collection.id);
 
