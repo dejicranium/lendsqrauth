@@ -148,8 +148,8 @@ function service(data) {
 
             // invalidate token 
             await instance.update({
-                token_is_used: true,
-                status: 'Accepted',
+                //token_is_used: true,
+                //status: 'Accepted',
                 date_joined: new Date(),
             })
 

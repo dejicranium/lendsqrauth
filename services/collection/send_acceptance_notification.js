@@ -47,6 +47,8 @@ function service(data) {
 
             // update invite to accepted.
             invite.status = "Accepted"
+            invite.token_is_used = true;
+
             await invite.save();
 
             let product = await initState.getInitState('collections', collection.id);
