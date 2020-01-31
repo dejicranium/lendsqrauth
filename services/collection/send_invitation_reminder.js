@@ -78,7 +78,7 @@ function service(borrower_invite) {
         }
 
         send_email(LENDER_INVITATION_CONTEXT_ID, lender.user.email, email_payload);
-        return send_email(BORROWER_INVITATION_CONTEXT_ID, borrower.user.email, email_payload);
+        return send_email(BORROWER_INVITATION_CONTEXT_ID, collection.borrower_email, email_payload);
 
     }).then(emailSent => {
         d.resolve("done")

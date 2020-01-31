@@ -77,9 +77,12 @@ module.exports = () => {
         let from = date + ' 00:00:00'
         let stop = date + ' 11:59:59'
 
+        console.log('start time is ' + from)
+        console.log('now is is ' + moment().format("YYYY-MM-DD"))
 
+        console.log('end time is ' + stop)
         q.fcall(() => {
-                let sqlQuery = `SELECT * from borrower_invites WHERE status = 'Pending' AND next_reminder_date BETWEEN '${from}' AND '${stop}' AND id > ${offset}`
+                let sqlQuery = `SELECT * from borrower_invites WHERE status = 'Pending' AND next_reminder_date BETWEEN '${from}' AND '${stop}' AND id > ${offset} LIMIT 100`
 
                 return models.sequelize.query(sqlQuery);
             })
@@ -99,7 +102,7 @@ module.exports = () => {
 
 
 
-    cron.schedule('*/50 * * * *', async () => {
+    cron.schedule('*/1 * * * *', async () => {
 
         let invites = await getRemindersDue();
         console.log('sending reminders for ' + invites.length + ' invitation');

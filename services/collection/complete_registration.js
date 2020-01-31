@@ -200,11 +200,7 @@ function service(data) {
             };
 
 
-            let borrower = await models.profile.findOne({
-                where: {
-                    id: collection.borrower_id
-                }
-            });
+
             let borrower_userId = null;
 
             if (borrower && borrower.user_id) {
