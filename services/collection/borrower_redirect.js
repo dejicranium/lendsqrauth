@@ -5,7 +5,7 @@ const q = require('q');
 const AuditLog = require('mlar')('audit_log');
 
 var spec = morx.spec({})
-    .build('token', 'required:true, eg:lender')
+    //.build('token', 'required:true, eg:lender')
     .end();
 
 function service(data) {
@@ -18,31 +18,20 @@ function service(data) {
             });
             const params = validParameters.params;
 
-            return models.borrower_invites.findOne({
+            return models.collection.findAll({
                 where: {
-                    token: params.token
-                }
+                    borrower_id: data.profile.id,
+                    status: 'inactive'
+                },
+                include: [{
+                    model: models.product
+                }]
             })
+
+
         })
-        .then(async token => {
-            if (!token) throw new Error('Could not find redirect collection');
-
-            return models.collection.findOne({
-                where: {
-                    id: token.collection_id
-                }
-            })
-
-        }).then(async (collection) => {
-            if (!collection) throw new Error("Could not find collection");
-            let product = await models.collection_init_state.findOne({
-                where: {
-                    collection_id: collection.id
-                }
-            })
-            collection = JSON.parse(JSON.stringify(collection))
-            collection.product = JSON.parse(product.state);
-            d.resolve(collection)
+        .then(async collections => {
+            d.resolve(collections)
 
         })
         .catch((err) => {
