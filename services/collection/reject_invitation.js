@@ -113,7 +113,7 @@ function service(data) {
             await instance.update({
                 feedback,
                 token_is_used: true,
-                status: 'Declined',
+                status: 'declined',
                 date_declined: new Date(),
             });
 
