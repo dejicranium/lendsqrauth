@@ -49,7 +49,10 @@ function service(data) {
             invite.status = "Accepted"
             invite.token_is_used = true;
 
+            collection.status = 'active';
+            await collection.save();
             await invite.save();
+
 
             let product = await initState.getInitState('collections', collection.id);
 

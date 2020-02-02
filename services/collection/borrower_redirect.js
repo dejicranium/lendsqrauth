@@ -19,6 +19,9 @@ function service(data) {
             const params = validParameters.params;
 
             return models.collection.findAll({
+                order: [
+                    ['id', 'DESC']
+                ],
                 where: {
                     borrower_id: data.profile.id,
                     status: 'inactive'
