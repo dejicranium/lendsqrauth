@@ -26,7 +26,7 @@ describe('#Download Service', function () {
 
 
         downloadUtil(data, 1, null, null, null, fields).then((result) => {
-                //console.log(result);
+                console.log(result);
                 console.log(result)
                 result.should.be.a('integer');
                 done();

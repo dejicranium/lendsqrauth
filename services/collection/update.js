@@ -404,11 +404,11 @@ function service(data) {
                                     }
                                 })
                                 await models.collection_schedules.bulkCreate(bulkdata)
-                                //console.log(resp)
+                                console.log(resp)
                             })
                             .catch(err => {
                                 //silent failure
-                                //console.log(err)
+                                console.log(err)
                             })
                         */
                     }
@@ -425,7 +425,7 @@ function service(data) {
             d.resolve(collection);
         })
         .catch((err) => {
-            //console.log(err.stack);
+            console.log(err.stack);
 
             d.reject(err);
         });

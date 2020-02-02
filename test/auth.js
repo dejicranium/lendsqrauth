@@ -46,7 +46,7 @@ describe('#Complete registration', function () {
             phone: "0810045706"
         }
         completeRegistration(regData).then((result) => {
-                //console.log(result);
+                console.log(result);
                 result.should.be.a('object');
                 done();
             })
@@ -71,7 +71,7 @@ describe('#Complete registration', function () {
             }
         }
         resendinvitation(iv).then((result) => {
-                //console.log(result);
+                console.log(result);
                 result.should.be.a('object');
                 done();
             })

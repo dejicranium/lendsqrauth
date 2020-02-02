@@ -10,14 +10,14 @@ try {
     envPath = `.${appEnvProfile}`;
   }
   const fullEnvPath = './config/env' + envPath + '.json';
-  // //console.log(fullEnvPath);
+  // console.log(fullEnvPath);
   var envJSON = require(fullEnvPath);
   for (var envProp in envJSON) {
     process.env[envProp] = envJSON[envProp];
   }
-  ////console.log(envJSON);
+  //console.log(envJSON);
 } catch (e) {
-  ////console.log(e);
+  //console.log(e);
 }
 //========================
 var models = require('./models/sequelize');
@@ -120,8 +120,8 @@ app.use(function (req, res, next) {
   };
 
   elasticLog.info(JSON.Sreqlog);
-  //console.log('req.id req.id ' + reqid)
-  ////console.log('**userId ' + req.user.id)
+  console.log('req.id req.id ' + reqid)
+  //console.log('**userId ' + req.user.id)
 
   /*
     logger({
@@ -177,7 +177,7 @@ app.use(base, function (req, res, next) {
 
 // start cron job
 
-//console.log("Config file is " + process.env.base_url)
+console.log("Config file is " + process.env.base_url)
 
 //get_collection_schedules();
 
@@ -185,7 +185,7 @@ var force_sync = process.env.FORCESYNC ? true : false;
 
 var stage = process.env.NODE_ENV || 'development-local';
 
-//console.log('environment is ' + process.env.NODE_ENV);
+console.log('environment is ' + process.env.NODE_ENV);
 if (
   stage === 'development' ||
   stage === 'test' ||
@@ -201,8 +201,8 @@ if (
     .then(function () {
       app.listen(appConfig.port, function () {
         //runWorker();
-        // //console.log(stage);
-        //console.log([appConfig.name, 'is running on port', appConfig.port.toString()].join(' '));
+        // console.log(stage);
+        console.log([appConfig.name, 'is running on port', appConfig.port.toString()].join(' '));
       });
     });
 }

@@ -17,7 +17,7 @@ describe('#Bank Info', function () {
     it('getverificationdata', async (done) => {
 
         utils.getLocalBVNVerificationData(1, 2).then((result) => {
-                //console.log(result);
+                console.log(result);
                 result.should.be.a('object');
                 done();
             })

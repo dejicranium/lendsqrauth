@@ -247,11 +247,11 @@ function service(data) {
                         }
                     });
                     await models.collection_schedules.bulkCreate(bulkdata);
-                    //console.log(resp);
+                    console.log(resp);
                 })
                 .catch(err => {
                     //silent failure
-                    //console.log(err)
+                    console.log(err)
                 })
 
 
@@ -270,7 +270,7 @@ function service(data) {
             })
         })
         .catch((error) => {
-            //console.log(error.stack)
+            console.log(error.stack)
             d.reject(error);
         })
 

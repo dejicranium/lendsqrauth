@@ -29,31 +29,31 @@ module.exports = async function (req, res, next) {
                 return;
             }
             try {
-                //console.log('attempting to start jwt decode')
+                console.log('attempting to start jwt decode')
                 let decoded_auth_token = jwt_decode(auth_token)
-                //console.log('auth token is ' + auth_token)
+                console.log('auth token is ' + auth_token)
 
                 let user_profiles = decoded_auth_token.profiles;
-                //console.log('user profiles  is ' + Object.keys(user_profiles))
+                console.log('user profiles  is ' + Object.keys(user_profiles))
 
                 let decoded_dict = jwt_decode(prof_token);
-                //console.log('decoded token is ' + decoded_dict);
+                console.log('decoded token is ' + decoded_dict);
 
 
                 if (decoded_dict) {
                     req.profile = decoded_dict;
 
-                    //console.log('profile id is ' + req.profile.id)
+                    console.log('profile id is ' + req.profile.id)
 
                     // check to make sure that the profile is among the logged in user's profiles 
 
                     if (!user_profiles.includes(req.profile.id)) {
-                        //console.log('attempting to get req profile.id')
+                        console.log('attempting to get req profile.id')
 
                         utils.jsonF(res, '334', "User-Profile mismatch");
                         return;
                     } else {
-                        //console.log('got req profile.id');
+                        console.log('got req profile.id');
                         // else  go on
                         next();
                         return;

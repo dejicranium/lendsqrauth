@@ -88,13 +88,13 @@ EXPRESS_UTILS.log = function (thing_to_log, num, title) {
 	/*
   num = num || 5;
   title = title || "LOGSTART";
-  //console.log("\n\n\n\n\n\n<*****************" + title + "***********************>");
+  console.log("\n\n\n\n\n\n<*****************" + title + "***********************>");
   for(var i=0; i < num; i++)
-  //console.log("**************************************************");
-  //console.log(thing_to_log);
+  console.log("**************************************************");
+  console.log(thing_to_log);
   for(var i=0; i < num; i++)
-  //console.log("**************************************************");
-  //console.log("<******************"+ title +"-END***********************>\n\n\n\n\n\n");
+  console.log("**************************************************");
+  console.log("<******************"+ title +"-END***********************>\n\n\n\n\n\n");
 */
 }
 

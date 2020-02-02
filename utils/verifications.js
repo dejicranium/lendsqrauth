@@ -16,7 +16,7 @@ async function verifyBVN(bvn) {
     if (verifiedBVN && verifiedBVN.mobile) {} else {
         throw new Error("Could not verify BVN");
     }
-
+    console.log("Verified bvn phone is " + verifiedBVN.mobile)
     return verifiedBVN.mobile;
 
 

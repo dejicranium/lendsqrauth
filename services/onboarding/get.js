@@ -65,8 +65,8 @@ function service(data) {
                         }
                     });
                     business_required_fields.forEach(field => {
-                        //console.log('business field = ' +
-                        //businessDetails[field])
+                        console.log('business field = ' +
+                            businessDetails[field])
                         if (!profile.business_info[field]) {
                             throw new Error("Can't create product until business information is completed")
                         }

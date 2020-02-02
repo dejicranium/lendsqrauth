@@ -17,7 +17,7 @@ describe('#Complete registration', function () {
     it('lender stats', async (done) => {
 
         lenderStats({}).then((result) => {
-                //console.log(result);
+                console.log(result);
                 result.should.be.a('object');
                 done();
             })

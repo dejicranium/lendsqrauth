@@ -22,7 +22,7 @@ describe('#Profile', function () {
         console.log(result)
         result.should.be.a('object')
 
-        //console.log(state)
+        console.log(state)
 
     })
     it('delete team member', async () => {
@@ -36,7 +36,7 @@ describe('#Profile', function () {
         console.log(result)
         result.should.be.a('object')
 
-        //console.log(state)
+        console.log(state)
 
     })
 })

@@ -223,10 +223,10 @@ function service(data) {
                         service_access_key: service_access_key,
                         user_id: userId
                     }, {}, null, false, true).then(resp => {
-                        //console.log(resp)
+                        console.log(resp)
                     })
                     .catch(err => {
-                        //console.log(err)
+                        console.log(err)
 
                     })
 
@@ -272,7 +272,7 @@ function service(data) {
             d.resolve(user);
         })
         .catch((err) => {
-            ////console.log(err.stack);
+            //console.log(err.stack);
             d.reject(err);
 
 

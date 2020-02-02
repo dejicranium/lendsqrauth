@@ -181,7 +181,7 @@ function service(data) {
                 });
 
             } catch (e) {
-                //console.log("got to error")
+                console.log("got to error")
                 // require('mlar')('locallogger').error(data.reqData, {}, e);
 
             }
@@ -194,7 +194,7 @@ function service(data) {
         })
 
         .catch(err => {
-            ////console.log(err.stack)
+            //console.log(err.stack)
             /*require('mlar')('locallogger').error({
                 body: data
             }, {}, error);*/
