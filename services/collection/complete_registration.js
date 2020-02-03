@@ -177,9 +177,10 @@ function service(data) {
 
 
             // SEND!
+            /*
             send_email(LENDER_COLLECTION_CONFIRMATION_EMAIL_CONTEXT_ID, lender.user.email, confirmation_email_payload);
             send_email(BORROWER_COLLECTION_CONFIRMATION_EMAIL_CONTEXT_ID, borrower.user.email, confirmation_email_payload);
-
+            */
 
             // create loan schedule
             let product = await models.product.findOne({
