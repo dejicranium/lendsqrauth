@@ -28,6 +28,9 @@ function service(borrower_invite) {
             }
         })
 
+        product = JSON.parse(product.state);
+
+
 
         let lender = await models.profile.findOne({
             where: {
