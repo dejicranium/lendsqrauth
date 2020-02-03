@@ -133,7 +133,7 @@ function service(data) {
 						continue
 					}
 				}
-				if (profile.role.name !== 'collaborator' && profile.role.name !== 'borrower') {
+				if (profile.role.name !== 'collaborator') {
 					finalresp.push(profile)
 				}
 			}
