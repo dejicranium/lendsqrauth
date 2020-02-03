@@ -122,10 +122,10 @@ function service(data) {
 
 			for (let i = 0; i < profiles.rows.length; i++) {
 				let profile = profiles.rows[i];
-				if (profile && profile.borrower_invite && profile.borrower_invite.status == 'Accepted') {
+				/*if (profile && profile.borrower_invite && profile.borrower_invite.status == 'Accepted') {
 					finalresp.push(profile);
 					continue
-				}
+				}*/
 				if (profile.role.name == 'collaborator') {
 					let user_invite = user_invites.find(p => p.profile_created_id == profile.id);
 					if (user_invite.status == 'accepted') {
