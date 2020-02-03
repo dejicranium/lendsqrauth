@@ -155,10 +155,7 @@ function service(data) {
             }
 
 
-            if (data.status) data.where.status = {
-                $like: '%' + data.status + '%'
-            }
-
+            if (data.status) data.where.status = data.status
 
             data.order = [
                 ['id', 'DESC']
