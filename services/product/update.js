@@ -101,8 +101,8 @@ function service(data) {
 			if (params.interest_period) {
 				params.interest_period = params.interest_period.toLowerCase();
 
-				if (!['per day', 'per month', 'per annum', 'flat'].includes(params.interest_period))
-					throw new Error('Interest period should be one of `per day`, `per month` or `per annum`')
+				if (!['per day', 'per week', 'per month', 'per annum', 'flat'].includes(params.interest_period))
+					throw new Error('Interest period should be one of `per day`, `per week`, `per month` or `per annum`')
 
 			}
 
