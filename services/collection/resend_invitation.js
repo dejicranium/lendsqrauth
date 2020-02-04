@@ -79,6 +79,13 @@ function service(data) {
                 invite.status = "Pending";
                 await invite.save();
 
+
+                // token create or update 
+                let tokenObject = await tokenCreateOrUpdate('borrower_invites', {
+                    inviter_id: data.profile.id,
+                    collection_id: collection.id
+                }, {});
+
                 let email_payload = {
                     lenderFullName: lender_name,
                     loanAmount: collection.product.amount + ` NGN`,
@@ -94,18 +101,12 @@ function service(data) {
                 let borrower_is_new_user = !borrower.user || !borrower.user.password;
 
                 if (borrower_is_new_user) {
-                    email_payload.acceptURL = config.base_url + 'signup/borrower?token=' + invite.token;
+                    email_payload.acceptURL = config.base_url + 'signup/borrower?token=' + tokenObject.token;
                 } else {
-                    email_payload.acceptURL += invite.token;
+                    email_payload.acceptURL += tokenObject.token
                 }
-                email_payload.rejectURL += invite.token;
+                email_payload.rejectURL += tokenObject.token
 
-
-                // token create or update 
-                await tokenCreateOrUpdate('borrower_invites', {
-                    inviter_id: data.profile.id,
-                    collection_id: collection.id
-                }, {});
 
 
 
