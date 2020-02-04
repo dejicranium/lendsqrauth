@@ -71,13 +71,6 @@ function service(data) {
 						exclude: DEFAULT_EXCLUDES
 					},
 					required: false,
-				}, {
-					model: models.borrower_invites,
-					attributes: {
-						exclude: DEFAULT_EXCLUDES
-					},
-
-					required: false
 				},
 
 			]
