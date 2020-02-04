@@ -55,6 +55,7 @@ function service(data) {
 
 
             let product = await initState.getInitState('collections', collection.id);
+            product = JSON.parse(product.state);
 
             let lender = await models.profile.findOne({
                 where: {
@@ -92,6 +93,65 @@ function service(data) {
             // SEND!
             send_email(LENDER_COLLECTION_CONFIRMATION_EMAIL_CONTEXT_ID, lender.user.email, confirmation_email_payload);
             send_email(BORROWER_COLLECTION_CONFIRMATION_EMAIL_CONTEXT_ID, collection.borrower_email, confirmation_email_payload);
+
+
+            let params = {
+                amount: collection.amount,
+                tenor: collection.tenor,
+                tenor_type: product.tenor_type,
+                num_of_collections: collection.num_of_collections,
+                interest: product.interest,
+                interest_period: product.interest_period,
+                start_date: collection.start_date,
+                collection_frequency: collection.collection_frequency,
+                repayment_model: product.repayment_model,
+            };
+
+            let result = await requests.createCollectionSchedule(params)
+                .then(async resp => {
+                    let bulkdata = [];
+                    resp.periods.forEach(async r => {
+
+
+                        if (resp.periods.indexOf(r) !== 0) {
+                            /*
+                            let borrower_userId = await models.profile.findOne({
+                                where: {
+                                    id: collection.borrower_id
+                                }
+                            });*/
+
+                            let period = {
+                                period_id: r.period,
+                                from_date: r.fromDate.join('-'),
+                                due_date: r.dueDate.join('-'),
+                                days_in_period: r.daysInPeriod,
+                                principal_due: r.principalDue,
+                                interest_due: r.interestDue,
+                                fee: r.feeChargesDue,
+                                total_amount: r.totalDueForPeriod,
+                                loan_id: product.id,
+                                balance_outstanding: r.principalLoanBalanceOutstanding,
+                                interest_outstanding: r.interestOutstanding,
+                                collection_id: collection.id,
+                                lender_userId: lender.user.id,
+                                borrower_userId: borrower.user.id,
+                                borrower_id: collection.borrower_id,
+                                lender_id: collection.lender_id,
+                                status: 'Pending',
+                            };
+                            bulkdata.push(period);
+
+                        }
+                    });
+                    await models.collection_schedules.bulkCreate(bulkdata);
+                    console.log(resp);
+                })
+                .catch(err => {
+                    //silent failure
+                    console.log(err)
+                })
+
 
             d.resolve("Accepted the invitation")
 
