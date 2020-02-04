@@ -71,7 +71,7 @@ function service(data) {
 			];
 		})
 		.spread(async (invitation, user, params) => {
-			if (invitation && invitation.status !== 'declined') {
+			if (invitation && invitation.status !== 'declined' && !invitation.status.deleted_flag) {
 				throw new Error('Invitation has been sent already');
 			}
 
