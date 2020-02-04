@@ -129,9 +129,8 @@ function service(data) {
 
 
                         let token = await crypto.randomBytes(32).toString('hex');
-                        await user_invite.update({
-                            token
-                        })
+                        user_invite.token = token;
+                        await user_invite.save();
 
                         let recipient = user.email;
                         emailPayload.userName = user.first_name ? user.first_name + ' ' + user.last_name : '';
