@@ -1,3 +1,6 @@
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+
+
 const models = require('mlar')('models');
 const ErrorLogger = require('mlar')('errorlogger');
 const morx = require('morx');
@@ -54,7 +57,11 @@ function service(data) {
             await invite.save();
 
 
-            let product = await initState.getInitState('collections', collection.id);
+            let product = await models.collection_init_state.findOne({
+                where: {
+                    collection_id: collection.id
+                }
+            })
             product = JSON.parse(product.state);
 
             let lender = await models.profile.findOne({
