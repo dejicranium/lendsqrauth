@@ -103,9 +103,9 @@ function service(data) {
                 if (borrower_is_new_user) {
                     email_payload.acceptURL = config.base_url + 'signup/borrower?token=' + tokenObject.token;
                 } else {
-                    email_payload.acceptURL += tokenObject.token
+                    email_payload.acceptURL += tokenObject.token;
                 }
-                email_payload.rejectURL += tokenObject.token
+                email_payload.rejectURL += tokenObject.token;
 
 
 
