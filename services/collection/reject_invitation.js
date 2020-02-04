@@ -31,15 +31,18 @@ function service(data) {
 
 
 
-            return models.borrower_invites.findOne({
-                where: {
-                    token: params.token
-                }
-            })
+            return [
+                models.borrower_invites.findOne({
+                    where: {
+                        token: params.token
+                    }
+                }),
 
+                params
 
+            ]
         })
-        .then(async (instance) => {
+        .spread(async (instance, params) => {
 
             if (!instance) throw new Error("Invalid token");
             if (instance.token_is_used) throw new Error("Token is already used");
