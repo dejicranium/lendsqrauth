@@ -127,24 +127,23 @@ function service(data) {
                             exists
                         } = await userIsRegistered(user_invite.user_created_id);
 
-                        const tokenCreateOrUpdate = require('../../utils/tokens').createOrUpdate
 
-                        let tokenObject = await tokenCreateOrUpdate('user_invites', {
-                            inviter: data.profile.id,
-                            invitee: params.email
-                        }, {});
+                        let token = await crypto.randomBytes(32).toString('hex');
+                        await user_invite.update({
+                            token
+                        })
 
                         let recipient = user.email;
                         emailPayload.userName = user.first_name ? user.first_name + ' ' + user.last_name : '';
 
                         if (!exists) {
                             INVITATION_EMAIL_CONTEXT_ID = 94;
-                            emailPayload.memberAcceptURL = config.base_url + 'signup/team?token=' + tokenObject.token
+                            emailPayload.memberAcceptURL = config.base_url + 'signup/team?token=' + token
                         } else {
-                            emailPayload.memberAcceptURL = config.base_url + 'team/accept?token=' + tokenObject.token
+                            emailPayload.memberAcceptURL = config.base_url + 'team/accept?token=' + token
                             if (!emailPayload.userName) {
                                 INVITATION_EMAIL_CONTEXT_ID = 94;
-                                emailPayload.memberAcceptURL = config.base_url + 'signup/team?token=' + tokenObject.token
+                                emailPayload.memberAcceptURL = config.base_url + 'signup/team?token=' + token
                             }
 
                         }
