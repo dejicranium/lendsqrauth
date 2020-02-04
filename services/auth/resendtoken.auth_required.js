@@ -113,12 +113,18 @@ function service(data) {
                         throw new Error("You haven't invited user with email: " + params.email);
                     if (['accepted'].includes(user_invite.status))
                         throw new Error("Invitation already " + user_invite.status);
+
+                    let token = await crypto.randomBytes(32).toString('hex');
+                    user_invite.token = token;
+                    await user_invite.save();
+
+
                     const emailPayload = {
                         //userName: GLOBAL_USER ? GLOBAL_USER.first_name + ' ' + GLOBAL_USER.last_name || GLOBAL_USER.business_name || '' : created1.first_name + ' ' + created1.last_name || created1.business_name || '', // existing team member
                         lenderFullName: data.user.first_name ? data.user.first_name + ' ' + data.user.last_name : data.user.business_name,
                         lenderName: data.user.first_name ? data.user.first_name + ' ' + data.user.last_name : data.user.business_name,
                         memberAcceptURL: "",
-                        memberDeclineURL: config.base_url + 'team/reject?token=' + user_invite.token
+                        memberDeclineURL: config.base_url + 'team/reject?token=' + token
                     }
 
                     if (user_invite.user_created_id) {
@@ -128,9 +134,7 @@ function service(data) {
                         } = await userIsRegistered(user_invite.user_created_id);
 
 
-                        let token = await crypto.randomBytes(32).toString('hex');
-                        user_invite.token = token;
-                        await user_invite.save();
+
 
                         let recipient = user.email;
                         emailPayload.userName = user.first_name ? user.first_name + ' ' + user.last_name : '';
