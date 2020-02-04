@@ -7,6 +7,7 @@ const assert = require('mlar')('assertions');
 const requests = require('mlar')('requests');
 const config = require('../../config');
 const AuditLog = require('mlar')('audit_log');
+const tokenCreateOrUpdate = require('../../utils/tokens').createOrUpdate
 
 /**  this is to be used by a borrower to reject a collections invite
  *  sent to him by a lender.
@@ -70,6 +71,14 @@ function service(data) {
 
                 if (borrower.status == 'blacklisted') throw new Error("Borrower's profile has been deactivated");
 
+                // change the borrower status
+                borrower.status = 'pending';
+                await borrower.save();
+
+                // change the invitation status 
+                invite.status = "Pending";
+                await invite.save();
+
                 let email_payload = {
                     lenderFullName: lender_name,
                     loanAmount: collection.product.amount + ` NGN`,
@@ -90,6 +99,15 @@ function service(data) {
                     email_payload.acceptURL += invite.token;
                 }
                 email_payload.rejectURL += invite.token;
+
+
+                // token create or update 
+                await tokenCreateOrUpdate('borrower_invites', {
+                    inviter_id: data.profile.id,
+                    collection_id: collection.id
+                }, {});
+
+
 
                 try {
                     await requests.inviteBorrower(collection.borrower_email, email_payload);
