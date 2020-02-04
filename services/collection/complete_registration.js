@@ -142,9 +142,9 @@ function service(data) {
             //     });
 
             // update the collection 
-            collection.update({
+            /*collection.update({
                 status: 'active',
-            });
+            });*/
 
             // invalidate token 
             await instance.update({
