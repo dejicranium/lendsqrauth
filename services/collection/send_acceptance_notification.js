@@ -87,7 +87,7 @@ function service(data) {
                 tenor: collection.tenor + ' ' + product.tenor_type,
                 link: config.base_url + 'collections',
                 collectionScheduleURL: config.base_url + 'collections', //TODO: makee sure that this links to reapyment schedule url
-                loanRepaymentScheduleURL: config.base_url + 'collections',
+                loanRepaymentURL: config.base_url + 'collections',
             };
             // SEND!
             send_email(LENDER_COLLECTION_CONFIRMATION_EMAIL_CONTEXT_ID, lender.user.email, confirmation_email_payload);
