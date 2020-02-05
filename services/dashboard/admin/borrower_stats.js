@@ -28,7 +28,7 @@ function service(data) {
             COUNT(*) as total,
             COUNT(CASE status WHEN 'active' THEN 1 ELSE 0 END) as total_active
             FROM profiles WHERE
-            role_id = 2 OR role_id = 5 and YEAR(created_on) = "${year}"
+            role_id = 3 and YEAR(created_on) = "${year}"
             GROUP BY MONTH(created_on)`;
             return models.sequelize.query(l)
         })
