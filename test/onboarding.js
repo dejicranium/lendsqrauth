@@ -15,7 +15,7 @@ describe('#Onboarding', function () {
     it('get onboarding status', async () => {
         let state = await getOnboardingStatus({
             profile: {
-                role: 'business_lender',
+                role: 'borrower',
                 id: 34
             },
             user: {

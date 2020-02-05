@@ -50,6 +50,16 @@ function service(data) {
         })
         .then(async (profile) => {
 
+            if (['borrower', 'collaborator'].includes(data.profile.role)) {
+                d.resolve({
+                    has_completed_profile: true,
+                    has_completed_bank_details: true,
+                    has_created_loan_product: true,
+                    has_created_collection: true
+                })
+                return d.promise
+            }
+
             let business_required_fields = ['business_name', 'tin_number', 'rc_number', 'business_address', 'state', 'country', 'business_phone']
             let user_required_fields = ['first_name', 'last_name', 'phone'];
 
