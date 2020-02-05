@@ -49,8 +49,7 @@ function service(data) {
                 }
             })
             product = JSON.parse(product.state)
-            let lender_name =
-                data.user.business_name || data.user.first_name + ' ' + data.user.last_name;
+            let lender_name = data.user.business_name || data.user.first_name + ' ' + data.user.last_name;
 
 
             let email_payload = {
