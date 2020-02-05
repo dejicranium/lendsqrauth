@@ -91,6 +91,7 @@ function service(data) {
 				params.parent_profile_id = data.profile.id;
 				params.user_id = user.id;
 				params.status = 'pending'
+				params.deleted_flag = null;
 
 
 
