@@ -157,9 +157,10 @@ function service(data) {
 
 
 			if (!invitation[1]) {
-				invitation[0].update({
+				await invitation[0].update({
 					status: 'pending',
-					profile_created_id: new_profile_id // replace the former instance with the new profile created
+					profile_created_id: new_profile_id, // replace the former instance with the new profile created,
+					user_created_id: created2 == 'user-created' ? created1.id : GLOBAL_USER.id
 				});
 			}
 
