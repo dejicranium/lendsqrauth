@@ -2,7 +2,7 @@ var utils = require('mlar')('mt1l');
 const routemeta = require('mlar')('routemeta');
 const auth_middleware = require('mlar')('authmiddleware');
 const profile_middleware = require('mlar')('profileVerifyMiddleware');
-const service = require('mlar').mreq('services', 'dashboard/admin/lenders_stats');
+const service = require('mlar').mreq('services', 'dashboard/admin/borrower_stats');
 const has_role = require('mlar')('hasRoleMiddleware');
 const lendlog = require('mlar')('locallogger');
 
@@ -27,12 +27,12 @@ function vinfo(req, res, next) {
 }
 
 vinfo.routeConfig = {};
-vinfo.routeConfig.path = "/lender-stats";
+vinfo.routeConfig.path = "/borrower-stats";
 vinfo.routeConfig.method = "get";
 vinfo.routeConfig.middlewares = [
     auth_middleware,
     profile_middleware,
     has_role('admin'),
-    routemeta('lender_stats', 'none')
+    routemeta('borrower-stats', 'none')
 ];
 module.exports = vinfo;

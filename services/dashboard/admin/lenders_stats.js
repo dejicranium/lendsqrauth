@@ -23,18 +23,12 @@ function service(data) {
     var d = q.defer();
 
     q.fcall(async () => {
-            let role = await models.profile.findOne({
-                where: {
-                    name: {}
-                }
-            })
-
-            let year = new Date().getFullYear();
-            let query = `SELECT MONTH(created_on) as month, COUNT(*) as num
+            let year = data.year || new Date().getFullYear();
+            let l = `SELECT MONTH(created_on) as month, COUNT(*) as num
             FROM profiles WHERE
-            role_id = 4 and YEAR(created_on)= '${year}'
+            role_id = 2 OR role_id = 5 and YEAR(created_on) = "${year}"
             GROUP BY MONTH(created_on)`;
-            return models.sequelize.query(query)
+            return models.sequelize.query(l)
 
         })
         .then(async report => {
@@ -45,6 +39,7 @@ function service(data) {
 
         })
         .catch(err => {
+            console.log(err.stack)
             d.reject(err);
         })
 

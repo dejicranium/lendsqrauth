@@ -7,9 +7,8 @@ const DEFAULT_EXCLUDES = require('mlar')('appvalues').DEFAULT_EXCLUDES;
 function service(data) {
 
     const d = q.defer();
-
-    const page = data.page ? Number(data.page) : 1;
-    const limit = data.limit ? Number(data.limit) : 20;
+    const page = data.page ? parseInt(data.page) : 1;
+    const limit = data.limit ? parseInt(data.limit) : 20;
     const offset = page ? (page - 1) * limit : false;
 
 
