@@ -49,7 +49,7 @@ function service(data) {
             // has 
         })
         .then(async (profile) => {
-
+            // return true for both collaborators and borrowers
             if (['borrower', 'collaborator'].includes(data.profile.role)) {
                 d.resolve({
                     has_completed_profile: true,

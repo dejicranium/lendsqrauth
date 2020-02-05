@@ -24,7 +24,9 @@ function service(data) {
 
     q.fcall(async () => {
             let year = data.year || new Date().getFullYear();
-            let l = `SELECT MONTH(created_on) as month, COUNT(*) as num
+            let l = `SELECT MONTH(created_on) as month,  
+            COUNT(*) as total,
+            COUNT(CASE status WHEN 'active' THEN 1 ELSE 0 END) as total_active
             FROM profiles WHERE
             role_id = 2 OR role_id = 5 and YEAR(created_on) = "${year}"
             GROUP BY MONTH(created_on)`;
@@ -34,6 +36,19 @@ function service(data) {
         .then(async report => {
             if (!report) d.resolve({})
             report = JSON.parse(JSON.stringify(report[0]));
+
+
+            for (let i = 1; i < 13; i++) {
+                if (!report[i]) {
+                    let report_obj = {
+                        month: i,
+                        total: 0,
+                        total_active: 0
+                    }
+                    report.push(report_obj)
+
+                }
+            }
 
             d.resolve(report)
 
