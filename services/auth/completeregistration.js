@@ -117,7 +117,7 @@ function service(data) {
             if (accepted_user_profile && accepted_user_profile.id) {
                 // add a parent_profile when it's accepted
                 accepted_user_profile.parent_profile_id = invite.inviter;
-                accepted_user_profile.status = 'pending';
+                accepted_user_profile.status = 'active';
                 await accepted_user_profile.save()
             }
 
