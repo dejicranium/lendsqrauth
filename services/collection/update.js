@@ -222,6 +222,9 @@ function service(data) {
             if (params.borrower_email) assert.emailFormatOnly(params.borrower_email, null, 'Email');
 
             if (params.disbursement_date) assert.dateFormatOnly(params.disbursement_date, null, 'Disbursement Date');
+            if (new Date(params.disbursement_date).getFullYear().toString() == "1970") params.disbursement_date = null;
+
+
             if (params.disbursement_mode) {
                 if (!['cash', 'transfer'].includes(params.disbursement_mode.toLowerCase()))
                     throw new Error("Disbursement mode should be either cash or transfer")
