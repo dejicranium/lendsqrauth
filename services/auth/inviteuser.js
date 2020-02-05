@@ -158,7 +158,8 @@ function service(data) {
 
 			if (!invitation[1]) {
 				invitation[0].update({
-					status: 'pending'
+					status: 'pending',
+					profile_created_id: new_profile_id // replace the former instance with the new profile created
 				});
 			}
 
