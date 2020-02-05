@@ -41,7 +41,7 @@ function service(data) {
             FROM collection_schedules WHERE borrower_id = ${data.profile.id}`;
 
 
-            let next_repayment_query = `SELECT due_date AS next_repayment_date FROM collection_schedules WHERE due_date > '${today_end}' AND borrower_id = ${profileId} LIMIT 1`
+            let next_repayment_query = `SELECT due_date AS next_repayment_date FROM collection_schedules WHERE due_date > '${today_start}' AND borrower_id = ${profileId} LIMIT 1`
             return [models.sequelize.query(query), models.sequelize.query(next_repayment_query)]
 
         })
