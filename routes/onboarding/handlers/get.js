@@ -31,7 +31,6 @@ vinfo.routeConfig.method = "get";
 vinfo.routeConfig.middlewares = [
     auth_middleware,
     profile_middleware,
-    has_role(['individual_lender', 'business_lender']),
     routemeta('get_onboarding_status', 'none')
 ];
 module.exports = vinfo;
