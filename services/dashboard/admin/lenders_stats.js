@@ -39,7 +39,7 @@ function service(data) {
 
 
             for (let i = 1; i < 13; i++) {
-                if (!report[i]) {
+                if (!report[i - 1]) {
                     let report_obj = {
                         month: i,
                         total: 0,
