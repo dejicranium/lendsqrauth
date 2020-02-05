@@ -121,7 +121,7 @@ function service(data) {
 				}*/
 				if (profile.role.name == 'collaborator') {
 					let user_invite = user_invites.find(p => p.profile_created_id == profile.id);
-					if (user_invite.status == 'accepted') {
+					if (user_invite && user_invite.status == 'accepted') {
 						finalresp.push(profile)
 						continue
 					}
