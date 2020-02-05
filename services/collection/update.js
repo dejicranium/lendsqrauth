@@ -288,58 +288,59 @@ function service(data) {
 
                     if (new_status === 'inactive' && collection.status !== 'inactive') {
                         // prepare email
-                        let lender_name =
-                            data.user.business_name || data.user.first_name + ' ' + data.user.last_name;
+                        /* let lender_name =
+                             data.user.business_name || data.user.first_name + ' ' + data.user.last_name;
 
 
-                        let email_payload = {
-                            lenderFullName: lender_name,
-                            loanAmount: collection.amount + ` NGN`,
-                            interestRate: product.interest + " %",
-                            interestPeriod: product.interest_period,
-                            tenor: collection.tenor + ' ' + product.tenor_type,
-                            borrowersFullName: collection.borrower_first_name + ' ' + collection.borrower_last_name,
-                            rejectURL: config.base_url + 'signup/borrower/reject?token=',
-                            acceptURL: config.base_url + 'signup/borrower/accept?token=',
-                            collectionURL: config.base_url + 'collections'
-                        };
+                         let email_payload = {
+                             lenderFullName: lender_name,
+                             loanAmount: collection.amount + ` NGN`,
+                             interestRate: product.interest + " %",
+                             interestPeriod: product.interest_period,
+                             tenor: collection.tenor + ' ' + product.tenor_type,
+                             borrowersFullName: collection.borrower_first_name + ' ' + collection.borrower_last_name,
+                             rejectURL: config.base_url + 'signup/borrower/reject?token=',
+                             acceptURL: config.base_url + 'signup/borrower/accept?token=',
+                             collectionURL: config.base_url + 'collections'
+                         };
 
-                        /// send collection set up email;
-                        let COLLECTION_SETUP_EMAIL_CONTEXT_ID = 105;
-                        send_email(COLLECTION_SETUP_EMAIL_CONTEXT_ID, data.user.email, email_payload);
+                         /// send collection set up email;
+                         let COLLECTION_SETUP_EMAIL_CONTEXT_ID = 105;
+                         //send_email(COLLECTION_SETUP_EMAIL_CONTEXT_ID, data.user.email, email_payload);
 
-                        let invitation = await models.borrower_invites.findOne({
-                            where: {
-                                collection_id: collection.id,
-                            }
-                        });
+                         let invitation = await models.borrower_invites.findOne({
+                             where: {
+                                 collection_id: collection.id,
+                             }
+                         });
 
-                        invitation.next_reminder_date = moment().add(4, 'days'); //post date the next invitation
-                        await invitation.save();
+                         invitation.next_reminder_date = moment().add(4, 'days'); //post date the next invitation
+                         await invitation.save();
 
 
-                        if (invitation && invitation.id) {
-                            /// get the user record so that we can define whether or not we are inviting a new user or not
-                            let borrower = await models.profile.findOne({
-                                where: {
-                                    id: collection.borrower_id
-                                },
-                                include: [{
-                                    model: models.user
-                                }]
-                            });
+                         if (invitation && invitation.id) {
+                             /// get the user record so that we can define whether or not we are inviting a new user or not
+                             let borrower = await models.profile.findOne({
+                                 where: {
+                                     id: collection.borrower_id
+                                 },
+                                 include: [{
+                                     model: models.user
+                                 }]
+                             });
 
-                            let borrower_is_new_user = !borrower.user || !borrower.user.password;
+                             let borrower_is_new_user = !borrower.user || !borrower.user.password;
 
-                            if (borrower_is_new_user) {
-                                email_payload.acceptURL = config.base_url + 'signup/borrower?token=' + invitation.token + '&email=' + collection.borrower_email;
-                            } else {
-                                email_payload.acceptURL = config.base_url + 'login?email=' + collection.borrower_email + '&token=' + invitation.token;
-                            }
-                            email_payload.rejectURL += invitation.token;
-                        }
+                             if (borrower_is_new_user) {
+                                 email_payload.acceptURL = config.base_url + 'signup/borrower?token=' + invitation.token + '&email=' + collection.borrower_email;
+                             } else {
+                                 email_payload.acceptURL = config.base_url + 'login?email=' + collection.borrower_email + '&token=' + invitation.token;
+                             }
+                             email_payload.rejectURL += invitation.token;
+                         }
 
-                        await requests.inviteBorrower(collection.borrower_email, email_payload);
+                         await requests.inviteBorrower(collection.borrower_email, email_payload);
+                         */
                     }
 
                     if (new_status === 'inactive') {
