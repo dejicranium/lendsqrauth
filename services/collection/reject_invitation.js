@@ -92,9 +92,7 @@ function service(data) {
                 }
             });
 
-            await user.update({
-                deleted_flag: 1
-            });
+
 
 
 
