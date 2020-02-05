@@ -105,7 +105,8 @@ function service(data) {
 					models.user.create({
 						email: params.email,
 						uuid: uuid,
-						created_by: globalUserId
+						created_by: globalUserId,
+						status: 'active'
 					}),
 					'user-created'
 				];
