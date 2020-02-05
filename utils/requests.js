@@ -202,7 +202,7 @@ module.exports = {
             "productId": 1,
             "clientId": 1,
             "principal": data.amount,
-            "loanTermFrequency": data.tenor, // 12
+            "loanTermFrequency": data.tenor,
             "loanTermFrequencyType": tenor_type_value,
             "numberOfRepayments": data.num_of_collections,
             "repaymentEvery": 1,
