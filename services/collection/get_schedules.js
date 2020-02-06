@@ -31,7 +31,7 @@ function service(data) {
 			const offset = page ? (page - 1) * limit : false;
 
 			data.limit = limit;
-			data.offset;
+			data.offset = offset;
 			data.where = {};
 
 			if (data.to && data.from) {
