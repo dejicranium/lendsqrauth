@@ -22,7 +22,7 @@ function service(borrower_invite) {
             }
         });
 
-        const product = await models.collection_init_state.findOne({
+        let product = await models.collection_init_state.findOne({
             where: {
                 collection_id: collection.id
             }
@@ -61,11 +61,13 @@ function service(borrower_invite) {
         let email_payload = {
             lenderFullName: lender.user.first_name ? lender.user.first_name + ' ' + lender.user.last_name : lender.user.business_name,
             borrowerFullName: collection.borrower_first_name + ' ' + collection.borrower_last_name,
+            borrowersFullName: collection.borrower_first_name + ' ' + collection.borrower_last_name,
             collectionURL: config.base_url + 'collections',
             tenor: collection.tenor,
-            interestRate: product.interest + ' %',
-            Period: product.interest_period,
-            rejectURL: config.base_url + 'signup/borrower/reject?token=' + borrower_invite.token,
+            interestRate: product.interest + '%',
+            loanAmount: collection.amount,
+            period: product.interest_period,
+            declineURL: config.base_url + 'signup/borrower/reject?token=' + borrower_invite.token,
             acceptURL: config.base_url + 'signup/borrower/accept?token=',
         }
 
@@ -75,9 +77,9 @@ function service(borrower_invite) {
         } = await userUtils.isRegisteredUser(collection.borrower_email);
 
         if (exists) {
-            acceptURL = config.base_url + 'login?email=' + collection.borrower_email + '&token=' + borrower_invite.token;
+            email_payload.acceptURL = config.base_url + 'login?email=' + collection.borrower_email + '&token=' + borrower_invite.token;
         } else {
-            acceptURL = config.base_url + 'signup/borrower?token=' + borrower_invite.token + '&email=' + collection.borrower_email;
+            email_payload.acceptURL = config.base_url + 'signup/borrower?token=' + borrower_invite.token + '&email=' + collection.borrower_email;
         }
 
         send_email(LENDER_INVITATION_CONTEXT_ID, lender.user.email, email_payload);

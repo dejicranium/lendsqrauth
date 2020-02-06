@@ -9,7 +9,7 @@ const generateRandom = require('mlar')('testutils').generateRandom;
 const utils = require('../utils/collections');
 const getCollections = require('./../services/collection/get')
 const sendReminder = require('./../services/collection/send_invitation_reminder')
-
+const confirmCollection = require('./../services/collection/confirm_collection_creation');
 describe('#Collections', function () {
 
     this.timeout(500000);
@@ -52,6 +52,23 @@ describe('#Collections', function () {
     it('send collection reminder', async () => {
 
         sendReminder(2)
+            .then(result => {
+                result.should.be.equal('done')
+                console.log(result)
+            })
+            .catch(err => {
+                console.log(err)
+            })
+
+    })
+    it('confirm collection', async () => {
+
+        confirmCollection({
+                collection_id: 2,
+                user: {
+                    business_name: "Cranium Tech"
+                }
+            })
             .then(result => {
                 result.should.be.equal('done')
                 console.log(result)

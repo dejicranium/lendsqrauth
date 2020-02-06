@@ -142,9 +142,9 @@ function service(data) {
             //     });
 
             // update the collection 
-            collection.update({
+            /*collection.update({
                 status: 'active',
-            });
+            });*/
 
             // invalidate token 
             await instance.update({
@@ -209,7 +209,7 @@ function service(data) {
                 borrower_userId = borrower.user_id;
             }
 
-
+            /*
             let result = await requests.createCollectionSchedule(params)
                 .then(async resp => {
                     let bulkdata = [];
@@ -223,38 +223,38 @@ function service(data) {
                                     id: collection.borrower_id
                                 }
                             });*/
+            /*
+                                        let period = {
+                                            period_id: r.period,
+                                            from_date: r.fromDate.join('-'),
+                                            due_date: r.dueDate.join('-'),
+                                            days_in_period: r.daysInPeriod,
+                                            principal_due: r.principalDue,
+                                            interest_due: r.interestDue,
+                                            fee: r.feeChargesDue,
+                                            total_amount: r.totalDueForPeriod,
+                                            loan_id: product.id,
+                                            balance_outstanding: r.principalLoanBalanceOutstanding,
+                                            interest_outstanding: r.interestOutstanding,
+                                            collection_id: collection.id,
+                                            lender_userId: lender.user.id,
+                                            borrower_userId: borrower_userId,
+                                            borrower_id: collection.borrower_id,
+                                            lender_id: collection.lender_id,
+                                            status: 'Pending',
+                                        };
+                                        bulkdata.push(period);
 
-                            let period = {
-                                period_id: r.period,
-                                from_date: r.fromDate.join('-'),
-                                due_date: r.dueDate.join('-'),
-                                days_in_period: r.daysInPeriod,
-                                principal_due: r.principalDue,
-                                interest_due: r.interestDue,
-                                fee: r.feeChargesDue,
-                                total_amount: r.totalDueForPeriod,
-                                loan_id: product.id,
-                                balance_outstanding: r.principalLoanBalanceOutstanding,
-                                interest_outstanding: r.interestOutstanding,
-                                collection_id: collection.id,
-                                lender_userId: lender.user.id,
-                                borrower_userId: borrower_userId,
-                                borrower_id: collection.borrower_id,
-                                lender_id: collection.lender_id,
-                                status: 'Pending',
-                            };
-                            bulkdata.push(period);
-
-                        }
-                    });
-                    await models.collection_schedules.bulkCreate(bulkdata);
-                    console.log(resp);
-                })
-                .catch(err => {
-                    //silent failure
-                    console.log(err)
-                })
-
+                                    }
+                                });
+                                await models.collection_schedules.bulkCreate(bulkdata);
+                                console.log(resp);
+                            })
+                            .catch(err => {
+                                //silent failure
+                                console.log(err)
+                            })
+                            */
 
 
             // audit

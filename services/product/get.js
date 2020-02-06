@@ -160,6 +160,7 @@ function service(data) {
             data.order = [
                 ['id', 'DESC']
             ]
+            data.distinct = true;
 
 
             return [
@@ -177,14 +178,14 @@ function service(data) {
                 delete products.collections
                 d.resolve(products);
             }
-
-            products.rows = JSON.parse(JSON.stringify(products.rows))
-            products.rows.map(p => {
-
-                p.num_of_borrowers = p.collections.length;
-                delete p.collections;
-                return p
-            })
+            /*
+                        products.rows = JSON.parse(JSON.stringify(products.rows))
+                        products.rows.map(p => {
+                        
+                            p.num_of_borrowers = p.collections.length;
+                            delete p.collections;
+                            return p
+                        })*/
             d.resolve(paginate(products.rows, 'products', products.count, data.limit, data.page));
         })
         .catch((err) => {

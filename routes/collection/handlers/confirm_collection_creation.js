@@ -1,9 +1,8 @@
 var utils = require('mlar')('mt1l');
 const routemeta = require('mlar')('routemeta');
 const auth_middleware = require('mlar')('authmiddleware');
-const service = require('mlar').mreq('services', 'product/get');
+const service = require('mlar').mreq('services', 'collection/confirm_collection_creation');
 const profile_middleware = require('mlar')('profileVerifyMiddleware');
-const has_role = require('mlar')('hasRoleMiddleware');
 
 function vinfo(req, res, next) {
     const data = {
@@ -12,10 +11,16 @@ function vinfo(req, res, next) {
         ...req.headers,
         ...req.params
     };
+
+    data.user = req.user;
     data.profile = req.profile;
+
+    data.reqData = req;
+
+
     service(data)
         .then(response => {
-            utils.jsonS(res, response, "Products");
+            utils.jsonS(res, response, "Collection confirmed");
         })
         .catch(error => {
             utils.jsonF(res, null, error.message);
@@ -24,12 +29,11 @@ function vinfo(req, res, next) {
 }
 
 vinfo.routeConfig = {};
-vinfo.routeConfig.path = "/";
-vinfo.routeConfig.method = "get";
+vinfo.routeConfig.path = "/confirm-creation";
+vinfo.routeConfig.method = "post";
 vinfo.routeConfig.middlewares = [
     auth_middleware,
     profile_middleware,
-    has_role(['admin', 'individual_lender', 'business_lender', 'collaborator']),
-    routemeta('get_products', 'none')
+    routemeta('collection-confirm', 'none'),
 ];
 module.exports = vinfo;

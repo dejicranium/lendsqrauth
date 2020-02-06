@@ -31,15 +31,18 @@ function service(data) {
 
 
 
-            return models.borrower_invites.findOne({
-                where: {
-                    token: params.token
-                }
-            })
+            return [
+                models.borrower_invites.findOne({
+                    where: {
+                        token: params.token
+                    }
+                }),
 
+                params
 
+            ]
         })
-        .then(async (instance) => {
+        .spread(async (instance, params) => {
 
             if (!instance) throw new Error("Invalid token");
             if (instance.token_is_used) throw new Error("Token is already used");
@@ -88,12 +91,8 @@ function service(data) {
                     id: borrower_profile.user_id
                 }
             });
-            await borrower_profile.update({
-                deleted_flag: 1
-            });
-            await user.update({
-                deleted_flag: 1
-            });
+
+
 
 
 
@@ -113,7 +112,7 @@ function service(data) {
             await instance.update({
                 feedback,
                 token_is_used: 1,
-                status: 'declined',
+                status: 'Declined',
                 date_declined: new Date(),
             });
 

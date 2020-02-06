@@ -34,7 +34,7 @@ function service(data) {
 
             data.where = {
                 borrower_id: data.profile_id,
-                status: 'active' // meaning collections that were not declined
+                //status: 'active' // meaning collections that were not declined
             }
             data.include = [{
                 model: models.product

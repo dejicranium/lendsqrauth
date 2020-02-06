@@ -57,12 +57,38 @@ function service(data) {
       //data.reqData.user = {id: invite.user_created_id}
       let audit = new AuditLog(data.reqData, 'CREATE', 'accepted membership invitation from user ' + invite.inviter);
       await audit.create();
+    })
+    .then(async invite => {
+      if (!invite) throw new Error('No such invitation exists');
+      await invite.update({
+        status: 'accepted'
+      });
+
+      // add a parent_profile when it's accepted
+      let accepted_user_profile = await models.profile.findOne({
+        where: {
+          id: invite.profile_created_id
+        }
+      });
+
+      if (accepted_user_profile && accepted_user_profile.id) {
+        // add a parent_profile when it's accepted
+        accepted_user_profile.parent_profile_id = invite.inviter;
+        accepted_user_profile.status = 'active';
+        await accepted_user_profile.save();
+      }
+
+      //data.reqData.user = {id: invite.user_created_id}
+      let audit = new AuditLog(data.reqData, 'CREATE', 'accepted membership invitation from user ' + invite.inviter);
+      await audit.create();
 
       d.resolve(`Invitation accepted`);
     })
     .catch(err => {
       d.reject(err);
     });
+
+  return d.promise;
 
   return d.promise;
 }

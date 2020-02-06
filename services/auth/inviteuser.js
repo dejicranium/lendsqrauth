@@ -71,7 +71,7 @@ function service(data) {
 			];
 		})
 		.spread(async (invitation, user, params) => {
-			if (invitation && invitation.status !== 'declined') {
+			if (invitation && invitation.status !== 'declined' && !invitation.deleted_flag) {
 				throw new Error('Invitation has been sent already');
 			}
 
@@ -91,6 +91,7 @@ function service(data) {
 				params.parent_profile_id = data.profile.id;
 				params.user_id = user.id;
 				params.status = 'pending'
+				params.deleted_flag = null;
 
 
 
@@ -104,7 +105,8 @@ function service(data) {
 					models.user.create({
 						email: params.email,
 						uuid: uuid,
-						created_by: globalUserId
+						created_by: globalUserId,
+						status: 'active'
 					}),
 					'user-created'
 				];
@@ -156,8 +158,10 @@ function service(data) {
 
 
 			if (!invitation[1]) {
-				invitation[0].update({
-					status: 'pending'
+				await invitation[0].update({
+					status: 'pending',
+					profile_created_id: new_profile_id, // replace the former instance with the new profile created,
+					user_created_id: created2 == 'user-created' ? created1.id : GLOBAL_USER.id
 				});
 			}
 

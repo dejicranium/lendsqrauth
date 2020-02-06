@@ -159,50 +159,25 @@ module.exports = {
                 collection_frequency = 1;
         }
         let repayment_model = null;
-        switch (data.repayment_model) {
 
+
+        switch (data.repayment_model) {
             case 'equal installments':
                 repayment_model = 1;
                 break;
             default:
                 repayment_model = 0;
-                break;
-        }
-        console.log('tenor type is ' + data.tenor_type);
-        console.log('tenor type value is ' + tenor_type_value);
-
-
-        const d = q.defer();
-        /*
-        let params = {
-            "dateFormat": "dd MMMM yyyy",
-            "locale": "en_GB",
-            "productId": 1,
-            "clientId": 1,
-            "principal": "200000.00",
-            "loanTermFrequency": 12,
-            "loanTermFrequencyType": 2,
-            "numberOfRepayments": 10,
-            "repaymentEvery": 1,
-            "repaymentFrequencyType": 2,
-            "interestRatePerPeriod": 2,
-            "amortizationType": 1,
-            "interestType": 0,
-            "interestCalculationPeriodType": 1,
-            "expectedDisbursementDate": "20 September 2011",
-            "transactionProcessingStrategyId": 2,
-            "submittedOnDate": "20 September 2011",
-            "loanType": "individual",
         }
 
-        */
+
+
         let params = {
             "dateFormat": "dd MMMM yyyy",
             "locale": "en_GB",
             "productId": 1,
             "clientId": 1,
             "principal": data.amount,
-            "loanTermFrequency": data.tenor, // 12
+            "loanTermFrequency": data.tenor,
             "loanTermFrequencyType": tenor_type_value,
             "numberOfRepayments": data.num_of_collections,
             "repaymentEvery": 1,
@@ -217,6 +192,8 @@ module.exports = {
             "submittedOnDate": moment().format('DD MMMM YYYY'), //"20 September 2011",
             "loanType": "individual",
         }
+
+        const d = q.defer();
 
         const url = config.mifos_base_url + `loans?command=calculateLoanSchedule`
 
