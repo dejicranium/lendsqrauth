@@ -16,7 +16,7 @@ describe('#Roles Stuff', function () {
     it('getRoleName', async (done) => {
 
         utils.getRoleName(1).then((result) => {
-                //console.log(result);
+                console.log(result);
                 result.should.be.a('string');
                 done();
             })
@@ -32,7 +32,7 @@ describe('#Roles Stuff', function () {
     it('getRoleId', async (done) => {
 
         utils.getRoleId('admin').then((result) => {
-                //console.log(result);
+                console.log(result);
                 result.should.be.a('string');
                 done();
             })

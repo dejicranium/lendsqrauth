@@ -53,6 +53,7 @@ function service(data) {
 
             if (!instance) throw new Error("Invalid token");
             if (instance.token_is_used) throw new Error("Token has already been used");
+
             return [models.collection.findOne({
                 where: {
                     id: instance.collection_id
@@ -113,6 +114,19 @@ function service(data) {
                 }]
 
             });
+
+            let borrower = await models.profile.findOne({
+                where: {
+                    id: collection.borrower_id
+                },
+                include: [{
+                    model: models.user,
+                    attributes: {
+                        exclude: ['password']
+                    }
+                }]
+
+            });
             // if (signup_info.id) {
             //     // create a borrower profile for the user
             //     let borrower_role = await models.role.findOne({
@@ -128,14 +142,14 @@ function service(data) {
             //     });
 
             // update the collection 
-            collection.update({
+            /*collection.update({
                 status: 'active',
-            });
+            });*/
 
             // invalidate token 
             await instance.update({
-                token_is_used: true,
-                status: 'Accepted',
+                //token_is_used: true,
+                //status: 'Accepted',
                 date_joined: new Date(),
             })
 
@@ -156,15 +170,17 @@ function service(data) {
                 interestPeriod: collection.product.interest_period,
                 tenor: collection.tenor + ' ' + collection.product.tenor_type,
                 link: config.base_url + 'collections',
-                loanRepaymentURL: '', //TODO: makee sure that this links to reapyment schedule url
+                collectionScheduleURL: config.base_url + 'collections', //TODO: makee sure that this links to reapyment schedule url
+                loanRepaymentScheduleURL: config.base_url + 'collections'
             };
 
 
 
             // SEND!
-            send_email(LENDER_COLLECTION_CONFIRMATION_EMAIL_CONTEXT_ID, confirmation_email_payload);
-            send_email(BORROWER_COLLECTION_CONFIRMATION_EMAIL_CONTEXT_ID, confirmation_email_payload);
-
+            /*
+            send_email(LENDER_COLLECTION_CONFIRMATION_EMAIL_CONTEXT_ID, lender.user.email, confirmation_email_payload);
+            send_email(BORROWER_COLLECTION_CONFIRMATION_EMAIL_CONTEXT_ID, borrower.user.email, confirmation_email_payload);
+            */
 
             // create loan schedule
             let product = await models.product.findOne({
@@ -186,18 +202,14 @@ function service(data) {
             };
 
 
-            let borrower = await models.profile.findOne({
-                where: {
-                    id: collection.borrower_id
-                }
-            });
+
             let borrower_userId = null;
 
             if (borrower && borrower.user_id) {
                 borrower_userId = borrower.user_id;
             }
 
-
+            /*
             let result = await requests.createCollectionSchedule(params)
                 .then(async resp => {
                     let bulkdata = [];
@@ -211,38 +223,38 @@ function service(data) {
                                     id: collection.borrower_id
                                 }
                             });*/
+            /*
+                                        let period = {
+                                            period_id: r.period,
+                                            from_date: r.fromDate.join('-'),
+                                            due_date: r.dueDate.join('-'),
+                                            days_in_period: r.daysInPeriod,
+                                            principal_due: r.principalDue,
+                                            interest_due: r.interestDue,
+                                            fee: r.feeChargesDue,
+                                            total_amount: r.totalDueForPeriod,
+                                            loan_id: product.id,
+                                            balance_outstanding: r.principalLoanBalanceOutstanding,
+                                            interest_outstanding: r.interestOutstanding,
+                                            collection_id: collection.id,
+                                            lender_userId: lender.user.id,
+                                            borrower_userId: borrower_userId,
+                                            borrower_id: collection.borrower_id,
+                                            lender_id: collection.lender_id,
+                                            status: 'Pending',
+                                        };
+                                        bulkdata.push(period);
 
-                            let period = {
-                                period_id: r.period,
-                                from_date: r.fromDate.join('-'),
-                                due_date: r.dueDate.join('-'),
-                                days_in_period: r.daysInPeriod,
-                                principal_due: r.principalDue,
-                                interest_due: r.interestDue,
-                                fee: r.feeChargesDue,
-                                total_amount: r.totalDueForPeriod,
-                                loan_id: product.id,
-                                balance_outstanding: r.principalLoanBalanceOutstanding,
-                                interest_outstanding: r.interestOutstanding,
-                                collection_id: collection.id,
-                                lender_userId: lender.user.id,
-                                borrower_userId: borrower_userId,
-                                borrower_id: collection.borrower_id,
-                                lender_id: collection.lender_id,
-                                status: 'Pending',
-                            };
-                            bulkdata.push(period);
-
-                        }
-                    });
-                    await models.collection_schedules.bulkCreate(bulkdata);
-                    //console.log(resp);
-                })
-                .catch(err => {
-                    //silent failure
-                    //console.log(err)
-                })
-
+                                    }
+                                });
+                                await models.collection_schedules.bulkCreate(bulkdata);
+                                console.log(resp);
+                            })
+                            .catch(err => {
+                                //silent failure
+                                console.log(err)
+                            })
+                            */
 
 
             // audit
@@ -259,7 +271,7 @@ function service(data) {
             })
         })
         .catch((error) => {
-            //console.log(error.stack)
+            console.log(error.stack)
             d.reject(error);
         })
 

@@ -159,7 +159,7 @@ function service(data) {
                 url = config.notif_base_url + "sms/send";
                 payload = {
                     recipient: phoneNumberFromBVN,
-                    message: `Please use this OTP to complete your transaction on Lendsqr: ${OTP}. It expires in 10 minutes.`,
+                    message: `Please use this OTP to complete your request on Lendsqr: ${OTP}. It expires in 10 minutes.`,
                     sender_id: 1
                 }
                 await makeRequest(url, 'POST', payload, requestHeaders, 'Verify BVN');

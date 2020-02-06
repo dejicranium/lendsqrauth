@@ -13,6 +13,9 @@ const config = require('../../config');
 const makeRequest = require('mlar')('makerequest');
 const generateRandom = require('mlar')('testutils').generateRandom;
 const AuditLog = require('mlar')('audit_log');
+const send_email = require('mlar').mreq('notifs', 'send');
+const userIsRegistered = require('../../utils/user').isRegisteredUser;
+const profileUtil = require('../../utils/profiles');
 
 var spec = morx.spec({})
     .build('email', 'required:false')
@@ -92,11 +95,7 @@ function service(data) {
 
             } else {
                 // send email 
-                let payload = {
-                    sender: config.sender_email,
-                    sender_id: 1,
-                }
-                //TODO: resend invitation
+
                 if (params.type === 'token' && params.subtype === 'resend_invitation') {
 
                     let user_invite = await models.user_invites.findOne({
@@ -106,25 +105,63 @@ function service(data) {
                         }
                     })
 
+                    let INVITATION_EMAIL_CONTEXT_ID = 93;
+
+
+
                     if (!user_invite || !user_invite.id)
                         throw new Error("You haven't invited user with email: " + params.email);
                     if (['accepted'].includes(user_invite.status))
                         throw new Error("Invitation already " + user_invite.status);
 
-                    payload.recipient = params.email;
+                    let token = await crypto.randomBytes(32).toString('hex');
+                    user_invite.token = token;
+                    await user_invite.save();
 
 
-                    payload.context_id = 80;
-                    payload.recipient = params.email,
-                        payload.data = {
-                            email: params.email,
-                            name: "User",
+                    const emailPayload = {
+                        //userName: GLOBAL_USER ? GLOBAL_USER.first_name + ' ' + GLOBAL_USER.last_name || GLOBAL_USER.business_name || '' : created1.first_name + ' ' + created1.last_name || created1.business_name || '', // existing team member
+                        lenderFullName: data.user.first_name ? data.user.first_name + ' ' + data.user.last_name : data.user.business_name,
+                        lenderName: data.user.first_name ? data.user.first_name + ' ' + data.user.last_name : data.user.business_name,
+                        memberAcceptURL: "",
+                        memberDeclineURL: config.base_url + 'team/reject?token=' + token
+                    }
+
+                    if (user_invite.user_created_id) {
+                        let {
+                            user,
+                            exists
+                        } = await userIsRegistered(user_invite.user_created_id);
+
+
+
+
+                        let recipient = user.email;
+                        emailPayload.userName = user.first_name ? user.first_name + ' ' + user.last_name : '';
+
+                        if (!exists) {
+                            INVITATION_EMAIL_CONTEXT_ID = 94;
+                            emailPayload.memberAcceptURL = config.base_url + 'signup/team?token=' + token
+                        } else {
+                            emailPayload.memberAcceptURL = config.base_url + 'team/accept?token=' + token
+                            if (!emailPayload.userName) {
+                                INVITATION_EMAIL_CONTEXT_ID = 94;
+                                emailPayload.memberAcceptURL = config.base_url + 'signup/team?token=' + token
+                            }
+
                         }
-                }
-                const url = config.notif_base_url + "email/send";
-                return makeRequest(url, 'POST', payload, requestHeaders);
-            }
 
+                        await user_invite.update({
+                            status: 'pending'
+                        })
+                        return send_email(INVITATION_EMAIL_CONTEXT_ID, recipient, emailPayload);
+
+                    }
+
+
+
+                }
+            }
         })
         .then(async (auth_token) => {
             if (!auth_token) throw new Error("Could not resend token");

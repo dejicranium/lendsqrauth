@@ -134,7 +134,8 @@ function service(data) {
                 interestPeriod: product.interest_period,
                 tenor: collection.tenor + ' ' + product.tenor_type,
                 link: config.base_url + 'collections',
-                loanRepaymentURL: '', //TODO: makee sure that this links to reapyment schedule url
+                collectionScheduleURL: config.base_url + 'collections', //TODO: makee sure that this links to reapyment schedule url
+                loanRepaymentScheduleURL: config.base_url + 'collections',
             };
             // SEND!
             send_email(LENDER_COLLECTION_CONFIRMATION_EMAIL_CONTEXT_ID, lender.user.email, confirmation_email_payload);
@@ -179,11 +180,11 @@ function service(data) {
                         }
                     });
                     await models.collection_schedules.bulkCreate(bulkdata);
-                    //console.log(resp);
+                    console.log(resp);
                 })
                 .catch(err => {
                     //silent failure
-                    //console.log(err)
+                    console.log(err)
                 })
 
 

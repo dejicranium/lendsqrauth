@@ -205,7 +205,7 @@ function service(data) {
             d.resolve(auth_token);
         })
         .catch((err) => {
-            //console.log(err.stack)
+            console.log(err.stack)
             d.reject(err);
 
         });

@@ -62,7 +62,7 @@ function service(data) {
 			// interest must be a digit or a float
 			if (params.interest) {
 				assert.digitsOrDecimalOnly(params.interest, null, 'interest')
-				if (parseFloat(params.interest) < 1) throw new Error("Interest must be at least 1%");
+				if (parseFloat(params.interest) < 0) throw new Error("Interest must be at least 0");
 			}
 
 			// max loan amount and min_loan amount must exist together,

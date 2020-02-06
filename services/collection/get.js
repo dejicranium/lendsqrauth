@@ -28,9 +28,11 @@ function service(data) {
 			});
 			const params = validParameters.params;
 			let getFunction = null;
-
+			let query = {
+				where: {}
+			};
 			if (params.collection_id) {
-				let query = {
+				query = {
 					where: {}
 				};
 				query.where.id = params.collection_id;
@@ -44,11 +46,25 @@ function service(data) {
 				})
 
 			} else {
-				let query = {
+				query = {
 					limit: data.limit,
 					offset: data.offset,
 					where: {}
 				}
+
+				query.include = [{
+					model: models.product,
+					where: {},
+					attributes: ['product_name', 'interest', 'interest_period'],
+					include: [{
+						model: models.profile,
+						where: {},
+						include: [{
+							model: models.user,
+							where: {}
+						}]
+					}]
+				}];
 
 				if (data.lender_id) query.where.lender_id = data.lender_id;
 				if (data.product_id) query.where.product_id = data.product_id;
@@ -82,19 +98,48 @@ function service(data) {
 				if (data.lender_name) query.where.num_of_collections = data.num_of_collections;
 				if (data.collection_frequency) query.where.collection_frequency = data.collection_frequency;
 
+				if (data.search) {
+					delete query.where;
+
+
+					query.where = {}
+					query.where.$or = [{
+						borrower_first_name: {
+							$like: '%' + data.search + '%'
+						},
+						borrower_last_name: {
+							$like: '%' + data.search + '%'
+						},
+						tenor: {
+							$like: '%' + data.search + '%'
+						},
+						amount: {
+							$like: '%' + data.search + '%'
+						}
+					}]
+					/*
+					query.where.$or = [{
+							tenor: {
+								$like: '%' + data.search + '%'
+							}
+						},
+						{
+							amount: {
+								$like: '%' + data.search + '%'
+							}
+
+						}
+					]*/
+				}
 				if (['business_lender', 'individual_lender'].includes(data.profile.role)) {
 					query.where.lender_id = data.profile.id
 				} else if (data.profile.role == 'borrower') {
-					query.where.lender_id = data.profile.parent_profile_id
 					query.where.borrower_id = data.profile.id
 				} else if (data.profile.role == 'collaborator') {
 					query.where.lender_id = data.profile.parent_profile_id
 				}
 
-				query.include = [{
-					model: models.product,
-					attributes: ['product_name', 'interest', 'interest_period']
-				}];
+
 				query.order = [
 					['id', 'DESC']
 				];
@@ -107,8 +152,12 @@ function service(data) {
 				/*query.where.deleted_flag = {
 					$ne: 1
 				};*/
-				getFunction = models.collection.findAndCountAll(query)
+
+
+
+
 			}
+			getFunction = models.collection.findAndCountAll(query)
 
 			return [getFunction, params]
 
@@ -136,8 +185,7 @@ function service(data) {
 
 			collections.rows = JSON.parse(JSON.stringify(collections.rows));
 
-			let lender_ids =
-				collections.rows.map(c => c.lender_id)
+			let lender_ids = collections.rows.map(c => c.lender_id)
 			let lenders = [];
 			if (lender_ids) {
 				lenders = await models.profile.findAll({

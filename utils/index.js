@@ -51,6 +51,7 @@ function json_send(res, data, message, status, status_code, meta, is_error) {
 		message: res.statusMessage,
 		userId: res.userId,
 		profileId: res.profileId,
+		environment: process.env.NODE_ENV,
 		data: {
 			status: response_json.status,
 			message: response_json.message,
@@ -87,13 +88,13 @@ EXPRESS_UTILS.log = function (thing_to_log, num, title) {
 	/*
   num = num || 5;
   title = title || "LOGSTART";
-  //console.log("\n\n\n\n\n\n<*****************" + title + "***********************>");
+  console.log("\n\n\n\n\n\n<*****************" + title + "***********************>");
   for(var i=0; i < num; i++)
-  //console.log("**************************************************");
-  //console.log(thing_to_log);
+  console.log("**************************************************");
+  console.log(thing_to_log);
   for(var i=0; i < num; i++)
-  //console.log("**************************************************");
-  //console.log("<******************"+ title +"-END***********************>\n\n\n\n\n\n");
+  console.log("**************************************************");
+  console.log("<******************"+ title +"-END***********************>\n\n\n\n\n\n");
 */
 }
 

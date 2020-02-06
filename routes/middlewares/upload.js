@@ -21,7 +21,7 @@
 //       cb(null, {fieldName: file.fieldname});
 //     },
 //     key: function (req, file, cb) {
-//       ////console.log(file);
+//       //console.log(file);
 //       const filetp = file.mimetype.split('/').pop();
 //       cb(null, req._$vnbreqid + '.'+filetp)
 //     }

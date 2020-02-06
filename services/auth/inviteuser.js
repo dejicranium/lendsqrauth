@@ -71,7 +71,7 @@ function service(data) {
 			];
 		})
 		.spread(async (invitation, user, params) => {
-			if (invitation && invitation.status !== 'declined') {
+			if (invitation && invitation.status !== 'declined' && !invitation.deleted_flag) {
 				throw new Error('Invitation has been sent already');
 			}
 
@@ -88,8 +88,11 @@ function service(data) {
 				});
 				params.uuid = Math.random().toString(36).substr(2, 9);
 				params.created_on = new Date();
-				//params.parent_profile_id = data.profile.id;
+				params.parent_profile_id = data.profile.id;
 				params.user_id = user.id;
+				params.status = 'pending'
+				params.deleted_flag = null;
+
 
 
 				return [params, models.profile.create(params), 'none'];
@@ -102,7 +105,8 @@ function service(data) {
 					models.user.create({
 						email: params.email,
 						uuid: uuid,
-						created_by: globalUserId
+						created_by: globalUserId,
+						status: 'active'
 					}),
 					'user-created'
 				];
@@ -124,7 +128,8 @@ function service(data) {
 				let new_profile = await models.profile.create({
 					role_id: params.role_id,
 					user_id: created1.id,
-					//parent_profile_id: globalProfileId,
+					parent_profile_id: globalProfileId,
+					status: 'pending',
 					uuid: Math.random().toString(36).substr(2, 9),
 					created_on: new Date()
 				});
@@ -147,14 +152,16 @@ function service(data) {
 					inviter: data.profile.id,
 					token: invite_token,
 					profile_created_id: new_profile_id, // we need to track the profile that was created as a result of this process
-					user_created_id: created2 == 'user-created' ? created1.id : null
+					user_created_id: created2 == 'user-created' ? created1.id : GLOBAL_USER.id
 				}
 			});
 
 
 			if (!invitation[1]) {
-				invitation[0].update({
-					status: 'pending'
+				await invitation[0].update({
+					status: 'pending',
+					profile_created_id: new_profile_id, // replace the former instance with the new profile created,
+					user_created_id: created2 == 'user-created' ? created1.id : GLOBAL_USER.id
 				});
 			}
 
@@ -230,7 +237,7 @@ function service(data) {
 			d.resolve('Invited team member');
 		})
 		.catch((err) => {
-			//console.log(err.stack);
+			console.log(err.stack);
 			d.reject(err);
 		});
 

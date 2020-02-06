@@ -38,7 +38,7 @@ class AuditLog  {
         }
         catch(e) {
             // silent treatement
-            //console.log(e.stack);
+            console.log(e.stack);
             throw new Error(e);
         }
     }

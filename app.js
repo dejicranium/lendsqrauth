@@ -10,14 +10,14 @@ try {
     envPath = `.${appEnvProfile}`;
   }
   const fullEnvPath = './config/env' + envPath + '.json';
-  // //console.log(fullEnvPath);
+  // console.log(fullEnvPath);
   var envJSON = require(fullEnvPath);
   for (var envProp in envJSON) {
     process.env[envProp] = envJSON[envProp];
   }
-  ////console.log(envJSON);
+  //console.log(envJSON);
 } catch (e) {
-  ////console.log(e);
+  //console.log(e);
 }
 //========================
 var models = require('./models/sequelize');
@@ -34,6 +34,7 @@ const apis_collection = require('./routes/collection');
 const apis_preferences = require('./routes/preference');
 const apis_dashboard = require('./routes/dashboard');
 const apis_audit = require('./routes/audit');
+const apis_onboarding = require('./routes/onboarding');
 
 var utils = require('mlar')('mt1l');
 
@@ -65,6 +66,14 @@ const logger = require('mlar')('mongolog');
 const elasticLog = require('mlar')('locallogger');
 const scrubber = require('mlar')('obscrub');
 const SCRUBVALS = require('./utils/scrubvals.json');
+const sendCollectionRemindersCron = require('./jobs/send_reminder_invitations');
+
+
+
+// start sendCollection reminders cron
+sendCollectionRemindersCron();
+
+
 
 app.use(
   bodyParser.urlencoded({
@@ -107,13 +116,12 @@ app.use(function (req, res, next) {
     query: scrubber(req.query, scrubs),
     headers: scrubber(req.headers, scrubs),
     useragent: req.headers['user-agent'],
-
-
+    environment: process.env.NODE_ENV
   };
 
-  elasticLog.info(JSON.Sreqlog)
-  //console.log('req.id req.id ' + reqid)
-  ////console.log('**userId ' + req.user.id)
+  elasticLog.info(JSON.Sreqlog);
+  console.log('req.id req.id ' + reqid)
+  //console.log('**userId ' + req.user.id)
 
   /*
     logger({
@@ -153,6 +161,7 @@ app.use(`${base}`, apis_collection(EndpointRouter));
 app.use(`${base}`, apis_preferences(EndpointRouter));
 app.use(`${base}`, apis_dashboard(EndpointRouter));
 app.use(`${base}`, apis_audit(EndpointRouter));
+app.use(`${base}`, apis_onboarding(EndpointRouter));
 
 //app.use(view_routes); //front end
 /*
@@ -168,7 +177,7 @@ app.use(base, function (req, res, next) {
 
 // start cron job
 
-//console.log("Config file is " + process.env.base_url)
+console.log("Config file is " + process.env.base_url)
 
 //get_collection_schedules();
 
@@ -176,7 +185,7 @@ var force_sync = process.env.FORCESYNC ? true : false;
 
 var stage = process.env.NODE_ENV || 'development-local';
 
-//console.log('environment is ' + process.env.NODE_ENV);
+console.log('environment is ' + process.env.NODE_ENV);
 if (
   stage === 'development' ||
   stage === 'test' ||
@@ -192,8 +201,8 @@ if (
     .then(function () {
       app.listen(appConfig.port, function () {
         //runWorker();
-        // //console.log(stage);
-        //console.log([appConfig.name, 'is running on port', appConfig.port.toString()].join(' '));
+        // console.log(stage);
+        console.log([appConfig.name, 'is running on port', appConfig.port.toString()].join(' '));
       });
     });
 }

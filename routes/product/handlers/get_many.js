@@ -19,7 +19,7 @@ function vinfo(req, res, next) {
         })
         .catch(error => {
             utils.jsonF(res, null, error.message);
-                                                
+
         })
 }
 
@@ -29,7 +29,7 @@ vinfo.routeConfig.method = "get";
 vinfo.routeConfig.middlewares = [
     auth_middleware,
     profile_middleware,
-    has_role(['admin', 'individual_lender', 'business_lender']),
+    has_role(['admin', 'individual_lender', 'business_lender', 'collaborator']),
     routemeta('get_products', 'none')
 ];
 module.exports = vinfo;

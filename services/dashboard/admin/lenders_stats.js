@@ -23,28 +23,38 @@ function service(data) {
     var d = q.defer();
 
     q.fcall(async () => {
-            let role = await models.profile.findOne({
-                where: {
-                    name: {}
-                }
-            })
-
-            let year = new Date().getFullYear();
-            let query = `SELECT MONTH(created_on) as month, COUNT(*) as num
+            let year = data.year || new Date().getFullYear();
+            let l = `SELECT MONTH(created_on) as month,  
+            COUNT(*) as total,
+            COUNT(CASE status WHEN 'active' THEN 1 ELSE 0 END) as total_active
             FROM profiles WHERE
-            role_id = 4 and YEAR(created_on)= '${year}'
+            role_id = 2 OR role_id = 5 and YEAR(created_on) = "${year}"
             GROUP BY MONTH(created_on)`;
-            return models.sequelize.query(query)
+            return models.sequelize.query(l)
 
         })
         .then(async report => {
             if (!report) d.resolve({})
             report = JSON.parse(JSON.stringify(report[0]));
 
+
+            for (let i = 1; i < 13; i++) {
+                if (!report[i - 1]) {
+                    let report_obj = {
+                        month: i,
+                        total: 0,
+                        total_active: 0
+                    }
+                    report.push(report_obj)
+
+                }
+            }
+
             d.resolve(report)
 
         })
         .catch(err => {
+            console.log(err.stack)
             d.reject(err);
         })
 

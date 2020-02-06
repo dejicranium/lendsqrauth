@@ -32,7 +32,7 @@ vinfo.routeConfig.method = "get";
 vinfo.routeConfig.middlewares = [
     auth_middleware,
     profile_middleware,
-    //has_role('borrower'),
+    has_role('admin'),
     routemeta('lender_stats', 'none')
 ];
 module.exports = vinfo;

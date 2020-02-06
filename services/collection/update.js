@@ -222,6 +222,9 @@ function service(data) {
             if (params.borrower_email) assert.emailFormatOnly(params.borrower_email, null, 'Email');
 
             if (params.disbursement_date) assert.dateFormatOnly(params.disbursement_date, null, 'Disbursement Date');
+            if (new Date(params.disbursement_date).getFullYear().toString() == "1970") params.disbursement_date = null;
+
+
             if (params.disbursement_mode) {
                 if (!['cash', 'transfer'].includes(params.disbursement_mode.toLowerCase()))
                     throw new Error("Disbursement mode should be either cash or transfer")
@@ -288,54 +291,59 @@ function service(data) {
 
                     if (new_status === 'inactive' && collection.status !== 'inactive') {
                         // prepare email
-                        let lender_name =
-                            data.user.business_name || data.user.first_name + ' ' + data.user.last_name;
+                        /* let lender_name =
+                             data.user.business_name || data.user.first_name + ' ' + data.user.last_name;
 
 
-                        let email_payload = {
-                            lenderFullName: lender_name,
-                            loanAmount: collection.amount + ` NGN`,
-                            interestRate: product.interest + " %",
-                            interestPeriod: product.interest_period,
-                            tenor: collection.tenor + ' ' + product.tenor_type,
-                            borrowersFullName: collection.borrower_first_name + ' ' + collection.borrower_last_name,
-                            rejectURL: config.base_url + 'signup/borrower/reject?token=',
-                            acceptURL: config.base_url + 'signup/borrower/accept?token=',
-                            collectionURL: config.base_url + 'collections'
-                        };
+                         let email_payload = {
+                             lenderFullName: lender_name,
+                             loanAmount: collection.amount + ` NGN`,
+                             interestRate: product.interest + " %",
+                             interestPeriod: product.interest_period,
+                             tenor: collection.tenor + ' ' + product.tenor_type,
+                             borrowersFullName: collection.borrower_first_name + ' ' + collection.borrower_last_name,
+                             rejectURL: config.base_url + 'signup/borrower/reject?token=',
+                             acceptURL: config.base_url + 'signup/borrower/accept?token=',
+                             collectionURL: config.base_url + 'collections'
+                         };
 
-                        /// send collection set up email;
-                        let COLLECTION_SETUP_EMAIL_CONTEXT_ID = 105;
-                        send_email(COLLECTION_SETUP_EMAIL_CONTEXT_ID, data.user.email, email_payload);
+                         /// send collection set up email;
+                         let COLLECTION_SETUP_EMAIL_CONTEXT_ID = 105;
+                         //send_email(COLLECTION_SETUP_EMAIL_CONTEXT_ID, data.user.email, email_payload);
 
-                        let invitation = await models.borrower_invites.findOne({
-                            where: {
-                                collection_id: collection.id,
-                            }
-                        });
+                         let invitation = await models.borrower_invites.findOne({
+                             where: {
+                                 collection_id: collection.id,
+                             }
+                         });
 
-                        if (invitation && invitation.id) {
-                            /// get the user record so that we can define whether or not we are inviting a new user or not
-                            let borrower = await models.profile.findOne({
-                                where: {
-                                    id: collection.borrower_id
-                                },
-                                include: [{
-                                    model: models.user
-                                }]
-                            });
+                         invitation.next_reminder_date = moment().add(4, 'days'); //post date the next invitation
+                         await invitation.save();
 
-                            let borrower_is_new_user = !borrower.user || !borrower.user.password;
 
-                            if (borrower_is_new_user) {
-                                email_payload.acceptURL = config.base_url + 'signup/borrower?token=' + invitation.token;
-                            } else {
-                                email_payload.acceptURL += invitation.token;
-                            }
-                            email_payload.rejectURL += invitation.token;
-                        }
+                         if (invitation && invitation.id) {
+                             /// get the user record so that we can define whether or not we are inviting a new user or not
+                             let borrower = await models.profile.findOne({
+                                 where: {
+                                     id: collection.borrower_id
+                                 },
+                                 include: [{
+                                     model: models.user
+                                 }]
+                             });
 
-                        await requests.inviteBorrower(collection.borrower_email, email_payload);
+                             let borrower_is_new_user = !borrower.user || !borrower.user.password;
+
+                             if (borrower_is_new_user) {
+                                 email_payload.acceptURL = config.base_url + 'signup/borrower?token=' + invitation.token + '&email=' + collection.borrower_email;
+                             } else {
+                                 email_payload.acceptURL = config.base_url + 'login?email=' + collection.borrower_email + '&token=' + invitation.token;
+                             }
+                             email_payload.rejectURL += invitation.token;
+                         }
+
+                         await requests.inviteBorrower(collection.borrower_email, email_payload);
+                         */
                     }
 
                     if (new_status === 'inactive') {
@@ -400,11 +408,11 @@ function service(data) {
                                     }
                                 })
                                 await models.collection_schedules.bulkCreate(bulkdata)
-                                //console.log(resp)
+                                console.log(resp)
                             })
                             .catch(err => {
                                 //silent failure
-                                //console.log(err)
+                                console.log(err)
                             })
                         */
                     }
@@ -421,7 +429,7 @@ function service(data) {
             d.resolve(collection);
         })
         .catch((err) => {
-            //console.log(err.stack);
+            console.log(err.stack);
 
             d.reject(err);
         });

@@ -60,8 +60,8 @@ module.exports = ErrorUtils;
 //   return d.promise;
 // }
 // a(2).then(x=>{
-//   //console.log(x)
+//   console.log(x)
 // }).catch(e => { 
 //   console.dir(e); 
-//   //console.log(e.code, e.message);
+//   console.log(e.code, e.message);
 // })

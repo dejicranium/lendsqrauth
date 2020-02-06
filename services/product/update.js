@@ -6,6 +6,8 @@ const validators = require('mlar')('validators');
 const assert = require('mlar')('assertions');
 const AuditLog = require('mlar')('audit_log');
 const product_utils = require('mlar')('product_utils');
+const resolvers = require('mlar')('resolvers');
+
 
 var spec = morx.spec({})
 	.build('product_id', 'required:true, eg:1')
@@ -99,8 +101,8 @@ function service(data) {
 			if (params.interest_period) {
 				params.interest_period = params.interest_period.toLowerCase();
 
-				if (!['per day', 'per month', 'per annum', 'flat'].includes(params.interest_period))
-					throw new Error('Interest period should be one of `per day`, `per month` or `per annum`')
+				if (!['per day', 'per week', 'per month', 'per annum', 'flat'].includes(params.interest_period))
+					throw new Error('Interest period should be one of `flat` `per day`, `per week`, `per month` or `per annum`')
 
 			}
 
@@ -149,9 +151,7 @@ function service(data) {
 			let p = product;
 
 
-			return product.update({
-				...params
-			})
+			return product.update(params)
 
 		}).then(async (product) => {
 			if (!product) throw new Error("An error occured while creating product");
@@ -159,7 +159,32 @@ function service(data) {
 
 			d.resolve(p)
 			let params = {};
-			if (p.max_tenor == null || p.product_name == null || p.product_description == null || p.repayment_method == null ||
+
+
+			// see whether collection is in draft;
+			let new_status1 = product.status == 'active' ? 'inactive' : 'draft';
+			let new_status2 = product.status == 'active' ? 'active' : 'inactive';
+			const required_fields = [
+				'max_tenor',
+				'min_tenor',
+				'product_name',
+				'product_description',
+				'repayment_method',
+				'min_loan_amount',
+				'max_loan_amount',
+				'tenor_type',
+				'interest_period',
+				'repayment_model',
+				'interest'
+			]
+			params.status = resolvers.resolveCompletionStatus(
+				product,
+				required_fields,
+				new_status1,
+				new_status2
+			);
+
+			/*if (p.max_tenor == null || p.product_name == null || p.product_description == null || p.repayment_method == null ||
 				p.repayment_model == null || p.min_loan_amount == null || p.max_loan_amount == null || p.tenor_type == null ||
 				p.min_tenor == null || p.interest_period == null || p.interest == null) {
 				params.status = 'draft';
@@ -167,11 +192,9 @@ function service(data) {
 				if (params.status != 'active') {
 					params.status = 'inactive';
 				}
-			}
+			}*/
 
-			await product.update({
-				...params
-			});
+			await product.update(params);
 
 			// see whether loan is draft or not
 			//let loan_is_draft = true;

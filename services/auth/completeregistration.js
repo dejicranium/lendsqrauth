@@ -117,6 +117,7 @@ function service(data) {
             if (accepted_user_profile && accepted_user_profile.id) {
                 // add a parent_profile when it's accepted
                 accepted_user_profile.parent_profile_id = invite.inviter;
+                accepted_user_profile.status = 'active';
                 await accepted_user_profile.save()
             }
 
@@ -180,7 +181,7 @@ function service(data) {
                 });
 
             } catch (e) {
-                //console.log("got to error")
+                console.log("got to error")
                 // require('mlar')('locallogger').error(data.reqData, {}, e);
 
             }
@@ -193,7 +194,7 @@ function service(data) {
         })
 
         .catch(err => {
-            ////console.log(err.stack)
+            //console.log(err.stack)
             /*require('mlar')('locallogger').error({
                 body: data
             }, {}, error);*/
