@@ -31,8 +31,7 @@ function service(data) {
             const limit = data.limit ? Number(data.limit) : 20;
             const offset = page ? (page - 1) * limit : false;
 
-            data.limit = limit;
-            data.offset = offset;
+
             data.where = {
 
             };
@@ -66,8 +65,7 @@ function service(data) {
             }
 
             if (data.profile.role !== 'admin') {
-                data.where.$or = [
-                    {
+                data.where.$or = [{
                         lender_id: data.profile.id
                     },
                     {
@@ -76,13 +74,13 @@ function service(data) {
                 ];
             }
 
-            return [models.collection_schedules.findAndCountAll(data), data];
+            return [models.collection_schedules.findAll(data), data];
 
         })
         .spread((schedules, data) => {
             if (!schedules) throw new Error("No schedules available");
 
-            d.resolve(paginate(schedules.rows, 'schedules', schedules.count, Number(data.limit), data.page));
+            d.resolve(schedules)
         })
         .catch((err) => {
 
