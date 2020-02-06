@@ -27,7 +27,7 @@ function service(data) {
 			});
 			const params = validParameters.params;
 			const page = data.page ? Number(data.page) : 1;
-			const limit = data.limit ? Number(data.limit) : 20;
+			const limit = data.limit ? Number(data.limit) : 200;
 			const offset = page ? (page - 1) * limit : false;
 
 			data.limit = limit;
