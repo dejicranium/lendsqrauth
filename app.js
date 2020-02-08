@@ -71,7 +71,7 @@ const sendCollectionRemindersCron = require('./jobs/send_reminder_invitations');
 
 
 // start sendCollection reminders cron
-sendCollectionRemindersCron();
+//sendCollectionRemindersCron();
 
 
 

@@ -13,7 +13,10 @@ describe('#Download Service', function () {
 
     it('shouldsendacceptancenotif', async (done) => {
         const data = {
-            collection_id: 2
+            collection_id: 4,
+            user: {
+                business_name: "Stuff"
+            }
         }
         send_acceptance_notif(data)
             .then(result => {

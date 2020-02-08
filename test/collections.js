@@ -33,8 +33,7 @@ describe('#Collections', function () {
         getCollections({
                 profile: {
                     role: 'individual_lender',
-                    status: 'inactive',
-                    id: 1
+                    id: 93
                 },
                 //status: 'draft'
                 //search: 'Matem'
