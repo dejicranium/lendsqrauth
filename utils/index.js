@@ -41,23 +41,25 @@ function json_send(res, data, message, status, status_code, meta, is_error) {
 			meta: scrubber(response_json.meta, SCRUBVALS)
 		}
 	});
-	let logFunc = null;
 	let logData = {
-		id: res._$appreqid,
-		type: 'response',
-		comment: 'Response',
-		headers: res.headers,
-		code: res.statusCode,
-		message: res.statusMessage,
-		userId: res.userId,
-		profileId: res.profileId,
+		response: {
+			id: res._$appreqid,
+			//type: 'response',
+			//comment: 'Response',
+			headers: res.headers,
+			code: res.statusCode,
+			message: res.statusMessage,
+			userId: res.userId,
+			profileId: res.profileId,
+			data: {
+				status: response_json.status,
+				message: response_json.message,
+				data: scrubber(response_json.data, SCRUBVALS),
+				meta: scrubber(response_json.meta, SCRUBVALS)
+			}
+		},
+		request: res._request,
 		environment: process.env.NODE_ENV,
-		data: {
-			status: response_json.status,
-			message: response_json.message,
-			data: scrubber(response_json.data, SCRUBVALS),
-			meta: scrubber(response_json.meta, SCRUBVALS)
-		}
 	}
 	if (parseInt(res.statusCode) !== 200) {
 		elasticLog.error(logData);

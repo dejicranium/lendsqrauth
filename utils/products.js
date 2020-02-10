@@ -88,8 +88,7 @@ function businessEligibleToCreateProduct(profileId, userId) {
 
             let business_required_fields = ['business_name', 'tin_number', 'rc_number', 'business_address', 'state', 'country', 'business_phone']
             business_required_fields.forEach(field => {
-                console.log('business field = ' +
-                    businessDetails[field])
+                //console.log('business field = ' + businessDetails[field])
                 if (!businessDetails[field]) {
                     throw new Error("Can't create product until business information is completed")
                 }

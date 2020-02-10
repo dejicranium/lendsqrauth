@@ -119,7 +119,9 @@ app.use(function (req, res, next) {
     environment: process.env.NODE_ENV
   };
 
-  elasticLog.info(JSON.Sreqlog);
+  res._request = reqlog;
+
+  //elasticLog.info(JSON.Sreqlog);
   //console.log('req.id req.id ' + reqid)
   //console.log('**userId ' + req.user.id)
 
@@ -202,7 +204,7 @@ if (
       app.listen(appConfig.port, function () {
         //runWorker();
         // console.log(stage);
-        console.log([appConfig.name, 'is running on port', appConfig.port.toString()].join(' '));
+        //console.log([appConfig.name, 'is running on port', appConfig.port.toString()].join(' '));
       });
     });
 }

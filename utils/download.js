@@ -10,7 +10,7 @@ module.exports = function (model, user_id, template_id = null, extras_func = nul
 
     var d = q.defer();
     var filename = file_name || md5(Date.now()) + "-" + md5(Math.random()) + ".csv";
-    console.log(model)
+    //console.log(model)
     // var adbookwhere = { AccountId:accountid };
     // if(user_id) adbookwhere = { user_id:user_id };
 
@@ -40,10 +40,10 @@ module.exports = function (model, user_id, template_id = null, extras_func = nul
             json2csv(search, function (err, csv) {
 
                 if (err) {
-                    console.log(err)
+                    //console.log(err)
                 }
 
-                console.log(csv)
+                //console.log(csv)
                 s3({
                         data: csv,
                         filename: filename

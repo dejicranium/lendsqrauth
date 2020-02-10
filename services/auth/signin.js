@@ -121,10 +121,10 @@ function service(data) {
             await audit_log.create();
 
 
-        d.resolve(response)
+            d.resolve(response)
         })
         .catch((err) => {
-            console.log(err.stack)
+            //console.log(err.stack)
             d.reject(err);
 
         });

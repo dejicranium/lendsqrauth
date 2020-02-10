@@ -10,6 +10,7 @@ if (process.env.NODE_ENV === 'production') {
 
 } else if (process.env.NODE_ENV === 'staging') {
     module.exports = {
+        NODE_ENV = 'staging',
         JWTsecret: process.env.JWTsecret || 'wd#o,9!fPJZ-> L<~%J-VEVGdnlr6(Gq2dq).XHOpQ^v[q4t1^-%Nq ff-jn_s=g',
         JWTexpiresIn: process.env.JWTexpiresIn || 86000,
         sender_email: process.env.sender_email || 'support@lendsqr.com',
@@ -19,8 +20,8 @@ if (process.env.NODE_ENV === 'production') {
         aws_s3base_url: process.env.AWS_S3BASE || "https://lendsqr-files.s3.us-east-2.amazonaws.com/downloads/",
         aws_access_key: process.env.aws_access_key || "AKIAVDBVPR56O5DJRBKP",
         aws_secret_key: process.env.aws_secret_key || "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",
-        
-        
+
+
         base_url: process.env.base_url || 'http://staging-lb-978527258.us-east-2.elb.amazonaws.com/',
 
 
@@ -40,6 +41,8 @@ if (process.env.NODE_ENV === 'production') {
 } else {
 
     module.exports = {
+        NODE_ENV = 'development',
+
         JWTsecret: process.env.JWTsecret || 'wd#o,9!fPJZ-> L<~%J-VEVGdnlr6(Gq2dq).XHOpQ^v[q4t1^-%Nq ff-jn_s=g',
         JWTexpiresIn: process.env.JWTexpiresIn || 86000,
         sender_email: process.env.sender_email || 'support@lendsqr.com',
