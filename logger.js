@@ -1,5 +1,3 @@
-const winston = require('winston');
-require('winston-logstash');
 const scrubber = require('mlar')('obscrub');
 const SCRUBVALS = require('./utils/scrubvals.json');
 const logger = require('pino')();
@@ -26,14 +24,4 @@ function error(req, status, error, data = {}) {
   return logger.error(errorData);
 }
 
-module.exports = logger
-/*
-winston.add(winston.transports.Logstash, {
-	port: 5000,
-	host: '3.18.62.42',
-	ssl_enable: false,
-	max_connect_retries: 9
-});
-
-module.exports = winston;
-*/
+module.exports = logger;

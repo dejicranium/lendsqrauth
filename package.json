@@ -5,6 +5,7 @@
   "main": "app.js",
   "scripts": {
     "test": "mocha reporter --spec",
+    "debug": "nodemon --inspect app.js",
     "dev-test": "mocha test/services/auth --recursive",
     "prof-test": "mocha test/services/profile --recursive",
     "product-test": "mocha test/services/product --recursive",
