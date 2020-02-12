@@ -45,7 +45,7 @@ function service(data) {
             if ((data.profile.id !== product.profile_id) && data.profile.role !== 'admin') throw new Error("You cannot update another profile's product")
             if (product.status === 'draft' || product.status === 'deleted') throw new Error("Cannot operate on a draft/deleted product");
 
-            if (product_utils.productHasActiveCollection(product)) {
+            if (product_utils.productHasActiveCollection(product) && data.profile.role !== 'admin') {
                 throw new Error("Cannot update a product with at least one active collection")
             }
             let p = product;
@@ -78,9 +78,8 @@ function service(data) {
             params.modified_on = new Date();
             params.modified_by = globalUserId;
 
-            return product.update({
-                ...params
-            })
+            return product.update(params);
+
         }).then(async (product) => {
             if (!product) throw new Error("An error occured while updating product");
             let action_type = null;
