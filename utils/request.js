@@ -18,7 +18,10 @@ module.exports = (url, method, payload, headers, caller = null, defaultheaders =
         message: `calling: ${url}`,
         data: payload,
         url: url,
-        method: method
+        method: method,
+        request: null,
+        response: null,
+        environment: process.env.NODE_ENV
     })
 
     q.fcall(() => {
@@ -44,13 +47,15 @@ module.exports = (url, method, payload, headers, caller = null, defaultheaders =
             //throw new Error(`Could not ${caller}. Reason: ` + err );
 
         }
-        elasticLog.info({
+        elasticLog.error({
             type: `API call`,
             request: null,
             response: null,
             environment: process.env.NODE_ENV,
             message: `Error from calling: ${url}. Reason: ${err}`,
-            data: payload
+            data: payload,
+            request: null,
+            response: null,
         })
 
         d.reject(err)

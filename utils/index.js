@@ -62,9 +62,9 @@ function json_send(res, data, message, status, status_code, meta, is_error) {
 	};
 
 	if (parseInt(res.statusCode) !== 200) {
-		elasticLog.error(JSON.parse(JSON.stringify(logData)));
+		elasticLog.error(logData);
 	} else {
-		elasticLog.info(JSON.parse(JSON.stringify(logData)));
+		elasticLog.info(logData);
 	}
 
 	res.status(status_code).json(response_json);
@@ -84,16 +84,16 @@ EXPRESS_UTILS.json401 = function (res, data, message) {
 
 EXPRESS_UTILS.log = function (thing_to_log, num, title) {
 	/*
-  num = num || 5;
-  title = title || "LOGSTART";
-  console.log("\n\n\n\n\n\n<*****************" + title + "***********************>");
-  for(var i=0; i < num; i++)
-  console.log("**************************************************");
-  console.log(thing_to_log);
-  for(var i=0; i < num; i++)
-  console.log("**************************************************");
-  console.log("<******************"+ title +"-END***********************>\n\n\n\n\n\n");
-*/
+	  num = num || 5;
+	  title = title || "LOGSTART";
+	  console.log("\n\n\n\n\n\n<*****************" + title + "***********************>");
+	  for(var i=0; i < num; i++)
+	  console.log("**************************************************");
+	  console.log(thing_to_log);
+	  for(var i=0; i < num; i++)
+	  console.log("**************************************************");
+	  console.log("<******************"+ title +"-END***********************>\n\n\n\n\n\n");
+	*/
 };
 
 EXPRESS_UTILS.randomString = function (length, chars) {
