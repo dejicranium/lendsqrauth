@@ -60,29 +60,29 @@ function json_send(res, data, message, status, status_code, meta, is_error) {
 		request: res._request,
 		environment: process.env.NODE_ENV
 	};
-
+	/*
 	if (parseInt(res.statusCode) !== 200) {
 		elasticLog.error(logData);
 	} else {
 		elasticLog.info(logData);
-	}
+	}*/
 
 	res.status(status_code).json(response_json);
 }
 
-EXPRESS_UTILS.jsonS = function(res, data, message, meta) {
+EXPRESS_UTILS.jsonS = function (res, data, message, meta) {
 	json_send(res, data, message, 'success', 200, meta);
 };
 
-EXPRESS_UTILS.jsonF = function(res, data, message) {
+EXPRESS_UTILS.jsonF = function (res, data, message) {
 	json_send(res, data, message, 'error', 400);
 };
 
-EXPRESS_UTILS.json401 = function(res, data, message) {
+EXPRESS_UTILS.json401 = function (res, data, message) {
 	json_send(res, data, message, 'error', 401);
 };
 
-EXPRESS_UTILS.log = function(thing_to_log, num, title) {
+EXPRESS_UTILS.log = function (thing_to_log, num, title) {
 	/*
   num = num || 5;
   title = title || "LOGSTART";
@@ -96,7 +96,7 @@ EXPRESS_UTILS.log = function(thing_to_log, num, title) {
 */
 };
 
-EXPRESS_UTILS.randomString = function(length, chars) {
+EXPRESS_UTILS.randomString = function (length, chars) {
 	if (!chars) {
 		chars = '#aA!';
 	}
@@ -110,7 +110,7 @@ EXPRESS_UTILS.randomString = function(length, chars) {
 	return result;
 };
 
-EXPRESS_UTILS.getPaginationMeta = function(perpage, total, currentpage, baseurl, usequery) {
+EXPRESS_UTILS.getPaginationMeta = function (perpage, total, currentpage, baseurl, usequery) {
 	var meta = {};
 	meta.total_pages = Math.ceil(total / perpage);
 	currentpage = currentpage * 1 || 1;
@@ -154,7 +154,7 @@ function scaffoldRoute(handler, middlewares, router) {
 		var config = handler.routeConfig;
 		unfurlConfig(handler, config, middlewares, router);
 	} else if (handler.routeConfig && handler.routeConfig.length) {
-		handler.routeConfig.forEach(function(config) {
+		handler.routeConfig.forEach(function (config) {
 			unfurlConfig(handler, config, middlewares, router);
 		});
 	}
@@ -162,7 +162,7 @@ function scaffoldRoute(handler, middlewares, router) {
 	return router;
 }
 
-EXPRESS_UTILS.coalesce = function(destination, sources) {
+EXPRESS_UTILS.coalesce = function (destination, sources) {
 	var _destination = _.clone(destination);
 	var _sources = [].concat(sources);
 
@@ -173,10 +173,10 @@ EXPRESS_UTILS.coalesce = function(destination, sources) {
 	return _destination;
 };
 
-EXPRESS_UTILS.buildRoutes = function(handlers, middlewares, router) {
+EXPRESS_UTILS.buildRoutes = function (handlers, middlewares, router) {
 	var handler_names = Object.keys(handlers);
 	if (handler_names.length) {
-		handler_names.forEach(function(handler_name) {
+		handler_names.forEach(function (handler_name) {
 			var handler = handlers[handler_name];
 			scaffoldRoute(handler, middlewares, router);
 		});
