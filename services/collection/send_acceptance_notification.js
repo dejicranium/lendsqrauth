@@ -51,6 +51,7 @@ function service(data) {
             // update invite to accepted.
             invite.status = "Accepted"
             invite.token_is_used = true;
+            invite.date_joined = new Date();
 
             collection.status = 'active';
             await collection.save();
