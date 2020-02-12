@@ -49,7 +49,7 @@ module.exports = (url, method, payload, headers, caller = null, defaultheaders =
             request: null,
             response: null,
             environment: process.env.NODE_ENV,
-            message: `Eerror from calling: ${url}. Reason: ${err}`,
+            message: `Error from calling: ${url}. Reason: ${err}`,
             data: payload
         })
 
