@@ -21,9 +21,7 @@ if (process.env.NODE_ENV === 'production') {
         aws_access_key: process.env.aws_access_key || "AKIAVDBVPR56O5DJRBKP",
         aws_secret_key: process.env.aws_secret_key || "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",
 
-
         base_url: process.env.base_url || 'http://staging-lb-978527258.us-east-2.elb.amazonaws.com/',
-
 
         admin_reg_token: process.env.admin_reg_token || 'saraytheiconoclast%32$6',
 
