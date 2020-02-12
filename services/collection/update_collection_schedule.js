@@ -31,9 +31,6 @@ function service(data) {
                 params
             ]
 
-
-
-
         })
         .spread((schedule, params) => {
             if (!schedule) throw new Error("Schedule not found");

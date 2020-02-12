@@ -11,6 +11,7 @@ const checktoken = require('mlar').mreq('services', 'auth/checktoken');
 const resendinvitation = require('mlar').mreq('services', 'auth/resendtoken.auth_required');
 
 const generateRandom = require('mlar')('testutils').generateRandom;
+const elasticLog = require('mlar')('locallogger');
 
 
 
@@ -54,6 +55,13 @@ describe('#Complete registration', function () {
                 done(err);
             })
 
+    })
+
+    it('should log to kibana', async (done) => {
+        for (let i = 0; i < 20000; i++) {
+            console.log(i)
+            elasticLog.error("hello world")
+        }
     })
 
 
