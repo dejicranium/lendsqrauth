@@ -2,7 +2,7 @@ const winston = require('winston');
 require('winston-logstash');
 const scrubber = require('mlar')('obscrub');
 const SCRUBVALS = require('./utils/scrubvals.json');
-const logger = require('pino')();
+//const logger = require('pino')();
 const reqIp = require('request-ip');
 
 const scrubs = SCRUBVALS;
@@ -25,6 +25,17 @@ function error(req, status, error, data = {}) {
 
   return logger.error(errorData);
 }
+
+const logger = require('winston-logstash-transport').createLogger(null, {
+  application: 'lendsqr',
+  logstash: {
+    host: '3.18.62.42',
+    port: 5000
+  },
+  transports: [
+    new winston.transports.Console(),
+  ]
+})
 
 module.exports = logger
 /*
