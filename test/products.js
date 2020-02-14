@@ -8,7 +8,7 @@ const checktoken = require('mlar').mreq('services', 'auth/checktoken');
 const generateRandom = require('mlar')('testutils').generateRandom;
 const utils = require('../utils/collections');
 const getProducts = require('./../services/product/get')
-
+const enableDisableProduct = require('./../services/product/enable_disable')
 
 describe('#Products', function () {
 
@@ -73,5 +73,30 @@ describe('#Products', function () {
             .catch(err => {
                 console.log(err);
             })
+    })
+    it('should deactivate product', (done) => {
+        enableDisableProduct({
+            product_id: 12,
+            user: {
+                id: 1
+            },
+            status: 'deactivated',
+            profile: {
+                id: 2,
+                role: 'admin'
+            }
+        }).then(result => {
+
+
+            let product = models.product.findOne({
+                where: {
+                    id: 12
+                }
+            })
+            product['status'].should.be.equal('deactivated');
+            done()
+        }).catch(error => {
+            done(error);
+        })
     })
 })

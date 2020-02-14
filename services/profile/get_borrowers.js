@@ -1,9 +1,9 @@
 const models = require('mlar')('models');
-const ErrorLogger = require('mlar')('errorlogger'); 
-const morx = require('morx'); 
-const q = require('q'); 
-const validators = require('mlar')('validators'); 
-const assert = require('mlar')('assertions'); 
+const ErrorLogger = require('mlar')('errorlogger');
+const morx = require('morx');
+const q = require('q');
+const validators = require('mlar')('validators');
+const assert = require('mlar')('assertions');
 const paginate = require('mlar')('paginate');
 
 /**
@@ -12,68 +12,90 @@ const paginate = require('mlar')('paginate');
  * where `profile_id` is passed, it means we are trying to get all the borrowers attached 
  * to a `profile_id`
  */
-var spec = morx.spec({}) 
-			   .build('profile_id', 'required:false, eg:1')   			    
-			   .end();
+var spec = morx.spec({})
+	.build('profile_id', 'required:false, eg:1')
+	.end();
 
-function service(data){
+function service(data) {
 
 	var d = q.defer();
 	const page = data.page ? Number(data.page) : 1;
-    const limit = data.limit ? Number(data.limit) : 20;
-    const offset = page ? (page - 1) * limit : false;	
-    
-    data.limit = limit;
-    data.offset = offset;
+	const limit = data.limit ? Number(data.limit) : 20;
+	const offset = page ? (page - 1) * limit : false;
 
-	q.fcall( async () => {
-		const validParameters = morx.validate(data, spec, {throw_error : true});
-		const params = validParameters.params;
-		
-		// get the borrower role.
+	data.limit = limit;
+	data.offset = offset;
 
-		let borrowerRole = await models.role.findOne({where: {name: 'borrower'}});
-		let borrowerRoleId = borrowerRole.id;
-		
-		
-		// if we are getting the borrowers linked to a lender (using profile_id)
-		if (params.profile_id) {
-		
-			data.where = {
-				role_id: borrowerRoleId,
-				parent_profile_id: params.profile_id,
+	q.fcall(async () => {
+			const validParameters = morx.validate(data, spec, {
+				throw_error: true
+			});
+			const params = validParameters.params;
+
+			// get the borrower role.
+
+			let borrowerRole = await models.role.findOne({
+				where: {
+					name: 'borrower'
+				}
+			});
+			let borrowerRoleId = borrowerRole.id;
+
+
+			// if we are getting the borrowers linked to a lender (using profile_id)
+			if (params.profile_id) {
+
+				data.where = {
+					role_id: borrowerRoleId,
+					parent_profile_id: params.profile_id,
+				}
+				data.include = [{
+					model: models.user,
+					attributes: {
+						exclude: ['password']
+					},
+
+				}];
+
+			} else {
+				data.where = {
+					role_id: borrowerRoleId
+				}
+				data.include = [{
+					model: models.user,
+					attributes: {
+						exclude: ['password']
+					}
+				}, {
+					model: models.borrower_invites,
+					attributes: ['date_joined']
+				}];
+
+
+				// if a lender is making the request, get only his borrowers
+				if (['individual_lender', 'business_lender'].includes(data.profile.role)) {
+					data.where.parent_profile_id = data.profile.id
+				}
 			}
-			data.include = [{model: models.user, attributes: {exclude: ['password']}}];
-
-		}
-		
-		else { 
-			data.where =  {
-				role_id: borrowerRoleId
-			}
-			data.include = [{model: models.user, attributes: {exclude: ['password']}}];
+			data.order = [
+				['id', 'DESC']
+			]
 
 
-			// if a lender is making the request, get only his borrowers
-			if (['individual_lender', 'business_lender'].includes(data.profile.role)) {
-				data.where.parent_profile_id = data.profile.id
-			}
-		}
-		
+			return models.profile.findAndCountAll(data);
 
-        return models.profile.findAndCountAll(data);
 
-        
-	}) 
-	.then((profile) => { 
-        if (!profile)  throw new Error("No profiles");
-        d.resolve(paginate(profile.rows, 'profiles', profile.count, limit,page));
-    })
-	.catch( (err) => {
+		})
+		.then((profile) => {
+			if (!profile) throw new Error("No profiles");
 
-		d.reject(err);
+			d.resolve(paginate(profile.rows, 'profiles', profile.count, limit, page));
+		})
+		.catch((err) => {
 
-	});
+			d.reject(err);
+
+		});
 
 	return d.promise;
 

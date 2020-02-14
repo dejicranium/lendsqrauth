@@ -151,6 +151,10 @@ function service(data) {
 				delete data.to;
 			}
 
+			data.order = [
+				['id', 'DESC']
+			]
+
 			return models.profile.findAndCountAll(data);
 		})
 		.then((profile) => {

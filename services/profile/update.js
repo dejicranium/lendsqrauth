@@ -24,6 +24,7 @@ var spec = morx.spec({})
 	.build('contact_email', 'required:false, eg:lender')
 	.build('support_email', 'required:false, eg:lender')
 	.build('social_links', 'required:false, eg:lender')
+	.build('status', 'required: false')
 	.end();
 
 function service(data) {
@@ -79,9 +80,7 @@ function service(data) {
 			//params = params.map(p. => p != "");
 
 			return [
-				profile.update({
-					...params
-				}),
+				profile.update(params),
 				params
 			];
 
