@@ -7,7 +7,8 @@ const chai = require('chai');
 const createUser = require('./../services/auth/signup');
 const get_team_members = require('./../services/profile/get_team_members')
 const get_user_profiles = require('./../services/profile/get_user_profiles');
-const delete_team_member = require('./../services/profile/delete_team_member')
+const delete_team_member = require('./../services/profile/delete_team_member');
+const updateStatus = require('./../services/profile/update_status');
 const TestBun = require('../utils/testBun');
 let tbud = new TestBun(models);
 
@@ -36,7 +37,7 @@ describe('#Profile Service', function () {
 
     before(function (done) {
         console.log('beforInc')
-        tbud.generate('user', user_data, {
+        /*tbud.generate('user', user_data, {
                 findOrCreate: {
                     keys: ['email'],
                     updateOnFind: true,
@@ -65,7 +66,7 @@ describe('#Profile Service', function () {
             })
             .catch(err => {
                 console.log(err)
-            })
+            })*/
         done()
     });
 
@@ -97,6 +98,18 @@ describe('#Profile Service', function () {
         result.should.be.a('object')
 
 
+    })
+
+    it('should change profile status', function (done) {
+        let data = {
+            profile_id: 2,
+            status: "blasklisted"
+        }
+        updateStatus(data).then(resp => {
+            console.log(resp)
+        }).catch(err => {
+            console.log(err)
+        })
     })
 
 })
