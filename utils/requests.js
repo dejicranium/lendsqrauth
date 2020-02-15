@@ -3,6 +3,7 @@ let config = require('../config')
 const makeRequest = require('mlar')('makerequest');
 const q = require('q')
 const moment = require('moment');
+const models = require('mlar')('models');
 const normalizeTenor = require('../utils/collections').normalizeTenor;
 const resolveCollectionStartDate = require('../utils/collections').resolveStartDate;
 
@@ -54,57 +55,6 @@ module.exports = {
         return d.promise
     },
 
-    notifyLoanCreated(email) {
-        const d = q.defer();
-        q.fcall(() => {
-
-                let url = config.notif_base_url + 'email/send';
-                let payload = {
-                    sender_id: 1,
-                    context_id: 65,
-                    recipient: email,
-                    sender: config.sender_email,
-                    data: {}
-                }
-
-                return makeRequest(url, 'POST', payload, constants.requestHeaders, 'notify lender of loan created');
-            })
-            .then(response => {
-                d.resolve(response)
-            })
-            .catch(err => {
-                d.reject(err);
-            })
-
-        return d.promise
-    },
-
-    notifyProductCreated(email) {
-        const d = q.defer();
-        q.fcall(() => {
-
-                let url = config.notif_base_url + 'email/send';
-                let payload = {
-                    sender_id: 1,
-                    context_id: 66,
-                    recipient: email,
-                    sender: config.sender_email,
-                    data: {
-
-                    }
-                }
-
-                return makeRequest(url, 'POST', payload, constants.requestHeaders, 'notify product creation');
-            })
-            .then(response => {
-                d.resolve(response)
-            })
-            .catch(err => {
-                d.reject(err);
-            })
-
-        return d.promise
-    },
 
     createCollectionSchedule(data) {
 

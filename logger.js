@@ -5,20 +5,20 @@ const reqIp = require('request-ip');
 
 const scrubs = SCRUBVALS;
 
-const logger = null; 
+const logger = null;
 try {
   logger = require('winston-logstash-transport').createLogger(null, {
-  application: 'lendsqr',
-  format: winston.format.json(),
-  logstash: {
-    host: '3.18.62.42',
-    port: 5000
-  },
-  transports: [
-    new winston.transports.Console(),
-  ]
-}) 
-} catch(e) {
+    application: 'lendsqr',
+    format: winston.format.json(),
+    logstash: {
+      host: '3.18.62.42',
+      port: 5000
+    },
+    transports: [
+      new winston.transports.Console(),
+    ]
+  })
+} catch (e) {
   // fail silently;
 }
 

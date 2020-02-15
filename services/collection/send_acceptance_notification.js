@@ -154,6 +154,10 @@ function service(data) {
                         }
                     });
                     await models.collection_schedules.bulkCreate(bulkdata);
+                    // update collection end_date 
+                    await collection.update({
+                        end_date: bulkdata[bulkdata.length - 1].due_date // due date of last collection schedule; //TODO: test this;
+                    })
                     //console.log(resp);
                 })
                 .catch(err => {
