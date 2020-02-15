@@ -51,7 +51,7 @@ function service(data) {
 					offset: data.offset,
 					where: {}
 				}
-
+				/*
 				query.include = [{
 					model: models.product,
 					where: {},
@@ -64,7 +64,7 @@ function service(data) {
 							where: {}
 						}]
 					}]
-				}];
+				}];*/
 
 				if (data.lender_id) query.where.lender_id = data.lender_id;
 				if (data.product_id) query.where.product_id = data.product_id;
