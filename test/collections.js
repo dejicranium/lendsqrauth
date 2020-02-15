@@ -9,7 +9,9 @@ const generateRandom = require('mlar')('testutils').generateRandom;
 const utils = require('../utils/collections');
 const getCollections = require('./../services/collection/get')
 const sendReminder = require('./../services/collection/send_invitation_reminder')
+const sendAcceptNotification = require('./../services/collection/send_acceptance_notification')
 const confirmCollection = require('./../services/collection/confirm_collection_creation');
+const getSummary = require('./../services/collection/summary');
 describe('#Collections', function () {
 
     this.timeout(500000);
@@ -70,6 +72,39 @@ describe('#Collections', function () {
             })
             .then(result => {
                 result.should.be.equal('done')
+                console.log(result)
+            })
+            .catch(err => {
+                console.log(err)
+            })
+
+    })
+    it('Accept collection invitation', async () => {
+
+        sendAcceptNotification({
+                collection_id: 2,
+                user: {
+                    business_name: "Cranium Tech"
+                }
+            })
+            .then(result => {
+                result.should.be.equal('Accepted the invitation')
+                console.log(result)
+            })
+            .catch(err => {
+                console.log(err)
+            })
+
+    })
+    it('should get summary', async () => {
+
+        getSummary({
+                collection_id: 2,
+                user: {
+                    business_name: "Cranium Tech"
+                }
+            })
+            .then(result => {
                 console.log(result)
             })
             .catch(err => {

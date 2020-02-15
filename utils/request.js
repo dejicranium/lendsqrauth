@@ -13,16 +13,22 @@ module.exports = (url, method, payload, headers, caller = null, defaultheaders =
     if (attachservicekey) {
         headers['service_access_key'] = '34$4l43*(z.er1*(7)&^'
     }
-    elasticLog.info({
-        type: `api-call`,
-        message: `calling: ${url}`,
-        data: payload,
-        url: url,
-        method: method,
-        request: null,
-        response: null,
-        environment: process.env.NODE_ENV
-    })
+    try {
+
+        elasticLog.info({
+            type: `api-call`,
+            message: `calling: ${url}`,
+            data: payload,
+            url: url,
+            method: method,
+            request: null,
+            response: null,
+            environment: process.env.NODE_ENV
+
+        })
+    } catch (e) {
+        //
+    }
 
     q.fcall(() => {
         return axios({
@@ -47,16 +53,21 @@ module.exports = (url, method, payload, headers, caller = null, defaultheaders =
             //throw new Error(`Could not ${caller}. Reason: ` + err );
 
         }
-        elasticLog.error({
-            type: `API call`,
-            request: null,
-            response: null,
-            environment: process.env.NODE_ENV,
-            message: `Error from calling: ${url}. Reason: ${err}`,
-            data: payload,
-            request: null,
-            response: null,
-        })
+        try {
+
+            elasticLog.error({
+                type: `API call`,
+                request: null,
+                response: null,
+                environment: process.env.NODE_ENV,
+                message: `Error from calling: ${url}. Reason: ${err}`,
+                data: payload,
+                request: null,
+                response: null,
+            })
+        } catch (e) {
+
+        }
 
         d.reject(err)
     })

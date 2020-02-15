@@ -59,9 +59,12 @@ function service(data) {
 					include: [{
 						model: models.profile,
 						where: {},
+						required: false,
 						include: [{
 							model: models.user,
-							where: {}
+							where: {},
+							required: false,
+
 						}]
 					}]
 				}];
