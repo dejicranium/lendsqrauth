@@ -61,12 +61,16 @@ function json_send(res, data, message, status, status_code, meta, is_error) {
 		environment: process.env.NODE_ENV
 	};
 
-	if (parseInt(res.statusCode) !== 200) {
-		elasticLog.error(logData);
-	} else {
-		elasticLog.info(logData);
+	try {
+		if (parseInt(res.statusCode) !== 200) {
+			elasticLog.error(logData);
+		} else {
+			elasticLog.info(logData)
+		}
 	}
-
+	catch(e) {
+		// fail silently
+	}
 	res.status(status_code).json(response_json);
 }
 

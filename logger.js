@@ -5,7 +5,9 @@ const reqIp = require('request-ip');
 
 const scrubs = SCRUBVALS;
 
-const logger = require('winston-logstash-transport').createLogger(null, {
+const logger = null; 
+try {
+  logger = require('winston-logstash-transport').createLogger(null, {
   application: 'lendsqr',
   format: winston.format.json(),
   logstash: {
@@ -15,6 +17,9 @@ const logger = require('winston-logstash-transport').createLogger(null, {
   transports: [
     new winston.transports.Console(),
   ]
-})
+}) 
+} catch(e) {
+  // fail silently;
+}
 
 module.exports = logger;
