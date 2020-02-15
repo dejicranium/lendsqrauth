@@ -56,12 +56,18 @@ function service(data) {
 					model: models.product,
 					where: {},
 					attributes: ['product_name', 'interest', 'interest_period'],
+					required: false,
+
 					include: [{
 						model: models.profile,
 						where: {},
+						required: false,
+
 						include: [{
 							model: models.user,
-							where: {}
+							where: {},
+							required: false,
+
 						}]
 					}]
 				}];
@@ -131,7 +137,6 @@ function service(data) {
 						}
 					]*/
 				}
-
 				if (['business_lender', 'individual_lender'].includes(data.profile.role)) {
 					query.where.lender_id = data.profile.id
 				} else if (data.profile.role == 'borrower') {
@@ -183,12 +188,11 @@ function service(data) {
 				if (collection.deleted_flag == 1) throw new Error('Collection has been deleted')
 				d.resolve(collections)
 			}
-			/*
+
 			collections.rows = JSON.parse(JSON.stringify(collections.rows));
 
 			let lender_ids = collections.rows.map(c => c.lender_id)
 			let lenders = [];
-
 			if (lender_ids) {
 				lenders = await models.profile.findAll({
 					where: {
@@ -203,16 +207,13 @@ function service(data) {
 					}]
 				})
 			}
-
 			collections.rows.forEach(c => {
 				if (lender_ids.includes(c.lender_id)) {
 					c.lender = lenders.find(l => l.id == c.lender_id)
 
-				} else {
-					c.lender = null;
 				}
 			})
-			*/
+
 
 			d.resolve(paginate(collections.rows, 'collections', collections.count, limit, page))
 
