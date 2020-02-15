@@ -131,6 +131,7 @@ function service(data) {
 						}
 					]*/
 				}
+
 				if (['business_lender', 'individual_lender'].includes(data.profile.role)) {
 					query.where.lender_id = data.profile.id
 				} else if (data.profile.role == 'borrower') {
@@ -157,6 +158,7 @@ function service(data) {
 
 
 			}
+			query.distinct = true;
 			getFunction = models.collection.findAndCountAll(query)
 
 			return [getFunction, params]
