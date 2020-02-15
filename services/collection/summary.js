@@ -62,8 +62,16 @@ function service(data) {
 
 
         .then((data) => {
-
-            d.resolve(data[0])
+            if (!data[0] || !data[0][0]) {
+                d.resolve({
+                    draft: 0,
+                    inactive: 0,
+                    active: 0,
+                    declined: 0,
+                    total: 0
+                })
+            }
+            d.resolve(data[0][0])
         })
         .catch((err) => {
 
