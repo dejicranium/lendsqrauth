@@ -258,7 +258,6 @@ function service(data) {
 
             } catch (e) {
                 // silent treatmentto be logged;
-                require('mlar')('locallogger').error(data.reqData, {}, e);
                 //throw new Error(e);
                 //throw new Error(e);
             }

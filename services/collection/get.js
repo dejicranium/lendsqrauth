@@ -39,11 +39,7 @@ function service(data) {
 				query.include = [{
 					model: models.product
 				}]
-				getFunction = models.collection.findOne({
-					where: {
-						id: params.collection_id
-					}
-				})
+				getFunction = models.collection.findOne(query)
 
 			} else {
 				query = {
@@ -138,7 +134,7 @@ function service(data) {
 					]*/
 				}
 				if (['business_lender', 'individual_lender'].includes(data.profile.role)) {
-					query.where.lender_id = data.profile.id
+					query.where.lender_id = parseInt(data.profile.id)
 				} else if (data.profile.role == 'borrower') {
 					query.where.borrower_id = data.profile.id
 				} else if (data.profile.role == 'collaborator') {
@@ -162,8 +158,8 @@ function service(data) {
 
 
 
+				getFunction = models.collection.findAndCountAll(query)
 			}
-			getFunction = models.collection.findAndCountAll(query)
 
 			return [getFunction, params]
 
@@ -174,14 +170,16 @@ function service(data) {
 			if (params.collection_id) {
 				let collection = collections
 
-				let collection_creator = collection.lender_id
-				let collection_borrower = collection.borrower_id
+				/*d.resolve({
+					collection_lender: collection.lender_id,
+					profile: data.profile.id
+				})*/
 
-				if (['business_lender', 'individual_lender'].includes(data.profile.role) && collection_creator != data.profile.id) {
+				if (['business_lender', 'individual_lender'].includes(data.profile.role) && collection.lender_id !== parseInt(data.profile.id)) {
 					throw new Error("Cannot get collection that your profile didn't create")
-				} else if (data.profile.role == 'borrower' && collection_borrower != data.profile.id) {
+				} else if (data.profile.role == 'borrower' && collection.borrower_id != data.profile.id) {
 					throw new Error("You aren't a borrower on this collection")
-				} else if (data.profile.role == 'collaborator' && collection_creator !== data.profile.parent_profile_id) {
+				} else if (data.profile.role == 'collaborator' && collection.lender_id !== data.profile.parent_profile_id) {
 					throw new Error("You aren't a collaborator on the profile that created this collection")
 				}
 

@@ -8,7 +8,10 @@ module.exports = (sequelize, DataTypes) => {
     },
     parent_profile_id: DataTypes.INTEGER,
     uuid: DataTypes.STRING,
-    deleted_flag: DataTypes.BOOLEAN,
+    deleted_flag: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: 0
+    },
     created_by: DataTypes.INTEGER,
     modified_on: DataTypes.DATE,
     modified_by: DataTypes.DATE,

@@ -11,7 +11,10 @@ module.exports = (sequelize, DataTypes) => {
     instagram_link: DataTypes.STRING,
     linkedin_link: DataTypes.STRING,
     contact_role: DataTypes.STRING,
-    created_on: DataTypes.DATE,
+    created_on: {
+      type: DataTypes.DATE,
+      defaultValue: new Date(),
+    },
     created_by: DataTypes.INTEGER,
     modified_on: DataTypes.DATE,
     modified_by: DataTypes.DATE,

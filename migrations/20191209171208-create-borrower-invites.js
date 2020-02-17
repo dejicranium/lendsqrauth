@@ -46,7 +46,15 @@ module.exports = {
       updatedAt: {
         allowNull: false,
         type: Sequelize.DATE
-      }
+      },
+      feedback: {
+        allowNull: true,
+        type: Sequelize.TEXT
+      },
+      next_reminder_date: {
+        allowNull: true,
+        type: Sequelize.DATE
+      },
     });
   },
   down: (queryInterface, Sequelize) => {
