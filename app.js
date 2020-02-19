@@ -25,8 +25,7 @@ try {
 const apm = require('elastic-apm-node').start({
   serviceName: 'auth-service',
   secretToken: config.apm_server_token,
-  serverUrl: config.apm_server_url,
-  ignoreUrls: ['/api/v1']
+  serverUrl: config.apm_server_url
 });
 
 var models = require('./models/sequelize');
