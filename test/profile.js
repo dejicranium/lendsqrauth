@@ -5,6 +5,7 @@ const models = require('mlar')('models');
 
 const chai = require('chai');
 const createUser = require('./../services/auth/signup');
+const get_borrowers = require('./../services/profile/get_borrowers')
 const get_team_members = require('./../services/profile/get_team_members')
 const get_user_profiles = require('./../services/profile/get_user_profiles');
 const delete_team_member = require('./../services/profile/delete_team_member');
@@ -106,6 +107,19 @@ describe('#Profile Service', function () {
             status: "blasklisted"
         }
         updateStatus(data).then(resp => {
+            console.log(resp)
+        }).catch(err => {
+            console.log(err)
+        })
+    })
+    it('should get borrowers', function (done) {
+        let data = {
+            profile: {
+                id: 1,
+                role: 'admin'
+            },
+        }
+        get_borrowers(data).then(resp => {
             console.log(resp)
         }).catch(err => {
             console.log(err)

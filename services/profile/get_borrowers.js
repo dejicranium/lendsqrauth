@@ -68,7 +68,12 @@ function service(data) {
 					}
 				}, {
 					model: models.borrower_invites,
-					attributes: ['date_joined']
+					attributes: ['date_joined', 'borrower_name', 'collection_id'],
+
+					include: [{
+						model: models.collection,
+						attributes: ['borrower_email']
+					}]
 				}];
 
 
@@ -88,6 +93,37 @@ function service(data) {
 		})
 		.then((profile) => {
 			if (!profile) throw new Error("No profiles");
+			profile.rows = JSON.parse(JSON.stringify(profile.rows));
+			let final_response = [];
+
+			profile.rows.forEach(prof => {
+				let profile_local = {};
+				if (!prof.user) {
+					prof.user = {}
+				}
+
+				if (prof.user.first_name || !prof.user.last_name) {
+
+					let denormalized_borrower_name = prof.borrower_invite.borrower_name ? prof.borrower_invite.borrower_name.split(' ') : [];
+
+					if (denormalized_borrower_name.length) {
+						profile_local.first_name = denormalized_borrower_name[0];
+						profile_local.last_name = denormalized_borrower_name.filter(name => denormalized_borrower_name.indexOf(name) !== 0).join(' ');
+
+					}
+					prof.user.first_name = profile_local.first_name;
+					prof.user.last_name = profile_local.last_name;
+
+
+					if (!prof.user.email) {
+						prof.user.email = prof.borrower_invite.collection ? prof.borrower_invite.collection.borrower_email : ''
+					}
+
+				}
+
+
+				final_response.push(prof);
+			})
 
 			d.resolve(paginate(profile.rows, 'profiles', profile.count, limit, page));
 		})
