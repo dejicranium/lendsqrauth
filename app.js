@@ -2,6 +2,7 @@
 Attempt loading env files
 */
 require('./winston-workaround');
+const config = require('./config');
 
 try {
   const appEnvProfile = process.env.ENV_PROFILE || '';
@@ -20,6 +21,13 @@ try {
   //console.log(e);
 }
 //========================
+
+const apm = require('elastic-apm-node').start({
+  serviceName: 'auth-service',
+  secretToken: config.apm_server_token,
+  serverUrl: config.apm_server_url,
+});
+
 var models = require('./models/sequelize');
 var express = require('express');
 var appConfig = require('./config/app');
@@ -78,7 +86,7 @@ app.use(
 );
 app.use(bodyParser.json());
 
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
   res.header('Access-Control-Allow-Origin', '*');
   res.header(
     'Access-Control-Allow-Headers',
@@ -145,7 +153,7 @@ app.use(function(req, res, next) {
 
 const base = '/api/v1';
 
-app.get(base, function(req, res, next) {
+app.get(base, function (req, res, next) {
   res.json({
     base: 1.0,
     env: process.env.NODE_ENV
@@ -167,7 +175,7 @@ Handle 404
 */
 //app.use(mosh.initMoshErrorHandler);
 
-app.use(base, function(req, res, next) {
+app.use(base, function (req, res, next) {
   utils.jsonF(res, null, `Undefined ${req.method} route access`);
 
   // res.json({m: `Undefined ${req.method} route access`})
@@ -196,8 +204,8 @@ if (
     .sync({
       force: force_sync
     })
-    .then(function() {
-      app.listen(appConfig.port, function() {
+    .then(function () {
+      app.listen(appConfig.port, function () {
         //runWorker();
         console.log(appConfig.name, 'is running on port', appConfig.port);
       });
