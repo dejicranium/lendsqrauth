@@ -12,6 +12,7 @@ const AuditLog = require('mlar')('audit_log');
 var spec = morx.spec({})
     .build('user_id', 'required:true') // to be used by admin
     .build('status', 'required:true')
+    .build('reason', 'required:false')
     .end();
 
 function service(data) {
@@ -43,13 +44,14 @@ function service(data) {
             } else if (params.status == 'activate') {
                 updateParams.status = 'active'
             }
+            updateParams.status_reason = params.reason
 
             return user.update(updateParams)
 
         }).then((user) => {
             if (!user) throw new Error("An error occured while updating user's account");
             let action_type = data.status === "activate" ? 'activated' : 'deactivated';
-            let audit_log = new AuditLog(data.reqData, "UPDATE",  action_type +" account with user id " + user.id);
+            let audit_log = new AuditLog(data.reqData, "UPDATE", action_type + " account with user id " + user.id);
             audit_log.create();
             d.resolve("Successfully updated user's status");
         })

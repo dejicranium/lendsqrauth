@@ -38,7 +38,8 @@ function service(data) {
                         model: models.user,
                         attributes: {
                             exclude: DEFAULT_EXCLUDES
-                        }
+                        },
+
                     }]
                 }), params]
             } else {
