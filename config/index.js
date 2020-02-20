@@ -30,8 +30,10 @@ if (process.env.NODE_ENV === 'production') {
     mifos_user: process.env.mifos_user || 'mifos',
     mifos_password: process.env.mifos_password || 'password',
 
-    wallet_service_base_url: process.env.wallet_service_base_url || 'https://wallet-service-staging.herokuapp.com/api/v1/',
-    sqs_jobs_queue_url: process.env.sqs_jobs_queue_url || 'https://sqs.us-east-2.amazonaws.com/350152003452/LendsqrAsyncJobs'
+    wallet_service_base_url: process.env.wallet_service_base_url || 'https://staging-wallet.lendsqr.com/api/v1/',
+    sqs_jobs_queue_url: process.env.sqs_jobs_queue_url || 'https://sqs.us-east-2.amazonaws.com/350152003452/LendsqrAsyncJobs',
+    apm_server_url: 'http://3.18.62.42:8200',
+    apm_server_token: 'kuyGhjlmnBNM'
 
   };
 } else {
@@ -67,7 +69,9 @@ if (process.env.NODE_ENV === 'production') {
     mifos_user: process.env.mifos_user || 'mifos',
     mifos_password: process.env.mifos_password || 'password',
 
-    wallet_service_base_url: process.env.wallet_service_base_url || 'https://wallet-service-lendsqr.herokuapp.com/api/v1/',
-    sqs_jobs_queue_url: process.env.sqs_jobs_queue_url || 'https://sqs.us-east-2.amazonaws.com/350152003452/LendsqrAsyncJobs'
+    wallet_service_base_url: process.env.wallet_service_base_url || 'https://staging-wallet.lendsqr.com/api/v1/',
+    sqs_jobs_queue_url: process.env.sqs_jobs_queue_url || 'https://sqs.us-east-2.amazonaws.com/350152003452/LendsqrAsyncJobs',
+    apm_server_url: 'http://3.18.62.42:8200',
+    apm_server_token: 'kuyGhjlmnBNM'
   };
 }
