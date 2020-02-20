@@ -18,7 +18,7 @@ module.exports = {
   staging: {
     username: 'lender',
     password: 'Su94LtyGwDx2aV7c',
-    database: 'lendsqr_auth',
+    database: 'lendsqr_staging',
     host: 'staging.cyock39x6hx4.us-east-2.rds.amazonaws.com',
     dialect: 'mysql'
   },
