@@ -17,7 +17,7 @@ describe('#Complete registration', function () {
                 business_name: 'Deji Consult',
                 id: 10000
             }).then((result) => {
-                console.log(result);
+                //console.log(result);
                 result.should.be.a('object');
                 done();
             })

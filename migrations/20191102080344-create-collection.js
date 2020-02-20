@@ -11,8 +11,17 @@ module.exports = {
       name: {
         type: Sequelize.STRING
       },
-      borrower_name: {
+      borrower_first_name: {
         type: Sequelize.STRING,
+      },
+      borrower_last_name: {
+        type: Sequelize.STRING,
+      },
+      next_reminder_date: {
+        type: Sequelize.DATE,
+      },
+      end_date: {
+        type: Sequelize.DATE,
       },
       borrower_email: {
         type: Sequelize.STRING,
@@ -33,10 +42,16 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       collection_frequency: {
-        type: Sequelize.INTEGER
+        type: Sequelize.STRING(10)
       },
       product_id: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        references: {
+          model: 'products',
+          key: 'id',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'SET NULL'
       },
       tenor: {
         type: Sequelize.STRING
@@ -51,13 +66,16 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       lender_id: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        references: {
+          model: 'profiles',
+          key: 'id',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'SET NULL'
       },
       lender_name: {
         type: Sequelize.STRING
-      },
-      product_id: {
-        type: Sequelize.INTEGER
       },
       tenor: {
         type: Sequelize.STRING
@@ -74,24 +92,36 @@ module.exports = {
       start_date: {
         type: Sequelize.DATE
       },
-      deleted_flag:{
+      deleted_flag: {
         type: Sequelize.BOOLEAN,
-      } ,
-      deleted_by:{
+      },
+      deleted_by: {
         type: Sequelize.INTEGER,
-      } ,
-      deleted_on:{
+        references: {
+          model: 'users',
+          key: 'id',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'SET NULL'
+      },
+      deleted_on: {
         type: Sequelize.DATE,
-      } ,
-      created_on:{
+      },
+      created_on: {
         type: Sequelize.DATE,
         allowNull: false,
         defaultValue: new Date()
-      } ,
-      created_by:{
+      },
+      created_by: {
         type: Sequelize.INTEGER,
-      } ,
-      modified_on:{
+        references: {
+          model: 'users',
+          key: 'id',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'SET NULL'
+      },
+      modified_on: {
         type: Sequelize.DATE,
         allowNull: false,
         defaultValue: new Date()
@@ -99,7 +129,12 @@ module.exports = {
       },
       modified_by: {
         type: Sequelize.INTEGER,
-  
+        references: {
+          model: 'users',
+          key: 'id',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'SET NULL'
       }
     });
   },

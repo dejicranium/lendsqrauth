@@ -429,7 +429,7 @@ function service(data) {
             d.resolve(collection);
         })
         .catch((err) => {
-            console.log(err.stack);
+            //console.log(err.stack);
 
             d.reject(err);
         });

@@ -11,14 +11,14 @@ module.exports = {
       name: {
         type: Sequelize.STRING
       },
-      created_on:{
+      created_on: {
         type: Sequelize.DATE,
         allowNull: false,
-      } ,
-      created_by:{
+      },
+      created_by: {
         type: Sequelize.INTEGER,
-      } ,
-      modified_on:{
+      },
+      modified_on: {
         type: Sequelize.DATE,
         allowNull: false,
         defaultValue: new Date()
@@ -26,6 +26,9 @@ module.exports = {
       },
       modified_by: {
         type: Sequelize.INTEGER,
+      },
+      display: {
+        type: Sequelize.BOOLEAN
       }
     });
   },

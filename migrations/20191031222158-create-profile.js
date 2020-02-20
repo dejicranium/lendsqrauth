@@ -12,10 +12,28 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       user_id: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        created_by: {
+          type: Sequelize.INTEGER,
+          references: {
+            model: 'users',
+            key: 'id',
+          },
+          onUpdate: 'CASCADE',
+          onDelete: 'SET NULL'
+        },
       },
       parent_profile_id: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        created_by: {
+          type: Sequelize.INTEGER,
+          references: {
+            model: 'profiles',
+            key: 'id',
+          },
+          onUpdate: 'CASCADE',
+          onDelete: 'SET NULL'
+        },
       },
       deleted_flag: {
         type: Sequelize.BOOLEAN
@@ -47,27 +65,35 @@ module.exports = {
       country: {
         type: Sequelize.STRING
       },
-      deleted_on:{
+      deleted_on: {
         type: Sequelize.DATE,
-      } ,
-      deleted_flag:{
+      },
+      deleted_flag: {
         type: Sequelize.BOOLEAN,
-      } ,
-      deleted_by:{
+      },
+      deleted_by: {
         type: Sequelize.INTEGER,
-      } ,
-      created_on:{
+      },
+      created_on: {
         type: Sequelize.DATE,
         allowNull: false,
-      } ,
-      created_by:{
+      },
+      created_by: {
         type: Sequelize.INTEGER,
-      } ,
-      modified_on:{
+      },
+      bvn: {
+        type: Sequelize.INTEGER,
+      },
+      status: {
+        type: Sequelize.STRING
+      },
+      modified_on: {
         type: Sequelize.DATE,
         allowNull: false,
         defaultValue: new Date()
-
+      },
+      uuid: {
+        type: Sequelize.STRING
       },
       modified_by: {
         type: Sequelize.INTEGER,

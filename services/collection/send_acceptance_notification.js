@@ -12,6 +12,7 @@ const requests = require('mlar')('requests');
 const send_email = require('mlar').mreq('notifs', 'send');
 const config = require('../../config');
 const initState = require('../../utils/init_state')
+const calculateFees = require('mlar')('feeCalc').calculate
 
 /**  this is to be used by a borrower to reject a collections invitation 
  *  sent to him by a lender.
@@ -51,6 +52,7 @@ function service(data) {
             // update invite to accepted.
             invite.status = "Accepted"
             invite.token_is_used = true;
+            invite.date_joined = new Date();
 
             collection.status = 'active';
             await collection.save();
@@ -135,7 +137,7 @@ function service(data) {
                                 days_in_period: r.daysInPeriod,
                                 principal_due: r.principalDue,
                                 interest_due: r.interestDue,
-                                fee: r.feeChargesDue,
+                                fee: calculateFees(r.totalDueForPeriod),
                                 total_amount: r.totalDueForPeriod,
                                 loan_id: product.id,
                                 balance_outstanding: r.principalLoanBalanceOutstanding,
@@ -152,7 +154,11 @@ function service(data) {
                         }
                     });
                     await models.collection_schedules.bulkCreate(bulkdata);
-                    console.log(resp);
+                    // update collection end_date 
+                    await collection.update({
+                        end_date: bulkdata[bulkdata.length - 1].due_date // due date of last collection schedule; //TODO: test this;
+                    })
+                    //console.log(resp);
                 })
                 .catch(err => {
                     //silent failure

@@ -3,6 +3,7 @@ let config = require('../config')
 const makeRequest = require('mlar')('makerequest');
 const q = require('q')
 const moment = require('moment');
+const models = require('mlar')('models');
 const normalizeTenor = require('../utils/collections').normalizeTenor;
 const resolveCollectionStartDate = require('../utils/collections').resolveStartDate;
 
@@ -43,68 +44,17 @@ module.exports = {
                 return makeRequest(url, 'POST', payload, constants.requestHeaders, 'create wallet');
             })
             .then(response => {
-                console.log(response);
+                //console.log(response);
                 d.resolve(response)
             })
             .catch(err => {
-                console.log(err);
+                //console.log(err);
                 d.reject(err);
             });
 
         return d.promise
     },
 
-    notifyLoanCreated(email) {
-        const d = q.defer();
-        q.fcall(() => {
-
-                let url = config.notif_base_url + 'email/send';
-                let payload = {
-                    sender_id: 1,
-                    context_id: 65,
-                    recipient: email,
-                    sender: config.sender_email,
-                    data: {}
-                }
-
-                return makeRequest(url, 'POST', payload, constants.requestHeaders, 'notify lender of loan created');
-            })
-            .then(response => {
-                d.resolve(response)
-            })
-            .catch(err => {
-                d.reject(err);
-            })
-
-        return d.promise
-    },
-
-    notifyProductCreated(email) {
-        const d = q.defer();
-        q.fcall(() => {
-
-                let url = config.notif_base_url + 'email/send';
-                let payload = {
-                    sender_id: 1,
-                    context_id: 66,
-                    recipient: email,
-                    sender: config.sender_email,
-                    data: {
-
-                    }
-                }
-
-                return makeRequest(url, 'POST', payload, constants.requestHeaders, 'notify product creation');
-            })
-            .then(response => {
-                d.resolve(response)
-            })
-            .catch(err => {
-                d.reject(err);
-            })
-
-        return d.promise
-    },
 
     createCollectionSchedule(data) {
 
@@ -198,20 +148,20 @@ module.exports = {
         const url = config.mifos_base_url + `loans?command=calculateLoanSchedule`
 
         q.fcall(async () => {
-                console.log('weerwer')
+                //console.log('weerwer')
                 return makeRequest(url, 'POST', params, constants.mifos_headers, null, false);
             })
             .then(response => {
                 //if(!response) throw new Error(response);
                 //d.resolve(moment(data.disbursement_date).format('DD MMMM YYYY'))
-                console.log('response is ' + response);
-                console.log(response)
+                //console.log('response is ' + response);
+                // console.log(response)
                 d.resolve(response)
 
             })
             .catch(error => {
                 //console.log(" error" + error);
-                console.log(error.response.data.errors)
+                // console.log(error.response.data.errors)
 
                 d.reject(error)
             })

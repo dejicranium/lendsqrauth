@@ -29,20 +29,20 @@ module.exports = {
       deleted_flag: {
         type: Sequelize.BOOLEAN
       },
-      deleted_on:{
+      deleted_on: {
         type: Sequelize.DATE,
-      } ,
-      deleted_by:{
+      },
+      deleted_by: {
         type: Sequelize.INTEGER,
-      } ,
-      created_on:{
+      },
+      created_on: {
         type: Sequelize.DATE,
         allowNull: false,
-      } ,
-      created_by:{
+      },
+      created_by: {
         type: Sequelize.INTEGER,
-      } ,
-      modified_on:{
+      },
+      modified_on: {
         type: Sequelize.DATE,
         allowNull: false,
         defaultValue: new Date()
@@ -50,6 +50,9 @@ module.exports = {
       },
       modified_by: {
         type: Sequelize.INTEGER,
+      },
+      account_name: {
+        type: Sequelize.STRING
       }
     });
   },

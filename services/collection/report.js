@@ -25,7 +25,7 @@ function service(data) {
                 SUM(CASE WHEN status = 'Successful' THEN total_amount END) successful_value,\
                 SUM(CASE WHEN status = 'Failed' THEN total_amount END) failed_value,\
                 SUM(CASE WHEN status = 'Pending' THEN total_amount END) pending_value,\
-                SUM(total_amount) as total_value 
+                SUM(total_amount) as total_value
                 FROM collection_schedules`)
             //return models.sequelize.query(`SELECT COUNT(id), due_date FROM collection_schedules GROUP BY MONTH(due_date)`)
             return query;

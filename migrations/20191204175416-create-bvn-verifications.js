@@ -12,10 +12,16 @@ module.exports = {
         type: Sequelize.BOOLEAN
       },
       user_id: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        references: {
+          model: 'users',
+          key: 'id',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'SET NULL'
       },
       bvn: {
-        type: Sequelize.INTEGER
+        type: Sequelize.STRING
       },
       phone: {
         type: Sequelize.STRING
@@ -27,6 +33,10 @@ module.exports = {
       updatedAt: {
         allowNull: false,
         type: Sequelize.DATE
+      },
+      account_name: {
+        allowNull: true,
+        type: Sequelize.STRING
       }
     });
   },

@@ -170,7 +170,7 @@ function resolveStartDate(startDate) {
 }
 
 async function validateBorrowerBvnUniqueness(email, bvn) {
-    console.log('verifying borrower uniqueness');
+    //console.log('verifying borrower uniqueness');
     const d = q.defer();
     q.fcall(() => {
             // see if a bank information already has that bvn

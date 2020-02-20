@@ -1,14 +1,14 @@
-function NUBAN (bankCode, accountNumber) {
+function NUBAN(bankCode, accountNumber) {
     this.bankCode = bankCode;
     this.accountNumber = accountNumber;
 }
 
-NUBAN.prototype.validate = function() {
+NUBAN.prototype.validate = function () {
 
-    if(typeof this.bankCode !== 'string' || typeof this.accountNumber !== 'string')
+    if (typeof this.bankCode !== 'string' || typeof this.accountNumber !== 'string')
         throw new Error('bankCode and accountNumber must be strings');
-    
-    if(this.bankCode.length !== 3 && this.accountNumber.length !== 10)
+
+    if (this.bankCode.length !== 3 && this.accountNumber.length !== 10)
         throw new Error('Invalid bankCode and accountNumber');
 
     var checkDigit = this.accountNumber.charAt(9);
@@ -21,7 +21,7 @@ NUBAN.prototype.validate = function() {
     nubanAccountFormat
         .split('')
         .forEach(function (char, index) {
-            checkSum += (char * dictionary[index]);    
+            checkSum += (char * dictionary[index]);
         });
 
     var validatedCheckDigit = 10 - (checkSum % 10);
@@ -31,11 +31,12 @@ NUBAN.prototype.validate = function() {
 }
 
 
-for(var xx = 0; xx < 10; xx++){
-    var testnuban = '80000000'+xx;
-for(var x = 0; x < 10; x++) {
-    var tn = testnuban + x;
-    var kk = new NUBAN('800', tn);
-    if(kk.validate())
-        console.log(xx, tn, kk.validate());
-}}
+for (var xx = 0; xx < 10; xx++) {
+    var testnuban = '80000000' + xx;
+    for (var x = 0; x < 10; x++) {
+        var tn = testnuban + x;
+        var kk = new NUBAN('800', tn);
+        if (kk.validate())
+        // console.log(xx, tn, kk.validate());
+    }
+}

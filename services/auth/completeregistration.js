@@ -198,7 +198,7 @@ function service(data) {
           });
 
         } catch (e) {
-          console.log("got to error")
+          //console.log("got to error")
           // require('mlar')('locallogger').error(data.reqData, {}, e);
 
         }
@@ -315,7 +315,7 @@ function service(data) {
             loginURL: config.base_url + 'login'
           });
         } catch (e) {
-          console.log('got to error');
+          //console.log('got to error');
           // require('mlar')('locallogger').error(data.reqData, {}, e);
         }
 

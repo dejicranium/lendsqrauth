@@ -1,4 +1,3 @@
-
 var mlite = require('mlite')(process.env.LOGLITETOKEN || '5af5bf2f84f87700048e356a');
 module.exports = function (data, label, type) {
 
@@ -9,7 +8,8 @@ module.exports = function (data, label, type) {
 	var _label = label || `LOG_ENTRY_${Date.now()}`;
 	var _type = type || 'log';
 
-	if(do_console_log){
+	if (do_console_log) {
+		/*
 		console.log(" ");
 		console.log("***************************");
 		console.log("***************************");
@@ -17,10 +17,10 @@ module.exports = function (data, label, type) {
 		console.log(_data);
 		console.log("***************************");
 		console.log("***************************");
-		console.log(" ");
+		console.log(" ");*/
 	}
 
-	if(send_mlite){
+	if (send_mlite) {
 		//info or errorX
 		mlite[_type]([_data], _label);
 	}

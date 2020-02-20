@@ -15,13 +15,26 @@ module.exports = {
         type: Sequelize.STRING
       },
       token: {
-        type:Sequelize.STRING,
+        type: Sequelize.STRING,
       },
       profile_created_id: {
-        type:Sequelize.INTEGER,
+        type: Sequelize.INTEGER,
+        references: {
+          model: 'profiles',
+          key: 'id',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'SET NULL'
+
       },
       user_created_id: {
-        type:Sequelize.INTEGER,
+        type: Sequelize.INTEGER,
+        references: {
+          model: 'users',
+          key: 'id',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'SET NULL'
       },
       status: {
         type: Sequelize.STRING
@@ -30,7 +43,7 @@ module.exports = {
         allowNull: false,
         type: Sequelize.DATE
       },
-     
+
     });
   },
   down: (queryInterface, Sequelize) => {

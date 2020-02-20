@@ -8,6 +8,9 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
+      uuid: {
+        type: Sequelize.STRING
+      },
       first_name: {
         type: Sequelize.STRING
       },
@@ -27,29 +30,32 @@ module.exports = {
       password: {
         type: Sequelize.STRING
       },
-      active: {
-        type: Sequelize.BOOLEAN
+      status: {
+        type: Sequelize.STRING
       },
-      disabled: {
-        type: Sequelize.BOOLEAN
+      status_reason: {
+        type: Sequelize.TEXT
       },
       deleted: {
         type: Sequelize.BOOLEAN
       },
-      deleted_on:{
-        type: Sequelize.DATE,
-      } ,
-      deleted_by:{
-        type: Sequelize.INTEGER,
-      } ,
-      created_on:{
+      image: {
+        type: Sequelize.TEXT
+      },
+      created_on: {
         type: Sequelize.DATE,
         allowNull: false,
-      } ,
-      created_by:{
+      },
+      created_by: {
         type: Sequelize.INTEGER,
-      } ,
-      modified_on:{
+      },
+      deleted_by: {
+        type: Sequelize.INTEGER,
+      },
+      deleted_on: {
+        type: Sequelize.DATE
+      },
+      modified_on: {
         type: Sequelize.DATE,
         allowNull: false,
         defaultValue: new Date()
@@ -58,8 +64,7 @@ module.exports = {
       modified_by: {
         type: Sequelize.INTEGER,
       }
-    }
-    );
+    });
   },
   down: (queryInterface, Sequelize) => {
     return queryInterface.dropTable('users');

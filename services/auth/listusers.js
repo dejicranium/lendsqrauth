@@ -86,6 +86,10 @@ function service(data) {
         }
     }
 
+    params.order = [
+        ['id', 'DESC']
+    ]
+
     q.fcall(async () => {
             return models.user.findAndCountAll(params)
         })

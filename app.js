@@ -2,6 +2,7 @@
 Attempt loading env files
 */
 require('./winston-workaround');
+const config = require('./config');
 
 try {
   const appEnvProfile = process.env.ENV_PROFILE || '';
@@ -20,6 +21,14 @@ try {
   //console.log(e);
 }
 //========================
+
+const apm = require('elastic-apm-node').start({
+  serviceName: 'auth-service',
+  secretToken: config.apm_server_token,
+  serverUrl: config.apm_server_url,
+  ignoreUrls: ['/api/v1']
+});
+
 var models = require('./models/sequelize');
 var express = require('express');
 var appConfig = require('./config/app');
@@ -36,12 +45,12 @@ const apis_dashboard = require('./routes/dashboard');
 const apis_audit = require('./routes/audit');
 const apis_onboarding = require('./routes/onboarding');
 
+// const runn = require('./runn');
 var utils = require('mlar')('mt1l');
 
 var get_collection_schedules = require('mlar')('job_get_schedule');
 
 const EndpointRouter = require('express').Router();
-
 //var routes = require('./routes');
 /*var routes = require('./routes');
 var view_routes = require('./view_routes');*/
@@ -68,12 +77,8 @@ const scrubber = require('mlar')('obscrub');
 const SCRUBVALS = require('./utils/scrubvals.json');
 const sendCollectionRemindersCron = require('./jobs/send_reminder_invitations');
 
-
-
 // start sendCollection reminders cron
-sendCollectionRemindersCron();
-
-
+//sendCollectionRemindersCron();
 
 app.use(
   bodyParser.urlencoded({
@@ -119,8 +124,10 @@ app.use(function (req, res, next) {
     environment: process.env.NODE_ENV
   };
 
-  elasticLog.info(JSON.Sreqlog);
-  console.log('req.id req.id ' + reqid)
+  res._request = reqlog;
+
+  //elasticLog.info(JSON.Sreqlog);
+  //console.log('req.id req.id ' + reqid)
   //console.log('**userId ' + req.user.id)
 
   /*
@@ -177,7 +184,7 @@ app.use(base, function (req, res, next) {
 
 // start cron job
 
-console.log("Config file is " + process.env.base_url)
+console.log('Config file is ' + process.env.base_url);
 
 //get_collection_schedules();
 
@@ -201,8 +208,7 @@ if (
     .then(function () {
       app.listen(appConfig.port, function () {
         //runWorker();
-        // console.log(stage);
-        console.log([appConfig.name, 'is running on port', appConfig.port.toString()].join(' '));
+        console.log(appConfig.name, 'is running on port', appConfig.port);
       });
     });
 }

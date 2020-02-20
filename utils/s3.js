@@ -46,12 +46,12 @@ function service(data) {
 
             s3.putObject(params, function (perr, pres) {
                 if (perr) {
-                    console.log("Error uploading data: ", perr);
+                    //console.log("Error uploading data: ", perr);
                     d.reject(perr);
                 } else {
-                    console.log(pres);
+                    //console.log(pres);
                     d2.resolve(s3BASE + serviceparams.filename);
-                    console.log("Successfully uploaded data to myBucket/myKey");
+                    //console.log("Successfully uploaded data to myBucket/myKey");
                 }
             });
 

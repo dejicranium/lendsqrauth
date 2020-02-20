@@ -21,26 +21,26 @@ module.exports = {
         type: Sequelize.STRING
       },
       business_phone: {
-        type: Sequelize.INTEGER
+        type: Sequelize.STRING
       },
       rc_number: {
-        type: Sequelize.INTEGER
+        type: Sequelize.STRING
       },
 
       certificate_of_incorporation: {
-        type: Sequelize.INTEGER
+        type: Sequelize.STRING
       },
       tin_number: {
-        type: Sequelize.INTEGER
+        type: Sequelize.STRING
       },
       state: {
-        type: Sequelize.INTEGER
+        type: Sequelize.STRING
       },
       meta: {
-        type: Sequelize.INTEGER
+        type: Sequelize.TEXT
       },
       country: {
-        type: Sequelize.INTEGER
+        type: Sequelize.STRING
       },
       created_by: {
         type: Sequelize.INTEGER
@@ -61,12 +61,17 @@ module.exports = {
         type: Sequelize.DATE
       },
       deleted_flag: {
-        allowNull: false,
-        type: Sequelize.DATE
+        allowNull: true,
+        type: Sequelize.BOOLEAN
       },
-      updatedAt: {
-        allowNull: false,
-        type: Sequelize.DATE
+
+      business_address: {
+        allowNull: true,
+        type: Sequelize.STRING
+      },
+      website_link: {
+        allowNull: true,
+        type: Sequelize.STRING
       }
     });
   },

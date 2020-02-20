@@ -36,6 +36,7 @@ function service(data) {
 				throw_error: true
 			});
 			const params = validParameters.params;
+			params.created_on = new Date();
 
 			if (params.borrower_first_name.length < 3) throw new Error("Names must be more than 2 characters")
 			if (params.borrower_last_name.length < 3) throw new Error("Names must be more than 2 characters")
