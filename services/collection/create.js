@@ -111,7 +111,7 @@ function service(data) {
 						parent_profile_id: data.profile.id,
 						user_id: user_id,
 						created_on: new Date(),
-
+						status: 'pending',
 						uuid: Math.random().toString(36).substr(2, 9),
 					});
 				};
@@ -122,7 +122,7 @@ function service(data) {
 						last_name: params.borrower_last_name,
 						phone: params.borrower_phone,
 						email: params.borrower_email,
-						status: 'active'
+						status: 'pending'
 					})
 				};
 
