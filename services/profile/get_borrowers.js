@@ -68,7 +68,7 @@ function service(data) {
 					}
 				}, {
 					model: models.borrower_invites,
-					attributes: ['date_joined', 'staatus', 'borrower_name', 'collection_id'],
+					attributes: ['date_joined', 'status', 'borrower_name', 'collection_id'],
 
 					include: [{
 						model: models.collection,
