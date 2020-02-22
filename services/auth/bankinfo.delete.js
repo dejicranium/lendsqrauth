@@ -39,7 +39,7 @@ function service(data) {
         .spread(async (bankdetails, params) => {
             if (!bankdetails) throw new Error(`No such account exists for the user`);
             await bankdetails.update({
-                delete_flag: 1,
+                deleted_flag: 1,
                 is_active: 0,
                 is_default: 0,
                 deleted_flag: 1,
