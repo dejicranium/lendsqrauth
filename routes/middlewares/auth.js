@@ -19,40 +19,40 @@ module.exports = async function (req, res, next) {
     }
     jwt.verify(auth_token, config.JWTsecret, function (err, decoded) {
 
-            if (err) {
-                utils.json401(res, null, "Invalid access token");
-                return;
-            }
-            if (decoded && decoded.expiry < new Date()) {
-                utils.json401(res, null, "Expired access token");
-                return;
-            }
-            models.auth_token.findOne({
-                    where: {
-                        type: 'session',
-                        token: auth_token,
-                    },
-                    include: [{
-                        model: models.user,
-                        include: [{
-                            model: models.profile
-                        }]
-                    }]
+        if (err) {
+            utils.json401(res, null, "Invalid access token");
+            return;
+        }
+        if (decoded && decoded.expiry < new Date()) {
+            utils.json401(res, null, "Expired access token");
+            return;
+        }
+        models.auth_token.findOne({
+            where: {
+                type: 'session',
+                token: auth_token,
+            },
+            include: [{
+                model: models.user,
+                include: [{
+                    model: models.profile
+                }]
+            }]
 
-                }).then(resp => {
-                    if (!resp) utils.json401(res, null, "Invalid access token");
-                    req.user = resp.user
-                    req.auth_token = auth_token;
-                    req.decoded = decoded
-                    next()
-                    return
-                })
-                .catch(err => {
-                    utils.json401(res, null, err);
-                    return;
-                })
+        }).then(resp => {
+            if (!resp) utils.json401(res, null, "Invalid access token");
+            req.user = resp.user
+            req.auth_token = auth_token;
+            req.decoded = decoded
+            next()
+            return
+        })
+            .catch(err => {
+                utils.json401(res, null, err);
+                return;
+            })
 
-        });
+    });
 
     return d.promise
 }

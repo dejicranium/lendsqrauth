@@ -4,7 +4,7 @@
   "description": "OB SANDBOX API",
   "main": "app.js",
   "scripts": {
-    "test": "mocha reporter --spec",
+    "test": "NODE_ENV=development && node_modules/.bin/sequelize db:migrate && mocha reporter --spec",
     "debug": "nodemon --inspect app.js",
     "dev-test": "mocha test/services/auth --recursive",
     "prof-test": "mocha test/services/profile --recursive",
@@ -69,6 +69,7 @@
     "chai": "3.5.0",
     "chai-as-promised": "^7.1.1",
     "mocha": "^3.0.2",
-    "nodemon": "^1.19.4"
+    "nodemon": "^1.19.4",
+    "sinon": "^9.0.0"
   }
 }

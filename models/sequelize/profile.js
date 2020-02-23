@@ -19,6 +19,7 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       defaultValue: 'active',
     },
+    status_reason: DataTypes.STRING,
     deleted_on: DataTypes.DATE,
     deleted_by: DataTypes.INTEGER,
   }, {

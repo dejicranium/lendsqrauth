@@ -33,7 +33,8 @@ if (process.env.NODE_ENV === 'production') {
     wallet_service_base_url: process.env.wallet_service_base_url || 'https://staging-wallet.lendsqr.com/api/v1/',
     sqs_jobs_queue_url: process.env.sqs_jobs_queue_url || 'https://sqs.us-east-2.amazonaws.com/350152003452/LendsqrAsyncJobs',
     apm_server_url: 'http://3.18.62.42:8200',
-    apm_server_token: 'kuyGhjlmnBNM'
+    apm_server_token: 'kuyGhjlmnBNM',
+    admin_notification_email: 'support@lendsqr.com'
 
   };
 } else {
@@ -72,6 +73,7 @@ if (process.env.NODE_ENV === 'production') {
     wallet_service_base_url: process.env.wallet_service_base_url || 'https://staging-wallet.lendsqr.com/api/v1/',
     sqs_jobs_queue_url: process.env.sqs_jobs_queue_url || 'https://sqs.us-east-2.amazonaws.com/350152003452/LendsqrAsyncJobs',
     apm_server_url: 'http://3.18.62.42:8200',
-    apm_server_token: 'kuyGhjlmnBNM'
+    apm_server_token: 'kuyGhjlmnBNM',
+    admin_notification_email: 'support@lendsqr.com'
   };
 }
