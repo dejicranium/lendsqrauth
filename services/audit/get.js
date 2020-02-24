@@ -48,6 +48,9 @@ function service(data) {
                     models.audit_log.findAndCountAll({
                         limit,
                         offset,
+                        order: [
+                            ['id', 'DESC']
+                        ],
                         include: [{
                             model: models.user,
                             attributes: {
