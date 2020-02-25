@@ -31,7 +31,7 @@ describe('BlacklistUser', function () {
             last_name: generateRandom('string', 5),
             password: password,
             password_confirmation: password,
-            email: 'emeka.okoroafor@gmail.com',
+            email: generateRandom('email'),
             phone: generateRandom('string', 10),
             type: 1,
             status: 'active'
@@ -67,7 +67,7 @@ describe('BlacklistUser', function () {
     });
 
     afterEach(async function () {
-        Promise.all([
+        await Promise.all([
             collectionSchedule.destroy({ force: true }),
             successfulCollectionSchedule.destroy({ force: true }),
             collection.destroy({ force: true }),
@@ -75,7 +75,6 @@ describe('BlacklistUser', function () {
             role.destroy({ force: true }),
             user.destroy({ force: true })
         ])
-        await user.destroy({ force: true });
     });
 
     describe('#blacklistuser', function (params) {
