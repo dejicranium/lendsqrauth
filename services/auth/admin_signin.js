@@ -210,7 +210,7 @@ function service(data) {
             if (!idToken.email_verified) throw new Error("1. Invalid admin credentials");
 
             params.first_name = idToken.given_name;
-            params.last_name = idToken.last_name;
+            params.last_name = idToken.family_name;
             params.status = 'active';
 
             return [models.user.findOne({
