@@ -3,6 +3,8 @@ const morx = require('morx');
 const q = require('q');
 const assert = require('mlar')('assertions');
 const AuditLog = require('mlar')('audit_log');
+const individualEligible = require('../../utils/products').individualEligibleToCreateProduct
+const businessEligible = require('../../utils/products').businessEligibleToCreateProduct
 
 var spec = morx.spec({})
 	//.build('profile_id', 'required:true, eg:lender')   
@@ -29,7 +31,13 @@ function service(data) {
 			const validParameters = morx.validate(data, spec, {
 				throw_error: true
 			});
-			const params = validParameters.params;
+			let params = validParameters.params;
+			// check availablility
+			if (data.profile.role === 'business_lender') {
+				await businessEligible(data.profile.id, data.user.id)
+			} else if (data.profile.role == 'individual_lender') {
+				await individualEligible(data.profile.id, data.user.id)
+			}
 
 			// min tenor and max tenor amount must exist together,
 			assert.mustBeAllOrNone([params.min_tenor, params.max_tenor], ['Min Tenor', 'Max Tenor'])
@@ -38,14 +46,23 @@ function service(data) {
 			if (params.min_tenor) assert.digitsOnly(params.min_tenor, null, 'min tenor')
 
 			if (params.max_tenor && params.min_tenor) {
-				if (params.min_tenor > params.max_tenor) {
+				if (parseFloat(params.min_tenor) > parseFloat(params.max_tenor)) {
 					throw new Error("Min tenor cannot be greater than max tenor")
 				}
+				assert.notDecimal(params.min_tenor, null, "Min Tenor");
+				assert.notDecimal(params.max_tenor, null, "Max Tenor");
+
+				assert.greaterThanZero(params.min_tenor, null, "Min Tenor");
+				assert.greaterThanZero(params.max_tenor, null, "Max Tenor");
+
+
 			}
+
 
 			// interest must be a digit or a float
 			if (params.interest) {
 				assert.digitsOrDecimalOnly(params.interest, null, 'interest')
+				if (parseFloat(params.interest) < 0) throw new Error("Interest must be at least 0");
 			}
 
 			// max loan amount and min_loan amount must exist together,
@@ -55,12 +72,16 @@ function service(data) {
 			if (params.min_loan_amount) {
 				assert.digitsOrDecimalOnly(params.min_loan_amount)
 				params.min_loan_amount = parseFloat(params.min_loan_amount).toFixed(2);
+				assert.greaterThanZero(params.min_loan_amount, null, "Min Loan Amount");
+
 
 			}
 			// digits or float
 			if (params.max_loan_amount) {
 				assert.digitsOrDecimalOnly(params.max_loan_amount)
 				params.max_loan_amount = parseFloat(params.max_loan_amount).toFixed(2);
+				assert.greaterThanZero(params.max_loan_amount, null, "Max Loan Amount");
+
 			}
 
 			if (params.min_loan_amount && params.max_loan_amount) {
@@ -89,8 +110,8 @@ function service(data) {
 			}
 			if (params.interest_period) {
 				params.interest_period = params.interest_period.toLowerCase();
-				if (!['per day', 'per month', 'per annum', 'flat'].includes(params.interest_period))
-					throw new Error('Interest period should be one of `per day`, `per month` or `per annum`')
+				if (!['per day', 'per week', 'per month', 'per annum', 'flat'].includes(params.interest_period))
+					throw new Error('Interest period should be one of `per day`, `per week`, `per month` or `per annum`')
 			}
 			if (params.product_name) {
 				if (params.product_name.length > 255) throw new Error("Product name cannot be more than 255 characters");
@@ -99,7 +120,7 @@ function service(data) {
 
 			let getProductName = models.product.findOne({
 				where: {
-					//profile_id: data.profile.id,
+					profile_id: data.profile.id,
 					product_name: params.product_name
 				}
 			})

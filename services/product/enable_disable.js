@@ -42,10 +42,10 @@ function service(data) {
         .spread((product, params) => {
             if (!product) throw new Error("No product found");
             // check if the profile who created this is the same as the person trying to accepti it.
-            if (data.profile.id !== product.profile_id) throw new Error("You cannot update another profile's product")
+            if ((data.profile.id !== product.profile_id) && data.profile.role !== 'admin') throw new Error("You cannot update another profile's product")
             if (product.status === 'draft' || product.status === 'deleted') throw new Error("Cannot operate on a draft/deleted product");
 
-            if (product_utils.productHasActiveCollection(product)) {
+            if (product_utils.productHasActiveCollection(product) && data.profile.role !== 'admin') {
                 throw new Error("Cannot update a product with at least one active collection")
             }
             let p = product;
@@ -78,16 +78,14 @@ function service(data) {
             params.modified_on = new Date();
             params.modified_by = globalUserId;
 
-            return product.update({
-                ...params
-            })
-        }).then(async(product) => {
+            return product.update(params);
+
+        }).then(async (product) => {
             if (!product) throw new Error("An error occured while updating product");
             let action_type = null;
             if (data.status === 'active') {
                 action_type = 'activated';
-            }
-            else if (data.status === 'inactive') {
+            } else if (data.status === 'inactive') {
                 action_type = 'inactivated';
             }
 

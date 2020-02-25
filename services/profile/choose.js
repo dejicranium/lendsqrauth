@@ -37,6 +37,8 @@ function service(data) {
         })
         .then(async (profile) => {
             if (!profile) throw new Error("User doesn't own this profile");
+            if (profile.status !== 'active') throw new Error("Profile is not active");
+            if (profile.deleted_flag) throw new Error("Profile has been deleted")
             // get permissions
             g_profile = profile;
             if (profile.status === 'inactive') {

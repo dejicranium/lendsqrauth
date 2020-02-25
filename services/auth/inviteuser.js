@@ -13,6 +13,7 @@ const makeRequest = require('mlar')('makerequest');
 const crypto = require('crypto');
 const requests = require('mlar')('requests');
 const AuditLog = require('mlar')('audit_log');
+const send_email = require('mlar').mreq('notifs', 'send');
 
 var spec = morx.spec({}).build('email', 'required:true, eg:1').build('role_id', 'required:true, eg:1').end();
 
@@ -21,10 +22,6 @@ function service(data) {
 
 	const globalProfileId = data.profile.id;
 	const globalUserId = data.user.id;
-
-	const requestHeaders = {
-		'Content-Type': 'application/json'
-	};
 
 	let GLOBAL_USER_EXISTS = false;
 	let GLOBAL_USER = null;
@@ -39,17 +36,15 @@ function service(data) {
 
 			if (data.user.email == params.email) throw new Error('Cannot send an invitation to yourself');
 
-			const requestHeaders = {
-				'Content-Type': 'application/json'
-			};
 
 			// check to make sure that only a lender can do this;
 			if (data.profile.role != 'individual_lender' && data.profile.role != 'business_lender') {
 				throw new Error('Only lenders can add team members');
 			}
+
 			let role = await models.role.findOne({
 				where: {
-					id: params.role_id
+					id: parseInt(params.role_id)
 				}
 			});
 			if (
@@ -76,7 +71,7 @@ function service(data) {
 			];
 		})
 		.spread(async (invitation, user, params) => {
-			if (invitation && invitation.status !== 'declined') {
+			if (invitation && invitation.status !== 'declined' && !invitation.deleted_flag) {
 				throw new Error('Invitation has been sent already');
 			}
 
@@ -94,33 +89,11 @@ function service(data) {
 				params.uuid = Math.random().toString(36).substr(2, 9);
 				params.created_on = new Date();
 				params.parent_profile_id = data.profile.id;
-				params.user_id = user;
+				params.user_id = user.id;
+				params.status = 'pending'
+				params.deleted_flag = null;
 
-				// copy existing profile to new profile object
-				/*                
-                let newProfile = {};
 
-				params.collaborator_role_id = collaboratorRoleId;
-
-				let paramsToCopy = {
-					...userProfile
-				};
-				paramsToCopy.role_id = params.collaborator_role_id;
-				paramsToCopy.user_id = user.id;
-
-				paramsToCopy.parent_profile_id = globalProfileId;
-				paramsToCopy.created_on = new Date();
-
-				newProfile = paramsToCopy;
-
-				let newProfileContact = {
-					/*
-                                   contact_first_name: params.first_name,
-                                   contact_last_name: params.last_name,
-                                   contact_email: params.email, 
-					created_on: new Date()
-                };
-                */
 
 				return [params, models.profile.create(params), 'none'];
 			} else {
@@ -132,7 +105,8 @@ function service(data) {
 					models.user.create({
 						email: params.email,
 						uuid: uuid,
-						created_by: globalUserId
+						created_by: globalUserId,
+						status: 'active'
 					}),
 					'user-created'
 				];
@@ -155,19 +129,16 @@ function service(data) {
 					role_id: params.role_id,
 					user_id: created1.id,
 					parent_profile_id: globalProfileId,
-					uuid: Math.random().toString(36).substr(2, 9)
+					status: 'pending',
+					uuid: Math.random().toString(36).substr(2, 9),
+					created_on: new Date()
 				});
 				new_profile_id = new_profile.id;
 
-
 			}
-
-
 
 			// invitation token
 			let invite_token = await crypto.randomBytes(32).toString('hex');
-
-
 
 
 			// create a user invite record
@@ -181,18 +152,21 @@ function service(data) {
 					inviter: data.profile.id,
 					token: invite_token,
 					profile_created_id: new_profile_id, // we need to track the profile that was created as a result of this process
-					user_created_id: created2 == 'user-created' ? created1.id : null
+					user_created_id: created2 == 'user-created' ? created1.id : GLOBAL_USER.id
 				}
 			});
 
 
 			if (!invitation[1]) {
-				invitation[0].update({
-					status: 'pending'
+				await invitation[0].update({
+					status: 'pending',
+					profile_created_id: new_profile_id, // replace the former instance with the new profile created,
+					user_created_id: created2 == 'user-created' ? created1.id : GLOBAL_USER.id
 				});
 			}
 
 			// send email
+			/*
 			let payload = {
 				context_id: 87,
 				sender: config.sender_email,
@@ -209,15 +183,61 @@ function service(data) {
 			} catch (e) {
 				// silent treatment. To be logged;
 			}
+			*/
+
+
+
+
+			// send email 
+			const emailPayload = {
+				//userName: GLOBAL_USER ? GLOBAL_USER.first_name + ' ' + GLOBAL_USER.last_name || GLOBAL_USER.business_name || '' : created1.first_name + ' ' + created1.last_name || created1.business_name || '', // existing team member
+				lenderFullName: data.user.first_name ? data.user.first_name + ' ' + data.user.last_name : data.user.business_name,
+				lenderName: data.user.first_name ? data.user.first_name + ' ' + data.user.last_name : data.user.business_name,
+				memberAcceptURL: "",
+				memberDeclineURL: config.base_url + 'team/reject?token=' + invite_token
+			}
+
+			let INVITATION_EMAIL_CONTEXT_ID = 93;
+			let recipient = null;
+
+			if (GLOBAL_USER) {
+				recipient = GLOBAL_USER.email
+				emailPayload.userName = GLOBAL_USER.first_name ? GLOBAL_USER.first_name + ' ' + GLOBAL_USER.last_name : '';
+				emailPayload.memberAcceptURL = config.base_url + 'team/accept?token=' + invite_token
+
+
+				// if user had already been invited by some, he won't have a name or firstname
+				if (!emailPayload.userName) {
+					INVITATION_EMAIL_CONTEXT_ID = 94;
+					emailPayload.memberAcceptURL = config.base_url + 'signup/team?token=' + invite_token
+
+				}
+
+
+			} else {
+				INVITATION_EMAIL_CONTEXT_ID = 94;
+				recipient = created1.email;
+				emailPayload.userName = created1.first_name ? created1.first_name + ' ' + created1.last_name : '';
+				emailPayload.memberAcceptURL = config.base_url + 'signup/team?token=' + invite_token
+
+			}
+
+			try {
+				send_email(INVITATION_EMAIL_CONTEXT_ID, recipient, emailPayload);
+			} catch (e) {
+				// silent treatement
+			}
 
 			// audit log
 			let audit_description = "sent invitation to a potential team member";
+
 			if (GLOBAL_USER_EXISTS) audit_description = " with user id " + GLOBAL_USER.id
 			let audit_log = new AuditLog(data.reqData, "CREATE", 'sent invitation to a potential team member')
 			await audit_log.create();
 			d.resolve('Invited team member');
 		})
 		.catch((err) => {
+			console.log(err.stack);
 			d.reject(err);
 		});
 

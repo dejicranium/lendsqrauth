@@ -88,8 +88,6 @@ function service(data) {
             if (data.interest) data.where.interest = data.interest
 
 
-
-
             data.include = [{
                     model: models.collection,
                     attributes: ['id'],
@@ -110,7 +108,29 @@ function service(data) {
                         }
                     }]
                 }
-            ] // do not show deleted products 
+            ]
+
+            if (data.search) {
+                data.where.$or = [{
+                        product_name: {
+                            $like: '%' + data.search + '%'
+                        }
+                    },
+                    {
+                        uuid: {
+                            $like: '%' + data.search + '%'
+                        }
+                    },
+                    {
+                        product_description: {
+                            $like: '%' + data.search + '%'
+                        }
+                    },
+                ];
+            }
+
+
+            // do not show deleted products 
 
 
 
@@ -135,14 +155,12 @@ function service(data) {
             }
 
 
-            if (data.status) data.where.status = {
-                $like: '%' + data.status + '%'
-            }
-
+            if (data.status) data.where.status = data.status
 
             data.order = [
                 ['id', 'DESC']
             ]
+            data.distinct = true;
 
 
             return [
@@ -160,14 +178,14 @@ function service(data) {
                 delete products.collections
                 d.resolve(products);
             }
-
-            products.rows = JSON.parse(JSON.stringify(products.rows))
-            products.rows.map(p => {
-
-                p.num_of_borrowers = p.collections.length;
-                delete p.collections;
-                return p
-            })
+            /*
+                        products.rows = JSON.parse(JSON.stringify(products.rows))
+                        products.rows.map(p => {
+                        
+                            p.num_of_borrowers = p.collections.length;
+                            delete p.collections;
+                            return p
+                        })*/
             d.resolve(paginate(products.rows, 'products', products.count, data.limit, data.page));
         })
         .catch((err) => {

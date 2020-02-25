@@ -16,7 +16,11 @@ module.exports = (sequelize, DataTypes) => {
     state: DataTypes.STRING,
     meta: DataTypes.TEXT,
     country: DataTypes.STRING,
-    deleted_flag: DataTypes.BOOLEAN,
+    deleted_flag: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: 0
+    },
+
     created_by: DataTypes.INTEGER,
     modified_on: DataTypes.DATE,
     modified_by: DataTypes.DATE,
@@ -24,9 +28,9 @@ module.exports = (sequelize, DataTypes) => {
     deleted_by: DataTypes.INTEGER,
     created_on: {
       type: DataTypes.DATE,
+      defaultValue: new Date()
     },
   }, {
-    freezeTableName: true,
     timestamps: false
   });
   business_info.associate = function (models) {

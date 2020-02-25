@@ -3,6 +3,9 @@ let config = require('../config')
 const makeRequest = require('mlar')('makerequest');
 const q = require('q')
 const moment = require('moment');
+const models = require('mlar')('models');
+const normalizeTenor = require('../utils/collections').normalizeTenor;
+const resolveCollectionStartDate = require('../utils/collections').resolveStartDate;
 
 
 module.exports = {
@@ -37,72 +40,21 @@ module.exports = {
             user_id: data.user_id
         }
         q.fcall(() => {
-            let url = config.wallet_service_base_url + 'wallets';
-            return makeRequest(url, 'POST', payload, constants.requestHeaders, 'create wallet');
-        })
+                let url = config.wallet_service_base_url + 'wallets';
+                return makeRequest(url, 'POST', payload, constants.requestHeaders, 'create wallet');
+            })
             .then(response => {
-                console.log(response);
+                //console.log(response);
                 d.resolve(response)
             })
             .catch(err => {
-                console.log(err);
+                //console.log(err);
                 d.reject(err);
             });
 
         return d.promise
     },
 
-    notifyLoanCreated(email) {
-        const d = q.defer();
-        q.fcall(() => {
-
-                let url = config.notif_base_url + 'email/send';
-                let payload = {
-                    sender_id: 1,
-                    context_id: 65,
-                    recipient: email,
-                    sender: config.sender_email,
-                    data: {}
-                }
-
-                return makeRequest(url, 'POST', payload, constants.requestHeaders, 'notify lender of loan created');
-            })
-            .then(response => {
-                d.resolve(response)
-            })
-            .catch(err => {
-                d.reject(err);
-            })
-
-        return d.promise
-    },
-
-    notifyProductCreated(email) {
-        const d = q.defer();
-        q.fcall(() => {
-
-                let url = config.notif_base_url + 'email/send';
-                let payload = {
-                    sender_id: 1,
-                    context_id: 66,
-                    recipient: email,
-                    sender: config.sender_email,
-                    data: {
-
-                    }
-                }
-
-                return makeRequest(url, 'POST', payload, constants.requestHeaders, 'notify product creation');
-            })
-            .then(response => {
-                d.resolve(response)
-            })
-            .catch(err => {
-                d.reject(err);
-            })
-
-        return d.promise
-    },
 
     createCollectionSchedule(data) {
 
@@ -116,6 +68,16 @@ module.exports = {
         */
 
         let tenor_type_value = null;
+        let collection_frequency = null;
+
+        // normalize the tenor;
+
+        let normalizedTenor = normalizeTenor(data.tenor, data.tenor_type, data.num_of_collections, data.collection_frequency);
+        data.tenor = normalizedTenor[0];
+        data.tenor_type = normalizedTenor[1];
+
+        data.start_date = resolveCollectionStartDate(data.start_date); // resolve when collection should start -
+
         switch (data.tenor_type) {
             case 'days':
                 tenor_type_value = 0;
@@ -133,70 +95,74 @@ module.exports = {
                 tenor_type_value = 1;
 
         }
-        console.log('tenor type is ' + data.tenor_type)
-        console.log('tenor type value is ' + tenor_type_value)
+        switch (data.collection_frequency) {
+            case 'daily':
+                collection_frequency = 0;
+                break;
+            case 'weekly':
+                collection_frequency = 1;
+                break;
+            case 'monthly':
+                collection_frequency = 2;
+                break;
+            default:
+                collection_frequency = 1;
+        }
+        let repayment_model = null;
 
 
-        const d = q.defer()
-        /*
-        let params = {
-            "dateFormat": "dd MMMM yyyy",
-            "locale": "en_GB",
-            "productId": 1,
-            "clientId": 1,
-            "principal": "200000.00",
-            "loanTermFrequency": 12,
-            "loanTermFrequencyType": 2,
-            "numberOfRepayments": 10,
-            "repaymentEvery": 1,
-            "repaymentFrequencyType": 2,
-            "interestRatePerPeriod": 2,
-            "amortizationType": 1,
-            "interestType": 0,
-            "interestCalculationPeriodType": 1,
-            "expectedDisbursementDate": "20 September 2011",
-            "transactionProcessingStrategyId": 2,
-            "submittedOnDate": "20 September 2011",
-            "loanType": "individual",
+        switch (data.repayment_model) {
+            case 'equal installments':
+                repayment_model = 1;
+                break;
+            default:
+                repayment_model = 0;
         }
 
-        */
+
+
         let params = {
             "dateFormat": "dd MMMM yyyy",
             "locale": "en_GB",
             "productId": 1,
             "clientId": 1,
             "principal": data.amount,
-            "loanTermFrequency": data.tenor, // 12
+            "loanTermFrequency": data.tenor,
             "loanTermFrequencyType": tenor_type_value,
             "numberOfRepayments": data.num_of_collections,
             "repaymentEvery": 1,
-            "repaymentFrequencyType": tenor_type_value,
+            "repaymentFrequencyType": collection_frequency,
             "interestRatePerPeriod": data.interest,
-            "amortizationType": 1,
-            "interestType": 0,
+            "interestRateFrequencyType": data.interest_period,
+            "amortizationType": repayment_model,
+            "interestType": repayment_model == 1 ? 1 : 0,
             "interestCalculationPeriodType": 1,
-            "expectedDisbursementDate": moment(data.disbursement_date).format('DD MMMM YYYY'), //"20 September 2011"
+            "expectedDisbursementDate": moment(data.start_date).format('DD MMMM YYYY'), //"20 September 2011"
             "transactionProcessingStrategyId": 2,
             "submittedOnDate": moment().format('DD MMMM YYYY'), //"20 September 2011",
             "loanType": "individual",
         }
 
+        const d = q.defer();
+
         const url = config.mifos_base_url + `loans?command=calculateLoanSchedule`
 
         q.fcall(async () => {
+                //console.log('weerwer')
                 return makeRequest(url, 'POST', params, constants.mifos_headers, null, false);
             })
             .then(response => {
-
+                //if(!response) throw new Error(response);
                 //d.resolve(moment(data.disbursement_date).format('DD MMMM YYYY'))
-                console.log('response is ' + response)
-                console.log(response)
+                //console.log('response is ' + response);
+                // console.log(response)
                 d.resolve(response)
 
             })
             .catch(error => {
-                console.log(" error" + error)
+                //console.log(" error" + error);
+                // console.log(error.response.data.errors)
+
                 d.reject(error)
             })
 
@@ -239,12 +205,12 @@ module.exports = {
                 }
             };
             return makeRequest(url, "POST", payload, constants.requestHeaders, "send email to new active user");
-        }).then(sent=> {
+        }).then(sent => {
             if (!sent) throw new Error("Could not send email to new active user");
             else {
                 d.resolve(sent);
             }
-        }).catch(error=> {
+        }).catch(error => {
             d.reject(error);
         });
 
@@ -253,14 +219,14 @@ module.exports = {
 
     getBanks(data) {
         const d = q.defer();
-        q.fcall(()=> {
-            let url = config.utility_base_url + 'util/fetch/bank';
-            return makeRequest(url, 'GET', payload, constant.requestHeaders, 'get banks');
-        })
-            .then(response=> {
+        q.fcall(() => {
+                let url = config.utility_base_url + 'util/fetch/bank';
+                return makeRequest(url, 'GET', payload, constant.requestHeaders, 'get banks');
+            })
+            .then(response => {
                 d.resolve(response)
             })
-            .catch(err=> {
+            .catch(err => {
                 d.reject(err)
             })
 

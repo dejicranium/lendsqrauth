@@ -2,7 +2,7 @@ const models = require('mlar')('models');
 const obval = require('mlar')('obval');
 
 
-class AuditLog  {
+class AuditLog {
     constructor(reqData, action_type, action) {
         this.reqData = reqData;
         this.action_type = action_type;
@@ -20,7 +20,10 @@ class AuditLog  {
             delete r.profile.id;
         }
         let actor_id = r.user ? r.user.id : null;
-        let actor_meta = JSON.stringify({...r.profile, ipAddress: r.connection.remoteAddress});
+        let actor_meta = JSON.stringify({
+            ...r.profile,
+            ipAddress: r.connection.remoteAddress
+        });
         let action_type = this.action_type;
         let action = this.action;
         let date = new Date();
@@ -35,11 +38,10 @@ class AuditLog  {
 
         try {
             await models.audit_log.create(logData);
-        }
-        catch(e) {
+        } catch (e) {
             // silent treatement
-            console.log(e.stack);
-            //throw new Error(e);
+            //console.log(e.stack);
+            throw new Error(e);
         }
     }
 }

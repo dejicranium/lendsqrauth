@@ -18,7 +18,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     created_on: {
       type: DataTypes.DATE,
-      defaultValue: new Date()
+      defaultValue: new Date(),
     }
   }, {
     timestamps: false

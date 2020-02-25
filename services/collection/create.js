@@ -10,6 +10,8 @@ const crypto = require('crypto');
 const requests = require('mlar')('requests');
 const AuditLog = require('mlar')('audit_log');
 const sendCollectionCreatedEmail = require('../../utils/notifs/collection_created');
+const validateBorrowerBvnUniqueness = require('../../utils/collections').validateBorrowerBvnUniqueness
+const verifications = require('../../utils/verifications');
 
 var spec = morx.spec({})
 	.build('borrower_first_name', 'required:true, eg:lender')
@@ -27,17 +29,25 @@ function service(data) {
 
 	var d = q.defer();
 	const globalUserId = data.USER_ID || 1;
-	let invitation_data = {
-	};
+	let invitation_data = {};
 
 	q.fcall(async () => {
 			const validParameters = morx.validate(data, spec, {
 				throw_error: true
 			});
 			const params = validParameters.params;
+			params.created_on = new Date();
 
 			if (params.borrower_first_name.length < 3) throw new Error("Names must be more than 2 characters")
 			if (params.borrower_last_name.length < 3) throw new Error("Names must be more than 2 characters")
+
+			let requestUser = await models.user.findOne({
+				where: {
+					id: data.user.id
+				}
+			})
+
+			if (requestUser.email === params.borrower_email) throw new Error("You can't add yourself as a borrower");
 
 			assert.digitsOnly(params.borrower_bvn, null, 'BVN');
 			assert.digitsOnly(params.borrower_phone, null, 'Phone');
@@ -63,33 +73,10 @@ function service(data) {
 			);
 
 
-			const requestHeaders = {
-				'Content-Type': 'application/json',
-			};
+			await validateBorrowerBvnUniqueness(params.borrower_email, params.borrower_bvn);
+			await verifications.verifyBVN(params.borrower_bvn);
+			await verifications.verifyPhone(params.borrower_phone);
 
-			if (params.borrower_bvn) {
-				// first verify that there is a bvn
-				let url = config.utility_base_url + "verify/bvn";
-				let payload = {
-					bvn: params.borrower_bvn
-				};
-
-				let verifiedBVN = await makeRequest(url, 'POST', payload, requestHeaders, 'Verify BVN');
-
-				if (verifiedBVN && verifiedBVN.mobile) {} else {
-					throw new Error("Could not verify BVN");
-				}
-
-			}
-			// make request to verify phone number
-			const verifiedPhone = await makeRequest(
-				config.utility_base_url + 'verify/phone/',
-				'POST', {
-					phone: params.borrower_phone
-				},
-				requestHeaders,
-				'validate phone number'
-			)
 
 
 			let user_with_email_exists = false;
@@ -123,11 +110,13 @@ function service(data) {
 						role_id: borrower_role.id,
 						parent_profile_id: data.profile.id,
 						user_id: user_id,
+						created_on: new Date(),
+
 						uuid: Math.random().toString(36).substr(2, 9),
 					});
 				};
 
-				let create_new_user = function() {
+				let create_new_user = function () {
 					return models.user.create({
 						first_name: params.borrower_first_name,
 						last_name: params.borrower_last_name,
@@ -177,6 +166,11 @@ function service(data) {
 					}
 				} else {
 					let new_user = await create_new_user(); // create a new user
+
+					// create wallet;
+					let createWallet = require('../../utils/wallet').create;
+					await createWallet(new_user);
+
 					return [
 						create_new_borrower_profile(new_user.id),
 						'NEW-PROFILE',
@@ -191,7 +185,7 @@ function service(data) {
 				params.borrower_id = borrower_cred.id;
 			}
 
-			params.lender_id = data.profile.id; 	// set the lender profile to the person making this request
+			params.lender_id = data.profile.id; // set the lender profile to the person making this request
 			params.status = "draft";
 
 

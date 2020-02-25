@@ -33,7 +33,8 @@ function service(data) {
             const params = validParameters.params;
 
             data.where = {
-                borrower_id: data.profile_id
+                borrower_id: data.profile_id,
+                //status: 'active' // meaning collections that were not declined
             }
             data.include = [{
                 model: models.product

@@ -8,13 +8,28 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      contact_first_name: {
-        type: Sequelize.STRING
-      },
       profile_id: {
         type: Sequelize.INTEGER,
+        references: {
+          model: 'profiles',
+          key: 'id',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE'
       },
-      contact_last_name: {
+      contact_name: {
+        type: Sequelize.STRING
+      },
+      facebook_link: {
+        type: Sequelize.STRING
+      },
+      twitter_link: {
+        type: Sequelize.STRING
+      },
+      linkedin_link: {
+        type: Sequelize.STRING
+      },
+      instagram_link: {
         type: Sequelize.STRING
       },
       contact_phone: {
@@ -29,20 +44,32 @@ module.exports = {
       contact_role: {
         type: Sequelize.STRING
       },
-      deleted_on:{
+      deleted_on: {
         type: Sequelize.DATE,
-      } ,
-      deleted_by:{
+      },
+      deleted_by: {
         type: Sequelize.INTEGER,
-      } ,
-      created_on:{
+        references: {
+          model: 'users',
+          key: 'id',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE'
+      },
+      created_on: {
         type: Sequelize.DATE,
         allowNull: false,
-      } ,
-      created_by:{
+      },
+      created_by: {
         type: Sequelize.INTEGER,
-      } ,
-      modified_on:{
+        references: {
+          model: 'users',
+          key: 'id',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE'
+      },
+      modified_on: {
         type: Sequelize.DATE,
         allowNull: false,
         defaultValue: new Date()
@@ -50,6 +77,12 @@ module.exports = {
       },
       modified_by: {
         type: Sequelize.INTEGER,
+        references: {
+          model: 'users',
+          key: 'id',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE'
       }
     });
   },

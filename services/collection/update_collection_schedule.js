@@ -31,9 +31,6 @@ function service(data) {
                 params
             ]
 
-
-
-
         })
         .spread((schedule, params) => {
             if (!schedule) throw new Error("Schedule not found");
@@ -41,7 +38,7 @@ function service(data) {
             return schedule.update(params)
         }).then(response => {
             if (!response) throw new Error("There was an error updating the schedule");
-            d.resolve(response)
+            d.resolve("Updated schedule")
         })
         .catch((err) => {
 

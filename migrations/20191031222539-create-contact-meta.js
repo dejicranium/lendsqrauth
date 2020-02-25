@@ -11,20 +11,32 @@ module.exports = {
       meta: {
         type: Sequelize.TEXT
       },
-      deleted_on:{
+      deleted_on: {
         type: Sequelize.DATE,
-      } ,
-      deleted_by:{
+      },
+      deleted_by: {
         type: Sequelize.INTEGER,
-      } ,
-      created_on:{
+        references: {
+          model: 'users',
+          key: 'id',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'SET NULL'
+      },
+      created_on: {
         type: Sequelize.DATE,
         allowNull: false,
-      } ,
-      created_by:{
+      },
+      created_by: {
         type: Sequelize.INTEGER,
-      } ,
-      modified_on:{
+        references: {
+          model: 'users',
+          key: 'id',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'SET NULL'
+      },
+      modified_on: {
         type: Sequelize.DATE,
         allowNull: false,
         defaultValue: new Date()
@@ -32,6 +44,12 @@ module.exports = {
       },
       modified_by: {
         type: Sequelize.INTEGER,
+        references: {
+          model: 'users',
+          key: 'id',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'SET NULL'
       }
     });
   },

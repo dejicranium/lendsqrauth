@@ -11,6 +11,7 @@ function vinfo(req, res, next){
         service(data)
         .then(response => {
             utils.jsonS(res, response, "User has been deleted successfully"); 
+                                    
         })
         .catch(error => {
             utils.jsonF(res, null, error.message); 

@@ -18,6 +18,7 @@ function vinfo(req, res, next) {
         })
         .catch(error => {
             utils.jsonF(res, null, error.message);
+                                                
         })
 }
 

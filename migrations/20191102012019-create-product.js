@@ -8,8 +8,14 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      lender_id: {
-        type: Sequelize.INTEGER
+      profile_id: {
+        type: Sequelize.INTEGER,
+        references: {
+          model: 'profiles',
+          key: 'id',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'SET NULL'
       },
       product_name: {
         type: Sequelize.STRING
@@ -29,20 +35,22 @@ module.exports = {
       max_loan_amount: {
         type: Sequelize.DOUBLE
       },
-      min_tenor_type: {
+      uuid: {
         type: Sequelize.STRING
       },
+
       min_tenor: {
         type: Sequelize.STRING
       },
       max_tenor: {
         type: Sequelize.STRING
       },
-      max_tenor_type: {
-        type: Sequelize.STRING
-      },
+
       interest: {
         type: Sequelize.DOUBLE
+      },
+      interest_period: {
+        type: Sequelize.STRING
       },
       status: {
         type: Sequelize.STRING
@@ -50,32 +58,35 @@ module.exports = {
       url_slug: {
         type: Sequelize.STRING
       },
-      deleted_flag:{
+      deleted_flag: {
         type: Sequelize.BOOLEAN,
-      } ,
-      deleted_by:{
+      },
+      deleted_by: {
         type: Sequelize.INTEGER,
-      } ,
-      deleted_on:{
+      },
+      deleted_on: {
         type: Sequelize.DATE,
-      } ,
-      created_on:{
+      },
+      created_on: {
         type: Sequelize.DATE,
         allowNull: false,
         defaultValue: new Date()
-      } ,
-      created_by:{
+      },
+      created_by: {
         type: Sequelize.INTEGER,
-      } ,
-      modified_on:{
+      },
+      modified_on: {
         type: Sequelize.DATE,
         allowNull: false,
         defaultValue: new Date()
+      },
+      tenor_type: {
+        type: Sequelize.STRING,
 
       },
       modified_by: {
         type: Sequelize.INTEGER,
-  
+
       }
     });
   },

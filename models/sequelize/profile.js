@@ -8,7 +8,10 @@ module.exports = (sequelize, DataTypes) => {
     },
     parent_profile_id: DataTypes.INTEGER,
     uuid: DataTypes.STRING,
-    deleted_flag: DataTypes.BOOLEAN,
+    deleted_flag: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: 0
+    },
     created_by: DataTypes.INTEGER,
     modified_on: DataTypes.DATE,
     modified_by: DataTypes.DATE,
@@ -16,6 +19,7 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       defaultValue: 'active',
     },
+    status_reason: DataTypes.STRING,
     deleted_on: DataTypes.DATE,
     deleted_by: DataTypes.INTEGER,
   }, {
@@ -57,6 +61,10 @@ module.exports = (sequelize, DataTypes) => {
     });
     profile.hasMany(models.collection_schedules, {
       foreignKey: 'lender_id',
+
+    });
+    profile.hasOne(models.borrower_invites, {
+      foreignKey: 'profile_created_id',
 
     });
 

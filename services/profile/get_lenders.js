@@ -151,6 +151,10 @@ function service(data) {
 				delete data.to;
 			}
 
+			data.order = [
+				['id', 'DESC']
+			]
+
 			return models.profile.findAndCountAll(data);
 		})
 		.then((profile) => {
@@ -158,7 +162,7 @@ function service(data) {
 			d.resolve(paginate(profile.rows, 'profiles', profile.count, limit, page));
 		})
 		.catch((err) => {
-			console.log(err.stack);
+			//console.log(err.stack);
 			d.reject(err);
 		});
 

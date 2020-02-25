@@ -3,21 +3,25 @@ const service = require('mlar').mreq('services', 'auth/logout');
 const routemeta = require('mlar')('routemeta');
 const auth_middleware = require('mlar')('authmiddleware');
 
-function vinfo(req, res, next){ 
-        const data = {...req.body, ...req.query, ...req.headers, ...req.params};
-        data.USERID = req.user.id;
-        service(data)
+function vinfo(req, res, next) {
+    const data = {
+        ...req.body,
+        ...req.query,
+        ...req.headers,
+        ...req.params
+    };
+    service(data)
         .then(response => {
-            utils.jsonS(res, response, "User logged out successfully"); 
+            utils.jsonS(res, response, "User logged out successfully");
         })
         .catch(error => {
-            utils.jsonF(res, null, error.message); 
+            utils.jsonF(res, null, error.message);
+                                    
         })
 }
 
 vinfo.routeConfig = {};
-vinfo.routeConfig.path = "/logout"; 
-vinfo.routeConfig.method = "post"; 
-vinfo.routeConfig.middlewares = [auth_middleware, routemeta('auth_logout', 'none')];
+vinfo.routeConfig.path = "/logout";
+vinfo.routeConfig.method = "post";
+vinfo.routeConfig.middlewares = [routemeta('auth_logout', 'none')];
 module.exports = vinfo;
-

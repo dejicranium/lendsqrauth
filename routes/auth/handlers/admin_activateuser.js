@@ -16,7 +16,7 @@ function vinfo(req, res, next){
             utils.jsonS(res, response, "User account has been updated successfully"); 
         })
         .catch(error => {
-            utils.jsonF(res, null, error.message); 
+            utils.jsonF(res, null, error.message);             
         })
 }
 

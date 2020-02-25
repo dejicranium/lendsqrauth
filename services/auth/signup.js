@@ -1,4 +1,3 @@
-
 const models = require('mlar')('models');
 const morx = require('morx');
 const q = require('q');
@@ -106,14 +105,14 @@ function service(data) {
             }), params, role]
         })
         .spread(async (user, params, role) => {
-            if (user) throw new Error("User with these credentials exists");
+            if (user && user.password) throw new Error("User with these credentials exists");
             // set role
             params.role_id = role.id;
             delete params.type;
 
             params.created_on = new Date();
             params.uuid = Math.random().toString(36).substr(2, 9);
-            if (params.create_profile === true) {
+            if (params.create_profile === true && !user) {
                 return models.sequelize.transaction((t1) => {
                     // create a user and his profile            
                     return q.all([
@@ -121,7 +120,25 @@ function service(data) {
                             transaction: t1
                         }),
                         models.profile.create({
-                            role_id: params.role_id
+                            role_id: params.role_id,
+                            created_on: new Date()
+
+                        }, {
+                            transaction: t1
+                        })
+                    ]);
+                })
+            } else if (user && !user.password) {
+                return models.sequelize.transaction((t1) => {
+                    // create a user and his profile            
+                    return q.all([ /// in cases wheere user's information had been saved because he was invited by a user and had decined
+                        user.update(params, {
+                            transaction: t1
+                        }),
+                        models.profile.create({
+                            role_id: params.role_id,
+                            created_on: new Date()
+
                         }, {
                             transaction: t1
                         })
@@ -184,21 +201,34 @@ function service(data) {
                 let first_name = user.first_name ? user.first_name : user.business_name;
                 let last_name = user.first_name ? user.last_name : user.business_name;
 
-                await createWalletJob(first_name, last_name, user.id);
+                //await createWalletJob(first_name, last_name, user.id);
 
                 let verification_email_context_id = 109;
-                let welcome_email_context_id = 108;
-
                 let fullname = data.business_name || data.first_name + ' ' + data.last_name;
 
-                send_email(welcome_email_context_id, user.email, {
-                    lenderFullName: fullname,
-                    loginURL: config.base_url + '/login'
-                });
-                send_email(verification_email_context_id, user.email, {
+
+                await send_email(verification_email_context_id, user.email, {
                     lenderFullName: fullname,
                     verifyAccountURL: config.base_url + 'activate?token=' + userToken
-                })
+                });
+
+                let firstName = user.first_name || user.business_name;
+                let lastName = user.last_name || user.business_name;
+                let userId = user.id;
+                let service_access_key = '34$4l43*(z.er1*(7)&^'
+
+                await makeRequest(config.wallet_service_base_url + 'wallets/ext_create', 'POST', {
+                        firstname: firstName,
+                        lastname: lastName,
+                        service_access_key: service_access_key,
+                        user_id: userId
+                    }, {}, null, false, true).then(resp => {
+                        console.log(resp)
+                    })
+                    .catch(err => {
+                        //console.log(err)
+
+                    })
 
                 //await sendEmailJob(81, user.email, payload.data);  // welcome email
                 /*
@@ -226,10 +256,10 @@ function service(data) {
                 */
 
 
-            }
-            catch(e){
+            } catch (e) {
                 // silent treatmentto be logged;
-                throw new Error(e);
+                //throw new Error(e);
+                //throw new Error(e);
             }
 
 
@@ -241,8 +271,9 @@ function service(data) {
             d.resolve(user);
         })
         .catch((err) => {
-            console.log(err.stack);
+            //console.log(err.stack);
             d.reject(err);
+
 
         });
 

@@ -15,7 +15,13 @@ module.exports = {
         type: Sequelize.TEXT
       },
       actor_id: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        references: {
+          model: 'users',
+          key: 'id',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'SET NULL'
       },
       action: {
         type: Sequelize.TEXT,

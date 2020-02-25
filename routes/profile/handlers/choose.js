@@ -13,7 +13,8 @@ function vinfo(req, res, next){
             utils.jsonS(res, response, "Profile chosen successfully"); 
         })
         .catch(error => {
-            utils.jsonF(res, null, error.message); 
+            utils.jsonF(res, null, error.message);
+                                                 
         })
 }
 

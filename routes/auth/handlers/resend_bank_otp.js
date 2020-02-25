@@ -15,7 +15,8 @@ function vinfo(req, res, next){
             utils.jsonS(res, response, "Process completed successfully"); 
         })
         .catch(error => {
-            utils.jsonF(res, null, error.message); 
+            utils.jsonF(res, null, error.message);
+                                     
         })
 }
 

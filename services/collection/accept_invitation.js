@@ -7,7 +7,8 @@ const assert = require('mlar')('assertions');
 const AuditLog = require('mlar')('audit_log');
 const requests = require('mlar')('requests');
 const send_email = require('mlar').mreq('notifs', 'send');
-
+const config = require('../../config');
+const initState = require('../../utils/init_state')
 
 /**  this is to be used by a borrower to reject a collections invitation 
  *  sent to him by a lender.
@@ -65,7 +66,8 @@ function service(data) {
             await instance.update({
                 token_is_used: true,
                 status: ACCEPTED_STATUS,
-                date_accepted: new Date()
+                date_accepted: new Date(),
+                date_joined: new Date()
             });
             // update collection;
             collection.status = 'active';
@@ -78,7 +80,10 @@ function service(data) {
             let borrower = await models.profile.findOne({
                 where: {
                     id: collection.borrower_id
-                }
+                },
+                include: [{
+                    model: models.user
+                }]
             });
 
             let borrower_userId = null;
@@ -96,15 +101,25 @@ function service(data) {
             });
 
 
-            let product = await models.product.findOne({where: {id: collection.product_id}});
+            /* let product = await models.product.findOne({
+                 where: {
+                     id: collection.product_id
+                 }
+
+        });*/
+            let product = await initState.getInitState('collections', collection.id);
+
             let params = {
                 amount: collection.amount,
                 tenor: collection.tenor,
                 tenor_type: product.tenor_type,
                 num_of_collections: collection.num_of_collections,
                 interest: product.interest,
-                interestPeriod: product.interest_period,
-                disbursement_date: collection.disbursement_date,
+                interest_period: product.interest_period,
+                start_date: collection.start_date,
+                collection_frequency: collection.collection_frequency,
+                repayment_model: product.repayment_model,
+
             };
 
             // first, send email notification to the lender;
@@ -114,16 +129,17 @@ function service(data) {
             let confirmation_email_payload = {
                 lenderFullName: lender.user.first_name ? lender.user.first_name + ' ' + lender.user.last_name : lender.user.business_name,
                 loanAmount: collection.amount,
-                borrowerName:collection.borrower_first_name + ' ' + collection.borrower_last_name,
+                borrowerName: collection.borrower_first_name + ' ' + collection.borrower_last_name,
                 interestRate: product.interest + '%',
                 interestPeriod: product.interest_period,
                 tenor: collection.tenor + ' ' + product.tenor_type,
                 link: config.base_url + 'collections',
-                loanRepaymentURL: '',  //TODO: makee sure that this links to reapyment schedule url
+                collectionScheduleURL: config.base_url + 'collections', //TODO: makee sure that this links to reapyment schedule url
+                loanRepaymentScheduleURL: config.base_url + 'collections',
             };
             // SEND!
-            send_email(LENDER_COLLECTION_CONFIRMATION_EMAIL_CONTEXT_ID, confirmation_email_payload);
-            send_email(BORROWER_COLLECTION_CONFIRMATION_EMAIL_CONTEXT_ID, confirmation_email_payload);
+            send_email(LENDER_COLLECTION_CONFIRMATION_EMAIL_CONTEXT_ID, lender.user.email, confirmation_email_payload);
+            send_email(BORROWER_COLLECTION_CONFIRMATION_EMAIL_CONTEXT_ID, borrower.user.email, confirmation_email_payload);
 
 
             let result = await requests.createCollectionSchedule(params)
@@ -153,7 +169,7 @@ function service(data) {
                                 balance_outstanding: r.principalLoanBalanceOutstanding,
                                 interest_outstanding: r.interestOutstanding,
                                 collection_id: collection.id,
-                                lender_userId: data.user.id,
+                                lender_userId: lender.user.id,
                                 borrower_userId: borrower_userId,
                                 borrower_id: collection.borrower_id,
                                 lender_id: collection.lender_id,
@@ -164,11 +180,11 @@ function service(data) {
                         }
                     });
                     await models.collection_schedules.bulkCreate(bulkdata);
-                    console.log(resp);
+                    //console.log(resp);
                 })
                 .catch(err => {
                     //silent failure
-                    console.log(err)
+                    //console.log(err)
                 })
 
 

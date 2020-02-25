@@ -29,7 +29,7 @@ module.exports = {
       created_on:{
         type: Sequelize.DATE,
         allowNull: false,
-        defaultValue: new Date();
+        defaultValue: new Date(),
       } ,
       created_by:{
         type: Sequelize.INTEGER,

@@ -1,18 +1,25 @@
-const bunyan = require('bunyan');
+const scrubber = require('mlar')('obscrub');
+const SCRUBVALS = require('./utils/scrubvals.json');
+//const logger = require('pino')();
+const reqIp = require('request-ip');
 
+const scrubs = SCRUBVALS;
 
-
-module.exports = bunyan.createLogger({
-    name: 'lendsqr_log',
-    streams: [
-        /*{
-            level: 'info',
-            stream: process.stdout,
-        },*/
-        {
-            level: 'info',
-            path: '/Users/dejiatoyebi/Documents/omega/lendiauth/logs.json'  // log ERROR and above to a file
-        }
+const logger = null;
+try {
+  logger = require('winston-logstash-transport').createLogger(null, {
+    application: 'lendsqr',
+    format: winston.format.json(),
+    logstash: {
+      host: '3.18.62.42',
+      port: 5000
+    },
+    transports: [
+      new winston.transports.Console(),
     ]
-})
+  })
+} catch (e) {
+  // fail silently;
+}
 
+module.exports = logger;

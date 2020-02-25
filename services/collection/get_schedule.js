@@ -22,9 +22,9 @@ function service(data) {
                 include: [{
                         model: models.collection
                     },
-                    {
-                        model: models.product
-                    },
+                    /* {
+                         model: models.product
+                     },*/
 
                 ]
             })
@@ -38,6 +38,18 @@ function service(data) {
             }
 
             schedule = JSON.parse(JSON.stringify(schedule));
+            schedule.collection = JSON.parse(JSON.stringify(schedule.collection));
+
+            let product = await models.collection_init_state.findOne({
+                where: {
+                    collection_id: schedule.collection.id
+                }
+            })
+
+            schedule.collection.product = JSON.parse(product.state);
+
+
+
             let lender = await models.profile.findOne({
                 where: {
                     id: schedule.lender_id

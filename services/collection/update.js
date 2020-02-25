@@ -2,17 +2,18 @@ const models = require('mlar')('models');
 const ErrorLogger = require('mlar')('errorlogger');
 const morx = require('morx');
 const q = require('q');
-const validators = require('mlar')('validators');
 const assert = require('mlar')('assertions');
 const requests = require('mlar')('requests');
 const makeRequest = require('mlar')('makerequest');
 const config = require('../../config');
 const resolvers = require('mlar')('resolvers');
-const collection_utils = require('mlar')('collection_utils');
 const AuditLog = require('mlar')('audit_log');
 const moment = require('moment');
 const send_email = require('mlar').mreq('notifs', 'send');
-
+const detect_change = require('mlar')('detectchange');
+const validateCollectionSetup = require('../../utils/collections').validateSetup;
+const validateDateThresholds = require('../../utils/collections').validateDateThresholds;
+const initState = require('../../utils/init_state');
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
 var spec = morx
@@ -39,7 +40,6 @@ var spec = morx
 function service(data) {
     var d = q.defer();
     const globalUserId = data.USER_ID || 1;
-    let tenor_just_added = false;
 
     q
         .fcall(async () => {
@@ -60,7 +60,16 @@ function service(data) {
             if (!collection || !collection.id) throw new Error('Could not find collection');
             if (collection.status === 'active') throw new Error('Cannot update an active collection');
 
-            if ((params.start_date || collection.start_date) &&  (params.disbursement_date || collection.disbursement_date)) {
+
+
+
+
+
+
+
+
+
+            if ((params.start_date || collection.start_date) && (params.disbursement_date || collection.disbursement_date)) {
                 let start_date = params.start_date || collection.start_date;
                 let disbursement_date = params.disbursement_date || collection.disbursement_date;
                 if (!moment(start_date).isAfter(disbursement_date) && !moment(start_date).isSame(disbursement_date, 'day')) throw new Error("Start date cannot be before disbursement date")
@@ -102,37 +111,86 @@ function service(data) {
             // see whether there is a product id attached to the collection or if user is trying to input one
 
             if (collection.product_id) {
-                product = await models.product.findOne({
+                /*product = await models.product.findOne({
                     where: {
                         id: collection.product_id
                     }
-                });
+                });*/
+                // get init state 
+                product = await initState.getInitState('collections', collection.id);
+
             } else if (params.product_id) {
                 product = await models.product.findOne({
                     where: {
                         id: params.product_id
                     }
                 });
+
+
+                // store state
+                await initState.storeState(product, 'collections', collection.id);
+
             } else {
                 //throw new Error('You need to provide a product id to proceed');
 
                 // if there's no product id, we are updating the stuff at the first stage
-                 let result = await collection.update({
+                let result = await collection.update({
                     borrower_first_name: params.borrower_first_name,
                     borrower_last_name: params.borrower_last_name,
                     borrower_bvn: params.borrower_bvn,
                     borrower_phone: params.borrower_phone
                 });
                 d.resolve(result);
-                 return  d.promise;
+                return d.promise;
             }
 
+
+
+
+
+
+
             if (!product || !product.id) throw new Error('Product does not exist');
+
+
+            let tenor = params.tenor || collection.tenor;
+            let tenor_type = product.tenor_type;
+            let frequency = params.collection_frequency || collection.frequency;
+            let collections = params.num_of_collections || collection.num_of_collections;
+
+
+
+
+            if (tenor && tenor_type && frequency && collections) {
+                // first , validate date thresholds
+                validateDateThresholds(tenor, tenor_type, collections, frequency);
+
+                let end_result = validateCollectionSetup(tenor, tenor_type, collections, frequency);
+                let can_proceed = end_result.can_proceed;
+
+                if (!can_proceed) {
+
+                    throw new Error(`You need to review your loan settings. With ${collections} collections, each set to occur on a ${frequency} basis, \
+                    the last date of collection is (${end_result.collection_end}), which is beyond the date, (${end_result.tenor_end}, that this loan should have closed.`)
+                }
+            }
+
+
+
+
+
             if (product.status !== 'active')
                 throw new Error("You cannot create a collection for a product that isn't active");
             if (product.profile_id !== data.profile.id)
                 throw new Error("You can't use a product that isn't attached to this profile");
 
+
+            if (params.collection_frequency) {
+                let accepted = ['daily', 'weekly', 'monthly'];
+                if (!accepted.includes(params.collection_frequency.toLowerCase())) {
+                    throw new Error(`Collection frequency should be one of ${accepted.join(', ')}`)
+                }
+            }
 
             if (params.amount) {
                 assert.digitsOrDecimalOnly(params.amount, null, 'Amount');
@@ -164,21 +222,23 @@ function service(data) {
             if (params.borrower_email) assert.emailFormatOnly(params.borrower_email, null, 'Email');
 
             if (params.disbursement_date) assert.dateFormatOnly(params.disbursement_date, null, 'Disbursement Date');
+            if (new Date(params.disbursement_date).getFullYear().toString() == "1970") params.disbursement_date = null;
+
+
             if (params.disbursement_mode) {
                 if (!['cash', 'transfer'].includes(params.disbursement_mode.toLowerCase()))
                     throw new Error("Disbursement mode should be either cash or transfer")
             }
             if (params.loan_status) {
-                if (!['disbursed', 'active', 'past due'].includes(params.loan_status.toLowerCase()))
-                    throw new Error("Loan status should be one of disbursed, active or past due")
+                if (!['disbursed', 'active', 'past_due', 'approved'].includes(params.loan_status.toLowerCase()))
+                    throw new Error("Loan status should be one of disbursed, approved, active or past due")
             }
-
             if (params.start_date) assert.dateFormatOnly(params.start_date, null, 'Start Date');
 
             if (params.num_of_collections) {
                 assert.digitsOnly(params.num_of_collections, null, 'No. of collections');
+                assert.greaterThanZero(params.num_of_collections, null, 'Number of collections');
             }
-
             return [product, collection, params];
         })
         .spread((product, collection, params) => {
@@ -191,8 +251,6 @@ function service(data) {
             //params.profile_id = data.profile.id
             params.modified_on = new Date();
             params.modified_by = globalUserId;
-
-            tenor_just_added = !collection.tenor && params.tenor; // tenor_just_added was declared at the beginning of the function
 
             return [
                 collection.update({
@@ -233,49 +291,59 @@ function service(data) {
 
                     if (new_status === 'inactive' && collection.status !== 'inactive') {
                         // prepare email
-                        let lender_name =
-                            data.user.business_name || data.user.first_name + ' ' + data.user.last_name;
+                        /* let lender_name =
+                             data.user.business_name || data.user.first_name + ' ' + data.user.last_name;
 
 
-                        let email_payload = {
-                            lenderFullName: lender_name,
-                            loanAmount: collection.amount + ` NGN`,
-                            interestRate: product.interest+  " %",
-                            interestPeriod: product.interest_period,
-                            tenor: collection.tenor + ' ' + product.tenor_type,
-                            borrowersFullName: collection.borrower_first_name + ' ' + collection.borrower_last_name,
-                            rejectURL: config.base_url + 'signup/borrower/reject?token=',
-                            acceptURL: config.base_url + 'signup/borrower/accept?token=',
-                            link: config.base_url + 'collections'
-                        };
+                         let email_payload = {
+                             lenderFullName: lender_name,
+                             loanAmount: collection.amount + ` NGN`,
+                             interestRate: product.interest + " %",
+                             interestPeriod: product.interest_period,
+                             tenor: collection.tenor + ' ' + product.tenor_type,
+                             borrowersFullName: collection.borrower_first_name + ' ' + collection.borrower_last_name,
+                             rejectURL: config.base_url + 'signup/borrower/reject?token=',
+                             acceptURL: config.base_url + 'signup/borrower/accept?token=',
+                             collectionURL: config.base_url + 'collections'
+                         };
 
-                        /// send collection set up email;
-                        let COLLECTION_SETUP_EMAIL_CONTEXT_ID = 105;
-                        send_email(COLLECTION_SETUP_EMAIL_CONTEXT_ID, data.user.email, email_payload);
+                         /// send collection set up email;
+                         let COLLECTION_SETUP_EMAIL_CONTEXT_ID = 105;
+                         //send_email(COLLECTION_SETUP_EMAIL_CONTEXT_ID, data.user.email, email_payload);
 
-                        let invitation = await models.borrower_invites.findOne({
-                            where: {
-                                collection_id: collection.id,
-                            }
-                        });
+                         let invitation = await models.borrower_invites.findOne({
+                             where: {
+                                 collection_id: collection.id,
+                             }
+                         });
 
-                        if (invitation && invitation.id) {
-                            /// get the user record so that we can define whether or not we are inviting a new user or not
-                            let borrower = await models.profile.findOne({where: {id: collection.borrower_id},
-                                include: [{model:models.user}] });
+                         invitation.next_reminder_date = moment().add(4, 'days'); //post date the next invitation
+                         await invitation.save();
 
-                            let borrower_is_new_user = !borrower.user || !borrower.user.password;
 
-                            if (borrower_is_new_user) {
-                                email_payload.acceptURL = config.base_url + 'signup/borrower?token=' + invitation.token;
-                            }
-                            else {
-                                email_payload.acceptURL += invitation.token;
-                            }
-                            email_payload.rejectURL += invitation.token;
-                        }
+                         if (invitation && invitation.id) {
+                             /// get the user record so that we can define whether or not we are inviting a new user or not
+                             let borrower = await models.profile.findOne({
+                                 where: {
+                                     id: collection.borrower_id
+                                 },
+                                 include: [{
+                                     model: models.user
+                                 }]
+                             });
 
-                        await requests.inviteBorrower(collection.borrower_email, email_payload);
+                             let borrower_is_new_user = !borrower.user || !borrower.user.password;
+
+                             if (borrower_is_new_user) {
+                                 email_payload.acceptURL = config.base_url + 'signup/borrower?token=' + invitation.token + '&email=' + collection.borrower_email;
+                             } else {
+                                 email_payload.acceptURL = config.base_url + 'login?email=' + collection.borrower_email + '&token=' + invitation.token;
+                             }
+                             email_payload.rejectURL += invitation.token;
+                         }
+
+                         await requests.inviteBorrower(collection.borrower_email, email_payload);
+                         */
                     }
 
                     if (new_status === 'inactive') {
@@ -361,6 +429,8 @@ function service(data) {
             d.resolve(collection);
         })
         .catch((err) => {
+            //console.log(err.stack);
+
             d.reject(err);
         });
 
