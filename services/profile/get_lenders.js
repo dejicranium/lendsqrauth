@@ -150,6 +150,9 @@ function service(data) {
 				};
 				delete data.to;
 			}
+			if (data.status) {
+				data.where.status = data.status;
+			}
 
 			data.order = [
 				['id', 'DESC']
