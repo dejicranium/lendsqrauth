@@ -225,6 +225,7 @@ function service(data) {
                     name: 'admin'
                 }
             });
+
             if (!user) {
 
                 // create a new user with profile admin
@@ -243,7 +244,11 @@ function service(data) {
                     ]);
                 })
             } else {
-
+                // for development, update last name -- temporary stuff
+                if (!user.last_name) {
+                    user.last_name = params.last_name;
+                    await user.save();
+                }
                 return [user, models.profile.findOne({
                     where: {
                         user_id: user.id,
