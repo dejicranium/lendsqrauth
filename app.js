@@ -12,8 +12,8 @@ try {
   }
   const fullEnvPath = './config/env' + envPath + '.json';
   // console.log(fullEnvPath);
-  var envJSON = require(fullEnvPath);
-  for (var envProp in envJSON) {
+  const envJSON = require(fullEnvPath);
+  for (let envProp in envJSON) {
     process.env[envProp] = envJSON[envProp];
   }
   //console.log(envJSON);
@@ -29,13 +29,13 @@ const apm = require('elastic-apm-node').start({
   ignoreUrls: ['/api/v1']
 });
 
-var models = require('./models/sequelize');
-var express = require('express');
-var appConfig = require('./config/app');
-var bodyParser = require('body-parser');
-var path = require('path');
+const models = require('./models/sequelize');
+const express = require('express');
+const appConfig = require('./config/app');
+const bodyParser = require('body-parser');
+const path = require('path');
 
-var app = express();
+const app = express();
 const apis_auth = require('./routes/auth');
 const apis_profile = require('./routes/profile');
 const apis_product = require('./routes/product');
@@ -46,9 +46,9 @@ const apis_audit = require('./routes/audit');
 const apis_onboarding = require('./routes/onboarding');
 
 // const runn = require('./runn');
-var utils = require('mlar')('mt1l');
+const utils = require('mlar')('mt1l');
 
-var get_collection_schedules = require('mlar')('job_get_schedule');
+const get_collection_schedules = require('mlar')('job_get_schedule');
 
 const EndpointRouter = require('express').Router();
 //var routes = require('./routes');
@@ -87,7 +87,7 @@ app.use(
 );
 app.use(bodyParser.json());
 
-app.use(function (req, res, next) {
+app.use(function(req, res, next) {
   res.header('Access-Control-Allow-Origin', '*');
   res.header(
     'Access-Control-Allow-Headers',
@@ -154,7 +154,7 @@ app.use(function (req, res, next) {
 
 const base = '/api/v1';
 
-app.get(base, function (req, res, next) {
+app.get(base, function(req, res, next) {
   res.json({
     base: 1.0,
     env: process.env.NODE_ENV
@@ -176,7 +176,7 @@ Handle 404
 */
 //app.use(mosh.initMoshErrorHandler);
 
-app.use(base, function (req, res, next) {
+app.use(base, function(req, res, next) {
   utils.jsonF(res, null, `Undefined ${req.method} route access`);
 
   // res.json({m: `Undefined ${req.method} route access`})
@@ -188,9 +188,9 @@ console.log('Config file is ' + process.env.base_url);
 
 //get_collection_schedules();
 
-var force_sync = process.env.FORCESYNC ? true : false;
+const force_sync = process.env.FORCESYNC ? true : false;
 
-var stage = process.env.NODE_ENV || 'development-local';
+const stage = process.env.NODE_ENV || 'development-local';
 
 console.log('environment is ' + process.env.NODE_ENV);
 if (
@@ -205,8 +205,8 @@ if (
     .sync({
       force: force_sync
     })
-    .then(function () {
-      app.listen(appConfig.port, function () {
+    .then(function() {
+      app.listen(appConfig.port, function() {
         //runWorker();
         console.log(appConfig.name, 'is running on port', appConfig.port);
       });
