@@ -58,6 +58,7 @@ function service(data) {
 
             await collection.save();
             await invite.save();
+            await borrower.save();
 
 
             let product = await models.collection_init_state.findOne({
