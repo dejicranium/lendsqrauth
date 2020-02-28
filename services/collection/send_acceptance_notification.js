@@ -13,12 +13,7 @@ const config = require('../../config');
 const initState = require('../../utils/init_state');
 const calculateFees = require('mlar')('feeCalc').calculate;
 
-/**  this is to be used by a borrower to reject a collections invitation 
- *  sent to him by a lender.
- * 
- * The Lenderr should be notified about the outcome
- *   
- */
+
 var spec = morx.spec({}).build('collection_id', 'required:true').end();
 
 function service(data) {
@@ -41,13 +36,21 @@ function service(data) {
                     where: {
                         collection_id: params.collection_id
                     }
-                })
+                }),
+
             ];
         })
         .spread(async (collection, invite) => {
             if (!collection) throw new Error('Could not find collection');
 
+            const borrower = await models.profile.findOne({
+                where: {
+                    id: collection.borrower_id
+                }
+            })
 
+
+            borrower.status = 'active';
             invite.status = 'Accepted';
             invite.token_is_used = true;
             invite.date_joined = new Date();
