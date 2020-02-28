@@ -36,7 +36,6 @@ function service(data) {
 
         })
         .then(async (profile) => {
-            =
 
             if (!profile) throw new Error("User doesn't own this profile");
 
