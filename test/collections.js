@@ -82,7 +82,7 @@ describe('#Collections', function () {
     it('Accept collection invitation', async () => {
 
         sendAcceptNotification({
-                collection_id: 2,
+                collection_id: 9,
                 user: {
                     business_name: "Cranium Tech"
                 }

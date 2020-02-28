@@ -12,6 +12,7 @@ function productHasActiveCollection(product) {
         }
         return false;
     }
+    return false;
 }
 
 function validateSetup(tenor, tenor_type, collections, frequency) {

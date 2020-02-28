@@ -37,7 +37,14 @@ function service(data) {
                 //status: 'active' // meaning collections that were not declined
             }
             data.include = [{
-                model: models.product
+                model: models.product,
+                include: [{
+                    model: models.profile,
+                    include: [{
+                        model: models.user,
+                        attributes: ['business_name', 'first_name', 'last_name']
+                    }]
+                }]
             }]
 
             return models.collection.findAndCountAll(data);

@@ -68,7 +68,7 @@ function service(data) {
 					}
 				}, {
 					model: models.borrower_invites,
-					attributes: ['date_joined', 'borrower_name', 'collection_id'],
+					attributes: ['date_joined', 'status', 'borrower_name', 'collection_id'],
 
 					include: [{
 						model: models.collection,
@@ -80,6 +80,10 @@ function service(data) {
 				// if a lender is making the request, get only his borrowers
 				if (['individual_lender', 'business_lender'].includes(data.profile.role)) {
 					data.where.parent_profile_id = data.profile.id
+				}
+
+				if (data.status) {
+					data.where.status = data.status
 				}
 			}
 			data.order = [
