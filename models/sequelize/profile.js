@@ -65,7 +65,7 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: 'lender_id',
 
     });
-    profile.hasOne(models.borrower_invites, {
+    profile.hasMany(models.borrower_invites, {
       foreignKey: 'profile_created_id',
 
     });
