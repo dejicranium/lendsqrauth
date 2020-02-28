@@ -81,6 +81,10 @@ function service(data) {
 				if (['individual_lender', 'business_lender'].includes(data.profile.role)) {
 					data.where.parent_profile_id = data.profile.id
 				}
+
+				if (data.status) {
+					data.where.status = data.status
+				}
 			}
 			data.order = [
 				['id', 'DESC']
