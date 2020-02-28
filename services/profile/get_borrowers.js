@@ -85,6 +85,33 @@ function service(data) {
 				if (data.status) {
 					data.where.status = data.status
 				}
+
+				if (data.search) {
+					data.include[0].where = {
+						$or: [{
+								last_name: {
+									$like: '%' + data.search + '%'
+								}
+							},
+							{
+								first_name: {
+									$like: '%' + data.search + '%'
+								}
+							},
+							{
+								uuid: {
+									$like: '%' + data.search + '%'
+								}
+							}
+						]
+					};
+					delete data.search;
+					if (data.first_name) delete data.first_name;
+					if (data.last_name) delete data.last_name;
+					if (data.business_name) delete data.business_name;
+					if (data.uuid) delete data.uuid;
+
+				}
 			}
 			data.order = [
 				['id', 'DESC']
