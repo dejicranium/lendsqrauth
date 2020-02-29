@@ -21,7 +21,7 @@ module.exports = {
     utility_base_url: process.env.utility_base_url || 'https://v2-test.lendsqr.com/api/v1/util/',
 
 
-    base_url: process.env.base_url || 'http://staging-lb-978527258.us-east-2.elb.amazonaws.com/',
+	 base_url: process.env.base_url || 'https://staging.lendsqr.com/',
 
 
     admin_reg_token: process.env.admin_reg_token || 'saraytheiconoclast%32$6',
