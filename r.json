@@ -39,7 +39,6 @@
 	"getBanks": "/utils/getbanks",
 	"notifs": "/utils/notifs",
 	"detectchange": "/utils/detectchange",
-	"job_get_schedule": "/jobs/get_collections_due",
 	"mocks": "/mocks",
 	"queue": "/queue",
 	"feeCalc": "/services/fees/index"
