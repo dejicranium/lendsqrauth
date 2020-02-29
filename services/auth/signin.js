@@ -27,6 +27,11 @@ function deactivatedMessage() {
     return `You can't access this account, please contact <a href="${supportMail}">${supportMail}</a> for further enquiries`
 }
 
+function deactivatedMessage() {
+    const supportMail = config.admin_notification_email
+    return `You can't access this account, please contact <a href="${supportMail}">${supportMail}</a> for further enquiries`
+}
+
 function service(data) {
 
     var d = q.defer();
