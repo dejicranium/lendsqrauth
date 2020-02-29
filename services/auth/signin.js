@@ -17,6 +17,10 @@ var spec = morx.spec({})
     .build('password', 'required:true, eg:tinatona98')
     .build('email', 'required:true, eg:tinaton@gmail.com')
     .end();
+function deactivatedMessage() {
+    const supportMail = config.admin_notification_email
+    return `You can't access this account, please contact <a href="${supportMail}">${supportMail}</a> for further enquiries`
+}
 
 function deactivatedMessage() {
     const supportMail = config.admin_notification_email
