@@ -12,6 +12,20 @@ const moment = require('moment');
 const AuditLog = require('mlar')('audit_log');
 
 
+/**
+ * Delete bank info module
+ * Implemented to soft delete bank account
+ * @module auth/bankinfo.delete
+ *
+ * @typdef {Object} ModulePayload
+ * @property {string} user_id - id of user
+ * @property {string} id - id of bank record to delete
+
+ * @param {ModulePayload} data - The {@link ModulePayload} payload
+ * @returns {Promise} -  bank details that was soft deleted
+ */
+
+
 var spec = morx.spec({})
     .build('user_id', 'required: true')
     .build('id', 'required: true')
