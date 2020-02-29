@@ -17,23 +17,27 @@ var spec = morx.spec({})
     .build('password', 'required:true, eg:tinatona98')
     .build('email', 'required:true, eg:tinaton@gmail.com')
     .end();
+function deactivatedMessage() {
+    const supportMail = config.admin_notification_email
+    return `You can't access this account, please contact <a href="${supportMail}">${supportMail}</a> for further enquiries`
+}
 
 function service(data) {
 
     var d = q.defer();
     q.fcall(async () => {
-            var validParameters = morx.validate(data, spec, {
-                throw_error: true
-            });
-            let params = validParameters.params;
+        var validParameters = morx.validate(data, spec, {
+            throw_error: true
+        });
+        let params = validParameters.params;
 
-            assert.emailFormatOnly(params.email); // validate email, throw error if it's some weird stuff
-            return [models.user.findOne({
-                where: {
-                    email: params.email
-                }
-            }), params]
-        })
+        assert.emailFormatOnly(params.email); // validate email, throw error if it's some weird stuff
+        return [models.user.findOne({
+            where: {
+                email: params.email
+            }
+        }), params]
+    })
         .spread(async (user, params) => {
             if (!user) throw new Error("Invalid credential(s)");
 
@@ -67,20 +71,21 @@ function service(data) {
 
         })
         .spread(async (user, token, user_profiles) => {
+            if (user.status === 'blacklisted') throw new Error(deactivatedMessage());
             if (user.status !== 'active') throw new Error('User is inactive');
 
             // ids of the user's profiles 
             user_profiles = user_profiles.map(profile => profile.id);
 
             let newToken = await jwt.sign({
-                    profiles: user_profiles,
-                    email: user.email,
-                    user_id: user.id,
-                    subtype: user.subtype
-                },
+                profiles: user_profiles,
+                email: user.email,
+                user_id: user.id,
+                subtype: user.subtype
+            },
                 config.JWTsecret, {
-                    expiresIn: config.JWTexpiresIn
-                })
+                expiresIn: config.JWTexpiresIn
+            })
 
             if (!token) {
                 // create and store token
