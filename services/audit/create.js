@@ -16,14 +16,16 @@ var spec = morx.spec({})
     .end();
 
 function service(data) {
-    let params = morx.validate(data, spec, {throw_error:true}).params;
+    let params = morx.validate(data, spec, {
+        throw_error: true
+    }).params;
     q.fcall(() => {
         let audit = new AuditLog(params.reqData, params.action_type, params.action);
         return audit.create();
-    }) .then(resp=> {
+    }).then(resp => {
         if (!resp) throw new Error("Could not create audit log");
         d.resolve(resp);
-    }) .catch(err=> {
+    }).catch(err => {
         d.reject(err)
     });
     return d.promise;
