@@ -22,10 +22,10 @@ const getBVNVerificationData = require('../../utils/bank').getLocalBVNVerificati
  * @module auth/bankinfo.add
  *
  * @typdef {Object} ModulePayload
- * @property {string} bvn - bank verification number
+ * @property {integer} bvn - bank verification number
  * @property {string} account_number - account number to be added
- * @property {string} bank_code - code of the bank to be added
- * @property {string} otp - optional one timee password to verify
+ * @property {integer} bank_code - code of the bank to be added
+ * @property {integer} otp - optional one timee password to verify
  * 
  * @param {ModulePayload} data - The {@link ModulePayload} payload
  * @returns {Promise} -  confirmation text

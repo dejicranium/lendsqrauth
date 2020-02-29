@@ -10,7 +10,7 @@ const getBanks = require('mlar')('getBanks');
  * @module auth/bankinfo.get
  *
  * @typdef {Object} ModulePayload
- * @property {string} user_id - id of user
+ * @property {integer} user_id - id of user
 
  * @param {ModulePayload} data - The {@link ModulePayload} payload
  * @returns {Promise} -  bank details

@@ -1,15 +1,24 @@
 const models = require('mlar')('models');
-const ErrorLogger = require('mlar')('errorlogger');
 const morx = require('morx');
 const q = require('q');
-const bcrypt = require('bcrypt');
-const validators = require('mlar')('validators');
-const obval = require('mlar')('obval');
-const assert = require('mlar')('assertions');
-const crypto = require('crypto');
-const DEFAULT_EXCLUDES = require('mlar')('appvalues').DEFAULT_EXCLUDES;
-const moment = require('moment');
 const requests = require('mlar')('requests');
+
+/**
+ * Update bankinfo module
+ * Implemented to update bank account
+ * @module auth/bankinfo.update
+ *
+ * @typdef {Object} ModulePayload
+ * @property {integer} id - id of bank record
+ * @property {string} account_number - new account number
+ * @property {integer} bank_code - new bank code
+ * @property {boolean} disable - flag to determine whether to disable bank record
+ * @property {boolean} default - flag to determine whether to default bank record
+ * @property {boolean} active - flaag to determine whether to activatee bank record
+
+ * @param {ModulePayload} data - The {@link ModulePayload} payload
+ * @returns {Promise} -  bank details
+ */
 
 
 var spec = morx.spec({})
@@ -63,6 +72,8 @@ function service(data) {
                 }).catch(err => {
                     throw new Error("Bank account is invalid")
                 })
+
+
             } else if (params.bank_code) {
                 if (!params.account_number) {
                     params.account_number = bankdetails.account_number

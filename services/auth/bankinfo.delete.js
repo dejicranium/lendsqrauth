@@ -10,8 +10,8 @@ const AuditLog = require('mlar')('audit_log');
  * @module auth/bankinfo.delete
  *
  * @typdef {Object} ModulePayload
- * @property {string} user_id - id of user
- * @property {string} id - id of bank record to delete
+ * @property {integer} user_id - id of user
+ * @property {integer} id - id of bank record to delete
 
  * @param {ModulePayload} data - The {@link ModulePayload} payload
  * @returns {Promise} -  bank details that was soft deleted
