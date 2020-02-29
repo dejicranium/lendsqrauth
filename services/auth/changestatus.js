@@ -1,13 +1,22 @@
 const models = require('mlar')('models');
-const ErrorLogger = require('mlar')('errorlogger');
 const morx = require('morx');
 const q = require('q');
-const bcrypt = require('bcrypt');
-const validators = require('mlar')('validators');
-const obval = require('mlar')('obval');
-const assert = require('mlar')('assertions');
-const DEFAULT_EXCLUDES = require('mlar')('appvalues').DEFAULT_EXCLUDES;
 const AuditLog = require('mlar')('audit_log');
+
+/**
+ * Change status module
+ * Implemented to update user status
+ * @module auth/changestatu
+ *
+ * @typdef {Object} ModulePayload
+ * @property {integer} user_id - id of user
+ * @property {string} status - new status
+ * @property {reason} confirm_password - reason for changing status
+ 
+ * @param {ModulePayload} data - The {@link ModulePayload} payload
+ * @returns {Promise} -  confirmation text
+ */
+
 
 var spec = morx.spec({})
     .build('user_id', 'required:true') // to be used by admin

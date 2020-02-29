@@ -14,7 +14,7 @@ const notifications = require("../../utils/notifs/account_notifications");
  * @property {integer} user_id - id user to blacklist
  * @property {string} reason - the reason
  * @param {ModulePayload} data - The {@link ModulePayload} payload
- * @returns {Promise} -  confirmation text;
+ * @returns {Promise} -  confirmation text
  */
 
 
