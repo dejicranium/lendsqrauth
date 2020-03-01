@@ -124,7 +124,6 @@ function service(data) {
 		})
 		.then((profile) => {
 			if (!profile) throw new Error("No profiles");
-			d.resolve(profile)
 			profile.rows = JSON.parse(JSON.stringify(profile.rows));
 			let final_response = [];
 
