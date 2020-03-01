@@ -40,7 +40,7 @@ class AuditLog {
             await models.audit_log.create(logData);
         } catch (e) {
             // silent treatement
-            //console.log(e.stack);
+            console.log(e.stack);
             throw new Error(e);
         }
     }

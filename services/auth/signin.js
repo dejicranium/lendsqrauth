@@ -139,7 +139,7 @@ function service(data) {
             d.resolve(response)
         })
         .catch((err) => {
-            //console.log(err.stack)
+            console.log(err.stack)
             d.reject(err);
 
         });

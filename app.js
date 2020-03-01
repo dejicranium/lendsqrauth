@@ -16,9 +16,9 @@ try {
   for (let envProp in envJSON) {
     process.env[envProp] = envJSON[envProp];
   }
-  //console.log(envJSON);
+  console.log(envJSON);
 } catch (e) {
-  //console.log(e);
+  console.log(e);
 }
 //========================
 
@@ -127,8 +127,8 @@ app.use(function(req, res, next) {
   res._request = reqlog;
 
   //elasticLog.info(JSON.Sreqlog);
-  //console.log('req.id req.id ' + reqid)
-  //console.log('**userId ' + req.user.id)
+  console.log('req.id req.id ' + reqid)
+  console.log('**userId ' + req.user.id)
 
   /*
     logger({
