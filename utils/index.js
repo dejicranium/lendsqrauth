@@ -68,7 +68,8 @@ function json_send(res, data, message, status, status_code, meta, is_error) {
 			elasticLog.info(logData)
 		}
 	}
-	catch(e) {
+	catch (e) {
+		console.log(e);
 		// fail silently
 	}
 	res.status(status_code).json(response_json);
@@ -84,6 +85,10 @@ EXPRESS_UTILS.jsonF = function (res, data, message) {
 
 EXPRESS_UTILS.json401 = function (res, data, message) {
 	json_send(res, data, message, 'error', 401);
+};
+
+EXPRESS_UTILS.json403 = function (res, data, message) {
+	json_send(res, data, message, 'error', 403);
 };
 
 EXPRESS_UTILS.log = function (thing_to_log, num, title) {

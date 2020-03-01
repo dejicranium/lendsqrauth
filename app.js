@@ -126,8 +126,7 @@ app.use(function (req, res, next) {
   res._request = reqlog;
 
   //elasticLog.info(JSON.Sreqlog);
-  console.log('req.id req.id ' + reqid)
-  console.log('**userId ' + req.user.id)
+
 
   /*
     logger({

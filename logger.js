@@ -1,11 +1,6 @@
-const scrubber = require('mlar')('obscrub');
-const SCRUBVALS = require('./utils/scrubvals.json');
-//const logger = require('pino')();
-const reqIp = require('request-ip');
+const winston = require('winston');
 
-const scrubs = SCRUBVALS;
-
-const logger = null;
+let logger = null;
 try {
   logger = require('winston-logstash-transport').createLogger(null, {
     application: 'lendsqr',
@@ -13,12 +8,10 @@ try {
     logstash: {
       host: '3.18.62.42',
       port: 5000
-    },
-    transports: [
-      new winston.transports.Console(),
-    ]
+    }
   })
 } catch (e) {
+  console.log(e);
   // fail silently;
 }
 
