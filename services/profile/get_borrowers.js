@@ -160,7 +160,7 @@ function service(data) {
 			d.resolve(paginate(profile.rows, 'profiles', profile.count, limit, page));
 		})
 		.catch((err) => {
-			d.reject(err.stack);
+			//d.reject(err.stack);
 			d.reject(err);
 
 		});
