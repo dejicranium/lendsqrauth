@@ -6,6 +6,7 @@ const assert = require('mlar')('assertions');
 const jwt = require('jsonwebtoken');
 const config = require('../../config');
 const AuditLog = require('mlar')('audit_log');
+const moment = require('moment');
 
 /**
  * Admin sign in module
@@ -35,31 +36,31 @@ function service(data) {
     let admin_role = null;
     var d = q.defer();
     q.fcall(async () => {
-            var validParameters = morx.validate(data, spec, {
-                throw_error: true
-            });
-            let params = validParameters.params;
+        var validParameters = morx.validate(data, spec, {
+            throw_error: true
+        });
+        let params = validParameters.params;
 
-            assert.emailFormatOnly(params.email); // validate email, throw error if it's some weird stuff
+        assert.emailFormatOnly(params.email); // validate email, throw error if it's some weird stuff
 
-            if (params.provider.toUpperCase() !== 'GOOGLE') throw new Error("Could not login user");
-            if (params.email.indexOf("lendsqr.com") < 0) throw new Error("3. Invalid admin credentials");
-            const jwt_decode = require('jwt-decode');
-            let idToken = jwt_decode(params.idToken);
+        if (params.provider.toUpperCase() !== 'GOOGLE') throw new Error("Could not login user");
+        if (params.email.indexOf("lendsqr.com") < 0) throw new Error("3. Invalid admin credentials");
+        const jwt_decode = require('jwt-decode');
+        let idToken = jwt_decode(params.idToken);
 
-            if (idToken.hd !== 'lendsqr.com') throw new Error("2. Invalid admin credentials");
-            if (!idToken.email_verified) throw new Error("1. Invalid admin credentials");
+        if (idToken.hd !== 'lendsqr.com') throw new Error("2. Invalid admin credentials");
+        if (!idToken.email_verified) throw new Error("1. Invalid admin credentials");
 
-            params.first_name = idToken.given_name;
-            params.last_name = idToken.family_name;
-            params.status = 'active';
+        params.first_name = idToken.given_name;
+        params.last_name = idToken.family_name;
+        params.status = 'active';
 
-            return [models.user.findOne({
-                where: {
-                    email: params.email
-                }
-            }), params]
-        })
+        return [models.user.findOne({
+            where: {
+                email: params.email
+            }
+        }), params]
+    })
         .spread(async (user, params) => {
             admin_role = await models.role.findOne({
                 where: {
@@ -121,16 +122,16 @@ function service(data) {
             }
 
             let newToken = await jwt.sign({
-                    id: profile.id,
-                    parent_profile_id: profile.parent_profile_id,
-                    email: user.email,
-                    user_id: user.id,
-                    role: 'admin',
-                    permissions: user_permissions
-                },
+                id: profile.id,
+                parent_profile_id: profile.parent_profile_id,
+                email: user.email,
+                user_id: user.id,
+                role: 'admin',
+                permissions: user_permissions
+            },
                 config.JWTsecret, {
-                    expiresIn: config.JWTexpiresIn
-                }
+                expiresIn: config.JWTexpiresIn
+            }
             )
 
             // we need to create a profile token, 
