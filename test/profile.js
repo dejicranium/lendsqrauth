@@ -120,7 +120,7 @@ describe('#Profile Service', function () {
             },
         }
         get_borrowers(data).then(resp => {
-            console.log(resp)
+            console.log(resp.rows[0]['borrower_invites'][0])
         }).catch(err => {
             console.log(err)
         })

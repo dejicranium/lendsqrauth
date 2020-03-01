@@ -124,6 +124,7 @@ function service(data) {
 		})
 		.then((profile) => {
 			if (!profile) throw new Error("No profiles");
+			d.resolve(profile)
 			profile.rows = JSON.parse(JSON.stringify(profile.rows));
 			let final_response = [];
 
@@ -159,7 +160,7 @@ function service(data) {
 			d.resolve(paginate(profile.rows, 'profiles', profile.count, limit, page));
 		})
 		.catch((err) => {
-
+			d.reject(err.stack);
 			d.reject(err);
 
 		});
