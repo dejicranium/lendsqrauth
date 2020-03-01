@@ -182,7 +182,7 @@ function service(data) {
                 expiresIn: config.JWTexpiresIn
             })
 
-            if (!token) {
+            if (!token || moment().isBefore(token.expiry)) {
                 // create and store token
                 return [user, profile_token, models.auth_token.create({
                     type: 'session',
@@ -192,11 +192,7 @@ function service(data) {
 
             }
             return [
-                user,
-                profile_token, token.update({
-                    token: newToken,
-                    is_used: 0
-                })
+                user, profile_token, token
             ]
 
 
