@@ -135,7 +135,7 @@ function service(data) {
 
 				if (prof.user.first_name || !prof.user.last_name) {
 
-					let denormalized_borrower_name = prof.borrower_invite.borrower_name ? prof.borrower_invite.borrower_name.split(' ') : [];
+					let denormalized_borrower_name = prof.borrower_invites[0].borrower_name ? prof.borrower_invites[0].borrower_name.split(' ') : [];
 
 					if (denormalized_borrower_name.length) {
 						profile_local.first_name = denormalized_borrower_name[0];
@@ -147,7 +147,7 @@ function service(data) {
 
 
 					if (!prof.user.email) {
-						prof.user.email = prof.borrower_invite.collection ? prof.borrower_invite.collection.borrower_email : ''
+						prof.user.email = prof.borrower_invites[0].collection ? prof.borrower_invites[0].collection.borrower_email : ''
 					}
 
 				}
