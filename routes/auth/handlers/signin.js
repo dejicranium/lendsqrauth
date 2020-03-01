@@ -1,6 +1,7 @@
 var utils = require('mlar')('mt1l');
 const service = require('mlar').mreq('services', 'auth/signin');
 const routemeta = require('mlar')('routemeta');
+const AccountBlacklisted = require('../../../utils/errors/account-blacklisted');
 
 
 function vinfo(req, res, next) {
@@ -17,8 +18,11 @@ function vinfo(req, res, next) {
             utils.jsonS(res, response, "User signed in successfully");
         })
         .catch(error => {
-            utils.jsonF(res, null, error.message);
-            
+            if (error instanceof AccountBlacklisted) {
+                utils.json403(res, {}, error.message);
+            } else {
+                utils.jsonF(res, null, error.message);
+            }
         })
 }
 
