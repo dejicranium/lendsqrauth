@@ -29,19 +29,6 @@ class TestBun {
             'deleteOnFind',
         ];
 
-
-
-        this.testRespStore = {}; // {label1: 1n}
-    }
-
-    storeResult(label, result) {
-        this.testRespStore[label] = result;
-    }
-
-    getResult(label) {
-        let result = this.testRespStore[label];
-        return result;
-
     }
 
 
@@ -88,6 +75,14 @@ class TestBun {
         let models = this.models;
         let func = null;
         let oldModelInstance = {};
+        let optionKeys = Object.keys(options);
+
+        optionKeys.forEach(option => {
+            if (!this.options.includes(option)) {
+                throw new Error(`${option} is not a valid option`)
+            }
+        })
+
         if (options.deleteOnFind) {
             // deleteOnFind should be an array
             let opts = {};

@@ -1,6 +1,5 @@
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
-
 const models = require('mlar')('models');
 const ErrorLogger = require('mlar')('errorlogger');
 const morx = require('morx');
@@ -11,8 +10,8 @@ const AuditLog = require('mlar')('audit_log');
 const requests = require('mlar')('requests');
 const send_email = require('mlar').mreq('notifs', 'send');
 const config = require('../../config');
-const initState = require('../../utils/init_state')
-const calculateFees = require('mlar')('feeCalc').calculate
+const initState = require('../../utils/init_state');
+const calculateFees = require('mlar')('feeCalc').calculate;
 
 /**  this is to be used by a borrower to reject a collections invitation 
  *  sent to him by a lender.
@@ -20,13 +19,12 @@ const calculateFees = require('mlar')('feeCalc').calculate
  * The Lenderr should be notified about the outcome
  *   
  */
-var spec = morx.spec({})
-    .build('collection_id', 'required:true')
-    .end();
+var spec = morx.spec({}).build('collection_id', 'required:true').end();
 
 function service(data) {
     var d = q.defer();
-    q.fcall(async () => {
+    q
+        .fcall(async () => {
             const validParameters = morx.validate(data, spec, {
                 throw_error: true
             });
@@ -44,17 +42,17 @@ function service(data) {
                         collection_id: params.collection_id
                     }
                 })
-            ]
+            ];
         })
         .spread(async (collection, invite) => {
-            if (!collection) throw new Error("Could not find collection");
+            if (!collection) throw new Error('Could not find collection');
 
-            // update invite to accepted.
-            invite.status = "Accepted"
+
+            invite.status = 'Accepted';
             invite.token_is_used = true;
             invite.date_joined = new Date();
-
             collection.status = 'active';
+
             await collection.save();
             await invite.save();
 
@@ -63,7 +61,7 @@ function service(data) {
                 where: {
                     collection_id: collection.id
                 }
-            })
+            });
             product = JSON.parse(product.state);
 
             let lender = await models.profile.findOne({
@@ -73,7 +71,7 @@ function service(data) {
                 include: [{
                     model: models.user
                 }]
-            })
+            });
 
             let borrower = await models.profile.findOne({
                 where: {
@@ -82,14 +80,15 @@ function service(data) {
                 include: [{
                     model: models.user
                 }]
-            })
+            });
 
             // first, send email notification to the lender;
             const LENDER_COLLECTION_CONFIRMATION_EMAIL_CONTEXT_ID = 104;
             const BORROWER_COLLECTION_CONFIRMATION_EMAIL_CONTEXT_ID = 103;
 
             let confirmation_email_payload = {
-                lenderFullName: lender.user.first_name ? lender.user.first_name + ' ' + lender.user.last_name : lender.user.business_name,
+                lenderFullName: lender.user.first_name ?
+                    lender.user.first_name + ' ' + lender.user.last_name : lender.user.business_name,
                 loanAmount: collection.amount,
                 borrowerName: collection.borrower_first_name + ' ' + collection.borrower_last_name,
                 interestRate: product.interest + '%',
@@ -97,12 +96,15 @@ function service(data) {
                 tenor: collection.tenor + ' ' + product.tenor_type,
                 link: config.base_url + 'collections',
                 collectionScheduleURL: config.base_url + 'collections', //TODO: makee sure that this links to reapyment schedule url
-                loanRepaymentURL: config.base_url + 'collections',
+                loanRepaymentURL: config.base_url + 'collections'
             };
             // SEND!
             send_email(LENDER_COLLECTION_CONFIRMATION_EMAIL_CONTEXT_ID, lender.user.email, confirmation_email_payload);
-            send_email(BORROWER_COLLECTION_CONFIRMATION_EMAIL_CONTEXT_ID, collection.borrower_email, confirmation_email_payload);
-
+            send_email(
+                BORROWER_COLLECTION_CONFIRMATION_EMAIL_CONTEXT_ID,
+                collection.borrower_email,
+                confirmation_email_payload
+            );
 
             let params = {
                 amount: collection.amount,
@@ -113,15 +115,14 @@ function service(data) {
                 interest_period: product.interest_period,
                 start_date: collection.start_date,
                 collection_frequency: collection.collection_frequency,
-                repayment_model: product.repayment_model,
+                repayment_model: product.repayment_model
             };
 
-            let result = await requests.createCollectionSchedule(params)
-                .then(async resp => {
+            let result = await requests
+                .createCollectionSchedule(params)
+                .then(async (resp) => {
                     let bulkdata = [];
-                    resp.periods.forEach(async r => {
-
-
+                    resp.periods.forEach(async (r) => {
                         if (resp.periods.indexOf(r) !== 0) {
                             /*
                             let borrower_userId = await models.profile.findOne({
@@ -147,36 +148,29 @@ function service(data) {
                                 borrower_userId: borrower.user.id,
                                 borrower_id: collection.borrower_id,
                                 lender_id: collection.lender_id,
-                                status: 'Pending',
+                                status: 'Pending'
                             };
                             bulkdata.push(period);
-
                         }
                     });
                     await models.collection_schedules.bulkCreate(bulkdata);
-                    // update collection end_date 
+                    // update collection end_date
                     await collection.update({
                         end_date: bulkdata[bulkdata.length - 1].due_date // due date of last collection schedule; //TODO: test this;
-                    })
-                    //console.log(resp);
+                    });
                 })
-                .catch(err => {
+                .catch((err) => {
                     //silent failure
-                    console.log(err)
-                })
+                    console.log(err);
+                });
 
-
-            d.resolve("Accepted the invitation")
-
+            d.resolve('Accepted the invitation');
         })
-
         .catch((error) => {
             d.reject(error);
-
-        })
+        });
 
     return d.promise;
-
 }
 service.morxspc = spec;
 module.exports = service;

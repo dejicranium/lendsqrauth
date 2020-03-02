@@ -13,7 +13,9 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue: 0
     },
     created_by: DataTypes.INTEGER,
-    modified_on: DataTypes.DATE,
+    modified_on: {
+      type: DataTypes.DATE,
+    },
     modified_by: DataTypes.DATE,
     status: {
       type: DataTypes.STRING,

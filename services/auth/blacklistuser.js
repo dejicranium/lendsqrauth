@@ -66,7 +66,7 @@ function service(data) {
                 ])
             })
 
-        }).then(async (user) => {
+        }).spread(async (user, collectionUpdated, collectionScheduleUpdated) => {
             if (!user) throw new Error("An error occurred while updating user's account");
             await notifications.userBlacklisted(user);
             data.reqData.user = JSON.parse(JSON.stringify(user));

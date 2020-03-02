@@ -38,7 +38,8 @@ function service(data) {
                         model: models.user,
                         attributes: {
                             exclude: DEFAULT_EXCLUDES
-                        }
+                        },
+
                     }]
                 }), params]
             } else {
@@ -47,6 +48,9 @@ function service(data) {
                     models.audit_log.findAndCountAll({
                         limit,
                         offset,
+                        order: [
+                            ['id', 'DESC']
+                        ],
                         include: [{
                             model: models.user,
                             attributes: {
