@@ -85,6 +85,33 @@ function service(data) {
 				if (data.status) {
 					data.where.status = data.status
 				}
+
+				if (data.search) {
+					data.include[0].where = {
+						$or: [{
+								last_name: {
+									$like: '%' + data.search + '%'
+								}
+							},
+							{
+								first_name: {
+									$like: '%' + data.search + '%'
+								}
+							},
+							{
+								uuid: {
+									$like: '%' + data.search + '%'
+								}
+							}
+						]
+					};
+					delete data.search;
+					if (data.first_name) delete data.first_name;
+					if (data.last_name) delete data.last_name;
+					if (data.business_name) delete data.business_name;
+					if (data.uuid) delete data.uuid;
+
+				}
 			}
 			data.order = [
 				['id', 'DESC']
@@ -108,7 +135,7 @@ function service(data) {
 
 				if (prof.user.first_name || !prof.user.last_name) {
 
-					let denormalized_borrower_name = prof.borrower_invite.borrower_name ? prof.borrower_invite.borrower_name.split(' ') : [];
+					let denormalized_borrower_name = prof.borrower_invites[0].borrower_name ? prof.borrower_invites[0].borrower_name.split(' ') : [];
 
 					if (denormalized_borrower_name.length) {
 						profile_local.first_name = denormalized_borrower_name[0];
@@ -120,7 +147,7 @@ function service(data) {
 
 
 					if (!prof.user.email) {
-						prof.user.email = prof.borrower_invite.collection ? prof.borrower_invite.collection.borrower_email : ''
+						prof.user.email = prof.borrower_invites[0].collection ? prof.borrower_invites[0].collection.borrower_email : ''
 					}
 
 				}
@@ -132,7 +159,7 @@ function service(data) {
 			d.resolve(paginate(profile.rows, 'profiles', profile.count, limit, page));
 		})
 		.catch((err) => {
-
+			//d.reject(err.stack);
 			d.reject(err);
 
 		});

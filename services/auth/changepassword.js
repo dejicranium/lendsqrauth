@@ -4,9 +4,27 @@ const q = require('q');
 const bcrypt = require('bcrypt');
 const assert = require('mlar')('assertions');
 const config = require('../../config');
-const makeRequest = require('mlar')('makerequest');
 const AuditLog = require('mlar')('audit_log');
 const send_email = require('mlar').mreq('notifs', 'send');
+
+const CHANGE_PASSWORD_EMAIL_CONTEXT_ID = 106;
+
+
+/**
+ * Change Password module
+ * Implemented to update bank account
+ * @module auth/changepassword
+ *
+ * @typdef {Object} ModulePayload
+ * @property {string} current_password - old password
+ * @property {string} new_password - new  password
+ * @property {integer} confirm_password - repitition of new passord
+ 
+ * @param {ModulePayload} data - The {@link ModulePayload} payload
+ * @returns {Promise} -  confirmation text
+ */
+
+
 
 var spec = morx.spec({})
     .build('current_password', 'required:true, eg:somethingsweet')
@@ -48,7 +66,6 @@ function service(data) {
             if (!generated_password) throw new Error("Could not generate new password");
 
             user.password = generated_password;
-
             // save user and invalidate already existing token.
             await models.auth_token.destroy({
                 where: {
@@ -63,26 +80,6 @@ function service(data) {
 
         }).then(async (user) => {
             if (!user) throw new Error("An error occured while updating user's account");
-
-            // prepare email;
-            /*const requestHeaders = {
-                'Content-Type' : 'application/json',
-            }
-            
-            // prepare email 
-            const payload = {
-                context_id: 79,
-                sender: config.sender_email,
-                recipient: user.email,e
-                sender_id: 1,
-            }
-            const url = config.notif_base_url + "email/send";
-            */
-            // send the change password email 
-            //await makeRequest(url, 'POST', payload, requestHeaders, 'send notification');
-
-            const CHANGE_PASSWORD_EMAIL_CONTEXT_ID = 106;
-
             send_email(CHANGE_PASSWORD_EMAIL_CONTEXT_ID, user.email, {
                 profileURL: config.base_url + '/'
             });
@@ -93,7 +90,7 @@ function service(data) {
             d.resolve("Successfully changed user's password");
         })
         .catch((err) => {
-            //console.log(err.stack);
+            console.log(err.stack);
             d.reject(err);
 
         });

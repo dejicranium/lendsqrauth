@@ -11,6 +11,7 @@ const DEFAULT_EXCLUDES = require('mlar')('appvalues').DEFAULT_EXCLUDES;
 const config = require('../../config');
 const jwt_decode = require('jwt-decode');
 const AuditLog = require('mlar')('audit_log');
+const AccountBlacklisted = require('../../utils/errors/account-blacklisted');
 
 
 var spec = morx.spec({})
@@ -20,7 +21,7 @@ var spec = morx.spec({})
 
 function deactivatedMessage() {
     const supportMail = config.admin_notification_email
-    return `You can't access this account, please contact <a href="${supportMail}">${supportMail}</a> for further enquiries`
+    return `You can't access this account, please contact ${supportMail} for further enquiries`
 }
 
 function service(data) {
@@ -72,7 +73,7 @@ function service(data) {
 
         })
         .spread(async (user, token, user_profiles) => {
-            if (user.status === 'blacklisted') throw new Error(deactivatedMessage());
+            if (user.status === 'blacklisted') throw new AccountBlacklisted(deactivatedMessage());
             if (user.status !== 'active') throw new Error('User is inactive');
 
             // ids of the user's profiles 
@@ -130,7 +131,7 @@ function service(data) {
             d.resolve(response)
         })
         .catch((err) => {
-            //console.log(err.stack)
+            console.log(err.stack)
             d.reject(err);
 
         });

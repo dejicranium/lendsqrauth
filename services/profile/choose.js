@@ -36,16 +36,25 @@ function service(data) {
 
         })
         .then(async (profile) => {
+
             if (!profile) throw new Error("User doesn't own this profile");
-            if (profile.status !== 'active') throw new Error("Profile is not active");
+
+            const borrower_role = await models.role.findOne({
+                where: {
+                    name: "borrower"
+                }
+            });
+            const borrower_role_id = borrower_role.id;
+            const profile_is_a_pending_borrower = profile.role_id == borrower_role_id && profile.status == 'pending';
+
+            if (profile.status !== 'active' && !profile_is_a_pending_borrower) throw new Error("Profile is not active");
             if (profile.deleted_flag) throw new Error("Profile has been deleted")
             // get permissions
             g_profile = profile;
             if (profile.status === 'inactive') {
                 throw new Error("Profile has been set to inactive");
             }
-            let permissions = await models.sequelize.query(`
-        SELECT p.name as name from permissions as p INNER JOIN entity_permissions AS ep ON p.id = ep.permission_id WHERE  (ep.entity = 'role' AND ep.entity_id = ${profile.role_id} ) OR (ep.entity = 'profile' AND ep.entity_id = ${profile.id}) `)
+            let permissions = await models.sequelize.query(`SELECT p.name as name from permissions as p INNER JOIN entity_permissions AS ep ON p.id = ep.permission_id WHERE  (ep.entity = 'role' AND ep.entity_id = ${profile.role_id} ) OR (ep.entity = 'profile' AND ep.entity_id = ${profile.id}) `)
             let role = await models.role.findOne({
                 where: {
                     id: profile.role_id

@@ -12,6 +12,27 @@ const AuditLog = require('mlar')('audit_log');
 const verifyAccountName = require('../../utils/bank').verifyAccountName
 const getBVNVerificationData = require('../../utils/bank').getLocalBVNVerificationData;
 
+
+
+
+/**
+ * Add bank info module
+ * Implemented to  add bank account
+ * Handles otp verification too
+ * @module auth/bankinfo.add
+ *
+ * @typdef {Object} ModulePayload
+ * @property {integer} bvn - bank verification number
+ * @property {string} account_number - account number to be added
+ * @property {integer} bank_code - code of the bank to be added
+ * @property {integer} otp - optional one timee password to verify
+ * 
+ * @param {ModulePayload} data - The {@link ModulePayload} payload
+ * @returns {Promise} -  confirmation text
+ */
+
+
+
 var spec = morx.spec({})
     .build('bvn', 'required:true')
     .build('account_number', 'required:true')
@@ -30,7 +51,6 @@ function service(data) {
     const requestHeaders = {
         'Content-Type': 'application/json',
     };
-
 
     q.fcall(async () => {
             const validParameters = morx.validate(data, spec, {
@@ -70,28 +90,21 @@ function service(data) {
                 throw new Error("A different account is already associated with this BVN");
             }
 
-
             // verify bvn and send otp 
             if (!params.otp) {
-
                 let url = config.utility_base_url + "verify/bvn";
-
                 let payload = {
                     bvn: params.bvn
                 };
-
-                let phoneNumberFromBVN = null;
-
                 let verifiedBVN = await makeRequest(url, 'POST', payload, requestHeaders, 'verify BVN');
-
+                let phoneNumberFromBVN = null;
                 if (verifiedBVN && verifiedBVN.mobile) {
                     phoneNumberFromBVN = verifiedBVN.mobile;
                 } else {
                     throw new Error("Could not verify BVN");
                 }
 
-
-                // store the fact that bvn has been berified 
+                // store the fact that bvn has been verified 
                 let verificationData = {
                     verified: 1,
                     bvn: params.bvn,
@@ -99,11 +112,8 @@ function service(data) {
                     user_id: data.user.id
                 }
 
-
                 // verify bank details 
-                await requests.verifyBank({
-                    ...params
-                }).then(resp => {
+                await requests.verifyBank(params).then(resp => {
                     if (!resp) throw new Error("Bank account is invalid")
                     verificationData.account_name = resp.account_name;
                 }).catch(err => {
@@ -127,12 +137,8 @@ function service(data) {
 
                 // generate otp 
                 let OTP = generateRandom('digits', 6);
-
-
                 // create verify bank OTP
-
                 //first check if there's one already;
-
                 let token_create = await models.auth_token.findOrCreate({
                     where: {
                         type: 'verify_bank_otp',
@@ -174,6 +180,7 @@ function service(data) {
             else {
 
                 let bvnverificationdata = await getBVNVerificationData(data.user.id, params.bvn);
+
                 // set thee account name
                 params.account_name = bvnverificationdata.account_name;
 
@@ -191,14 +198,10 @@ function service(data) {
 
                 // create account number;
                 params.user_id = globalUserId;
-
-                await models.user_bank.create({
-                    ...params
-                });
-
+                models.user_bank.create(params);
                 // if token has no issues, show success and flag as used
                 token.is_used = true;
-                await token.save();
+                token.save();
 
                 let audit_log = new AuditLog(data.reqData, "CREATE", "added a new bank account");
                 audit_log.create();

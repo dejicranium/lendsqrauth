@@ -1,27 +1,18 @@
 /*
 Attempt loading env files
 */
+
+if (process.env.NODE_ENV === 'live') {
+  require('dotenv').config({ path: 'live.env' });
+} else if (process.env.NODE_ENV === 'staging') {
+  require('dotenv').config({ path: 'staging.env' });
+} else {
+  require('dotenv').config({ path: 'devs.env' });
+}
+
+//========================
 require('./winston-workaround');
 const config = require('./config');
-
-try {
-  const appEnvProfile = process.env.ENV_PROFILE || '';
-  let envPath = '';
-  if (appEnvProfile) {
-    envPath = `.${appEnvProfile}`;
-  }
-  const fullEnvPath = './config/env' + envPath + '.json';
-  // console.log(fullEnvPath);
-  const envJSON = require(fullEnvPath);
-  for (let envProp in envJSON) {
-    process.env[envProp] = envJSON[envProp];
-  }
-  //console.log(envJSON);
-} catch (e) {
-  //console.log(e);
-}
-//========================
-
 const apm = require('elastic-apm-node').start({
   serviceName: 'auth-service',
   secretToken: config.apm_server_token,
@@ -47,8 +38,6 @@ const apis_onboarding = require('./routes/onboarding');
 
 // const runn = require('./runn');
 const utils = require('mlar')('mt1l');
-
-const get_collection_schedules = require('mlar')('job_get_schedule');
 
 const EndpointRouter = require('express').Router();
 //var routes = require('./routes');
@@ -127,8 +116,6 @@ app.use(function(req, res, next) {
   res._request = reqlog;
 
   //elasticLog.info(JSON.Sreqlog);
-  //console.log('req.id req.id ' + reqid)
-  //console.log('**userId ' + req.user.id)
 
   /*
     logger({
@@ -197,7 +184,7 @@ if (
   stage === 'development' ||
   stage === 'test' ||
   stage === 'local' ||
-  stage === 'production' ||
+  stage === 'live' ||
   stage === 'staging' ||
   stage === 'development-local'
 ) {

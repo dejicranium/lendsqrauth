@@ -44,7 +44,7 @@ module.exports = (url, method, payload, headers, caller = null, defaultheaders =
             response = response.data
         }
 
-        //console.log(response);
+        console.log(response);
         d.resolve(response);
     }).catch(err => {
         //(err.response.data.errors)

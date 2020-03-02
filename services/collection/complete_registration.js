@@ -271,7 +271,7 @@ function service(data) {
             })
         })
         .catch((error) => {
-            //console.log(error.stack)
+            console.log(error.stack)
             d.reject(error);
         })
 
