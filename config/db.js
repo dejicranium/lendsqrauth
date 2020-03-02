@@ -9,9 +9,9 @@ module.exports = {
   },
   live: {
     username: 'lender',
-    password: 'Su94LtyGwDx2aV7c',
-    database: 'lendsqr_auth',
-    host: 'staging.cyock39x6hx4.us-east-2.rds.amazonaws.com',
+    password: '8IG5EvP2EZxow3nY',
+    database: 'lendsqr_live',
+    host: 'live-2.cyock39x6hx4.us-east-2.rds.amazonaws.com',
     dialect: 'mysql'
   },
   staging: {
