@@ -1,18 +1,19 @@
 const models = require('mlar')('models');
-const ErrorLogger = require('mlar')('errorlogger');
 const morx = require('morx');
 const q = require('q');
-const bcrypt = require('bcrypt');
-const validators = require('mlar')('validators');
-const obval = require('mlar')('obval');
-const assert = require('mlar')('assertions');
-const crypto = require('crypto');
-const DEFAULT_EXCLUDES = require('mlar')('appvalues').DEFAULT_EXCLUDES;
-const moment = require('moment');
-const config = require('../../config');
-const makeRequest = require('mlar')('makerequest');
-const generateRandom = require('mlar')('testutils').generateRandom;
 const AuditLog = require('mlar')('audit_log');
+
+/**
+ * Accept invitation module
+ * Implemented to enable team members to accept collaboration invitation
+ * @module auth/accept_invitation
+ *
+ * @typdef {Object} ModulePayload
+ * @property {string} token - invitation token
+ * 
+ * @param {ModulePayload} data - The {@link ModulePayload} payload
+ * @returns {Promise} - Invitation accepted message
+ */
 
 var spec = morx
   .spec({})

@@ -44,7 +44,6 @@ function service(data) {
                 }), params]
             } else {
                 return [
-
                     models.audit_log.findAndCountAll({
                         limit,
                         offset,
@@ -69,6 +68,8 @@ function service(data) {
                 if (params.id) {
                     d.resolve({})
                 } else d.resolve([]);
+
+                // get one audit record
             } else if (params.id) {
                 resp = JSON.parse(JSON.stringify(resp));
                 resp.actor_meta = JSON.parse(resp.actor_meta);
@@ -82,6 +83,8 @@ function service(data) {
                     resp.verbose_description + "Anonymous user " + resp.action;
                 }
                 d.resolve(resp);
+
+                // get bulk
             } else {
                 resp = JSON.parse(JSON.stringify(resp));
 
@@ -102,7 +105,7 @@ function service(data) {
             }
         })
         .catch((err) => {
-            //console.log(err.stack)
+            console.log(err.stack)
             d.reject(err);
 
         });

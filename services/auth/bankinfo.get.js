@@ -1,15 +1,21 @@
 const models = require('mlar')('models');
-const ErrorLogger = require('mlar')('errorlogger');
 const morx = require('morx');
 const q = require('q');
-const bcrypt = require('bcrypt');
-const validators = require('mlar')('validators');
-const obval = require('mlar')('obval');
-const assert = require('mlar')('assertions');
-const crypto = require('crypto');
-const DEFAULT_EXCLUDES = require('mlar')('appvalues').DEFAULT_EXCLUDES;
-const moment = require('moment');
 const getBanks = require('mlar')('getBanks');
+
+
+/**
+ * Get bank info module
+ * Implemented to get bank account
+ * @module auth/bankinfo.get
+ *
+ * @typdef {Object} ModulePayload
+ * @property {integer} user_id - id of user
+
+ * @param {ModulePayload} data - The {@link ModulePayload} payload
+ * @returns {Promise} -  bank details
+ */
+
 
 var spec = morx.spec({})
     .build('user_id', 'required: true')
@@ -18,9 +24,6 @@ var spec = morx.spec({})
 function service(data) {
     var d = q.defer();
 
-
-    // decide whether to default user_id to the user making the request or not
-    // as we don't want people except admin viewing other people's bank details 
 
     q.fcall(async () => {
             const validation = morx.validate(data, spec, {

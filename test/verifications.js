@@ -15,11 +15,11 @@ describe('#Verifications', function () {
     it('verify bvn', async () => {
 
         verifications.verifyBVN('22294409275').then((result) => {
-                //console.log(result);
+                console.log(result);
                 result.should.be.a('string');
             })
             .catch(err => {
-                //console.log(err);
+                console.log(err);
             })
 
     })
@@ -27,11 +27,11 @@ describe('#Verifications', function () {
     it('verify phone', async () => {
 
         verifications.verifyPhone('08100455706').then((result) => {
-                //console.log(result);
+                console.log(result);
                 result.should.be.a('string');
             })
             .catch(err => {
-                //console.log(err);
+                console.log(err);
             })
 
     })

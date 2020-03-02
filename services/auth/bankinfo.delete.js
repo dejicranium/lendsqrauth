@@ -1,15 +1,21 @@
 const models = require('mlar')('models');
-const ErrorLogger = require('mlar')('errorlogger');
 const morx = require('morx');
 const q = require('q');
-const bcrypt = require('bcrypt');
-const validators = require('mlar')('validators');
-const obval = require('mlar')('obval');
-const assert = require('mlar')('assertions');
-const crypto = require('crypto');
-const DEFAULT_EXCLUDES = require('mlar')('appvalues').DEFAULT_EXCLUDES;
-const moment = require('moment');
 const AuditLog = require('mlar')('audit_log');
+
+
+/**
+ * Delete bank info module
+ * Implemented to soft delete bank account
+ * @module auth/bankinfo.delete
+ *
+ * @typdef {Object} ModulePayload
+ * @property {integer} user_id - id of user
+ * @property {integer} id - id of bank record to delete
+
+ * @param {ModulePayload} data - The {@link ModulePayload} payload
+ * @returns {Promise} -  bank details that was soft deleted
+ */
 
 
 var spec = morx.spec({})

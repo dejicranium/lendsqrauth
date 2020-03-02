@@ -111,7 +111,7 @@ function service(data) {
 						parent_profile_id: data.profile.id,
 						user_id: user_id,
 						created_on: new Date(),
-						status: 'active',
+						status: 'pending',
 						uuid: Math.random().toString(36).substr(2, 9),
 					});
 				};

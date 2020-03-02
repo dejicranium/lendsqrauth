@@ -226,7 +226,7 @@ function service(data) {
                         console.log(resp)
                     })
                     .catch(err => {
-                        //console.log(err)
+                        console.log(err)
 
                     })
 
@@ -271,7 +271,7 @@ function service(data) {
             d.resolve(user);
         })
         .catch((err) => {
-            //console.log(err.stack);
+            console.log(err.stack);
             d.reject(err);
 
 
