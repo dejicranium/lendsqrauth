@@ -2,7 +2,6 @@
 Attempt loading env files
 */
 
-process.env.NODE_ENV = 'live';
 if (process.env.NODE_ENV === 'live') {
   require('dotenv').config({ path: 'live.env' });
 } else if (process.env.NODE_ENV === 'staging') {
