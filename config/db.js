@@ -7,14 +7,13 @@ module.exports = {
     host: process.env.DEVHOST || 'staging.cyock39x6hx4.us-east-2.rds.amazonaws.com',
     dialect: 'mysql'
   },
-  production: {
-    username: process.env.PRODUN,
-    password: process.env.PRODPW,
-    database: process.env.PRODDB,
-    host: process.env.PRODHOST,
+  live: {
+    username: 'lender',
+    password: 'Su94LtyGwDx2aV7c',
+    database: 'lendsqr_auth',
+    host: 'staging.cyock39x6hx4.us-east-2.rds.amazonaws.com',
     dialect: 'mysql'
   },
-
   staging: {
     username: 'lender',
     password: 'Su94LtyGwDx2aV7c',
